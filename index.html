@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="./_static/favicon.ico">
   <title>Hong-p Docs</title>
   <style>
     :root {
@@ -89,8 +90,12 @@
       path: "specs/2026.2/incremental-backup-cbt.html",
       title: "Incremental Backup with CBT"
     }];
+    const knownTitles = {
+      "specs/2026.2/incremental-backup-cbt.html": "Incremental Backup with CBT"
+    };
 
     function titleFor(path) {
+      if (knownTitles[path]) return knownTitles[path];
       const name = path.split("/").pop().replace(/\.html$/, "");
       return name.replace(/[-_]+/g, " ").replace(/\b\w/g, letter =>
         letter.toUpperCase());
