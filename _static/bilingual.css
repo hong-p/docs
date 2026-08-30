@@ -1,0 +1,53 @@
+.bilingual-entry {
+  border-left: 3px solid #2a7ab0;
+  margin: -0.35rem 0 1.2rem 0.25rem;
+  padding: 0.45rem 0 0.45rem 0.85rem;
+}
+
+.bilingual-translation {
+  color: #23313d;
+  margin: 0;
+}
+
+.bilingual-translation strong,
+.bilingual-code-label strong,
+.bilingual-glossary-title strong {
+  color: #174c6f;
+  font-size: 0.82em;
+  letter-spacing: 0.02em;
+}
+
+.bilingual-text {
+  display: inline;
+}
+
+.bilingual-glossary {
+  background: #f5f8fa;
+  border: 1px solid #d6e1e8;
+  border-radius: 4px;
+  margin-top: 0.45rem;
+  padding: 0.55rem 0.75rem;
+}
+
+.bilingual-glossary-title {
+  margin: 0 0 0.25rem;
+}
+
+.bilingual-glossary ul {
+  margin-bottom: 0;
+}
+
+.bilingual-code-comments {
+  border-left: 3px solid #6f7d89;
+  margin: 0.2rem 0 1.2rem 0.25rem;
+  padding-left: 0.85rem;
+}
+
+.bilingual-code-label {
+  margin: 0 0 0.35rem;
+}
+
+.bilingual-code-comments pre,
+.bilingual-code-comment-ko {
+  white-space: pre-wrap;
+}
