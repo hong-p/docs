@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Simon과 Cinder CBT, 백업, QoS, KMS에 대해 이야기하기 위한 영어·한국어 회화 연습 자료">
+  <title>Simon Meeting Agenda | Cinder CBT</title>
+  <style>
+    :root {
+      --ink: #172235;
+      --muted: #66758c;
+      --paper: #f4f7fb;
+      --card: #ffffff;
+      --line: #dce4ee;
+      --navy: #101d36;
+      --blue: #2867d7;
+      --blue-soft: #edf3ff;
+      --orange: #e87543;
+      --green: #138779;
+      --shadow: 0 12px 30px rgba(28, 53, 91, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+        "Noto Sans KR", "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+    a { color: inherit; }
+    .hero {
+      color: #fff;
+      background:
+        radial-gradient(circle at 88% 10%, rgba(40, 103, 215, .45), transparent 33%),
+        radial-gradient(circle at 5% 95%, rgba(232, 117, 67, .28), transparent 28%),
+        linear-gradient(135deg, #0c1730, #142b58 58%, #1b4073);
+      padding: 48px 22px 58px;
+    }
+    .hero-inner, .content, .footer-inner { max-width: 1080px; margin: 0 auto; }
+    .eyebrow {
+      display: inline-block;
+      padding: 5px 10px;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 999px;
+      color: #dbe7ff;
+      background: rgba(255, 255, 255, .08);
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 760px;
+      margin: 18px 0 14px;
+      font-size: clamp(2.2rem, 6vw, 4.6rem);
+      line-height: 1.05;
+      letter-spacing: -.06em;
+    }
+    .hero p {
+      max-width: 720px;
+      margin-bottom: 22px;
+      color: #cfdbf1;
+      font-size: clamp(1rem, 2vw, 1.18rem);
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    button, .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 9px 14px;
+      border: 1px solid rgba(255, 255, 255, .24);
+      border-radius: 10px;
+      color: #fff;
+      background: rgba(255, 255, 255, .1);
+      font: inherit;
+      font-size: .9rem;
+      font-weight: 750;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    button:hover, .back-link:hover { background: rgba(255, 255, 255, .18); }
+    .topnav {
+      position: sticky;
+      z-index: 5;
+      top: 0;
+      border-bottom: 1px solid rgba(23, 34, 53, .1);
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 5px 18px rgba(27, 47, 78, .06);
+      backdrop-filter: blur(12px);
+    }
+    .nav-inner {
+      display: flex;
+      gap: 5px;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 8px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-inner a {
+      flex: 0 0 auto;
+      padding: 6px 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 750;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-inner a:hover { color: var(--blue); background: var(--blue-soft); }
+    .content { padding: 46px 18px 76px; }
+    .study-tip {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 42px;
+      padding: 17px 19px;
+      border: 1px solid #cbdaf8;
+      border-left: 5px solid var(--blue);
+      border-radius: 14px;
+      background: linear-gradient(110deg, #edf3ff, #fff);
+      box-shadow: var(--shadow);
+    }
+    .tip-icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      color: #fff;
+      background: var(--blue);
+      font-weight: 900;
+    }
+    .study-tip strong { display: block; margin-bottom: 2px; }
+    .study-tip p { margin: 0; color: #4a5b75; font-size: .9rem; }
+    .section {
+      scroll-margin-top: 58px;
+      margin-bottom: 58px;
+    }
+    .section-kicker {
+      margin-bottom: 5px;
+      color: var(--blue);
+      font-size: .72rem;
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    h2 {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 17px;
+      color: var(--ink);
+      font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+      line-height: 1.2;
+      letter-spacing: -.045em;
+    }
+    h2 small {
+      color: var(--muted);
+      font-size: .88rem;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 25px 0 10px;
+      color: #30445f;
+      font-size: 1rem;
+      letter-spacing: -.02em;
+    }
+    .section-intro {
+      margin-bottom: 15px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .pair {
+      margin: 10px 0;
+      padding: 13px 16px 12px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--orange);
+      border-radius: 12px;
+      background: var(--card);
+      box-shadow: 0 5px 16px rgba(28, 53, 91, .045);
+    }
+    .english, .korean { margin: 0; }
+    .english {
+      color: var(--ink);
+      font-size: 1rem;
+      font-weight: 760;
+      line-height: 1.48;
+    }
+    .korean {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #d8e0ea;
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.55;
+    }
+    .label {
+      margin: 23px 0 8px;
+      color: var(--green);
+      font-size: .8rem;
+      font-weight: 800;
+    }
+    .terms {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+    .term {
+      margin: 0;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .term .english { font-size: .88rem; }
+    .term .korean {
+      margin-top: 5px;
+      padding-top: 5px;
+      font-size: .82rem;
+    }
+    .numbered { counter-reset: question; }
+    .numbered .pair { counter-increment: question; }
+    .numbered .english::before {
+      content: counter(question) ". ";
+      color: var(--blue);
+    }
+    footer {
+      color: var(--muted);
+      background: #eaf0f7;
+      font-size: .82rem;
+    }
+    .footer-inner { padding: 22px 18px 28px; }
+    .footer-inner a { color: var(--blue); }
+    .hide-korean .korean { display: none; }
+    .hide-korean .pair { padding-bottom: 13px; }
+    @media (max-width: 700px) {
+      .terms { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 36px 17px 44px; }
+      .content { padding: 34px 13px 58px; }
+      .terms { grid-template-columns: 1fr; }
+      .pair { padding: 12px 13px 11px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">SIMON MEETING · EASY ENGLISH</span>
+      <h1>Simon 미팅 영어 안건</h1>
+      <p>Cinder CBT, 백업, QoS, KMS, Everpure와 OpenStack에 대해 쉬운 영어로 대화하기 위한 연습 자료입니다.</p>
+      <div class="hero-actions">
+        <button id="toggleKorean" type="button" aria-pressed="false">한국어 숨기기</button>
+        <a class="back-link" href="./index.html">문서 목록으로 돌아가기</a>
+      </div>
+    </div>
+  </header>
+
+  <nav class="topnav" aria-label="안건 목차">
+    <div class="nav-inner">
+      <a href="#company">회사 목표</a>
+      <a href="#cbt-value">CBT 가치</a>
+      <a href="#storage">스토리지</a>
+      <a href="#everpure">Everpure</a>
+      <a href="#schedule">백업 일정</a>
+      <a href="#qos">볼륨 QoS</a>
+      <a href="#kms">KMS</a>
+      <a href="#career">경력</a>
+      <a href="#hobbies">취미</a>
+      <a href="#follow-up">후속 표현</a>
+      <a href="#keywords">단어</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <aside class="study-tip">
+      <span class="tip-icon" aria-hidden="true">✓</span>
+      <div>
+        <strong>암기 방법</strong>
+        <p>한국어를 숨긴 뒤 영어 문장을 먼저 소리 내어 말해 보세요. 이해가 어려우면 버튼을 눌러 번역을 다시 확인하세요.</p>
+      </div>
+    </aside>
+
+    <section class="section" id="company">
+      <p class="section-kicker">01 · COMPANY GOAL</p>
+      <h2>What my company wants <small>회사가 원하는 것</small></h2>
+      <div class="pair"><p class="english">My company is interested in Cinder CBT backup.</p><p class="korean">우리 회사는 Cinder CBT 백업에 관심이 있습니다.</p></div>
+      <div class="pair"><p class="english">After we finish the CBT backup feature, we want to see how we can expand it.</p><p class="korean">CBT 백업 기능을 완성한 후, 어떻게 확장할 수 있을지 알아보고 싶습니다.</p></div>
+      <h3>Easy questions · 쉬운 질문</h3>
+      <div class="pair"><p class="english">Can we use it for a backup service?</p><p class="korean">백업 서비스에 사용할 수 있을까요?</p></div>
+      <div class="pair"><p class="english">Can we use it for VM disaster recovery?</p><p class="korean">VM 재해 복구에 사용할 수 있을까요?</p></div>
+      <div class="pair"><p class="english">Can we connect it with image-based backup or restore?</p><p class="korean">이미지 기반 백업이나 복구와 연결할 수 있을까요?</p></div>
+      <div class="pair"><p class="english">What other use cases do you think are possible?</p><p class="korean">그 밖에 어떤 사용 사례가 가능하다고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">After we finish CBT backup, what do you think we can do next?</p><p class="korean">CBT 백업을 완성한 뒤, 다음에는 무엇을 할 수 있다고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Do you think CBT can be used for VM disaster recovery?</p><p class="korean">CBT를 VM 재해 복구에 사용할 수 있다고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Could we use this feature directly in a backup product?</p><p class="korean">이 기능을 백업 제품에서 바로 사용할 수 있을까요?</p></div>
+      <div class="pair"><p class="english">What other use cases do you see for CBT?</p><p class="korean">CBT에 어떤 다른 사용 사례가 있다고 보시나요?</p></div>
+    </section>
+
+    <section class="section" id="cbt-value">
+      <p class="section-kicker">02 · CBT VALUE</p>
+      <h2>CBT backup — why is it useful? <small>CBT 백업은 왜 유용한가?</small></h2>
+      <div class="pair"><p class="english">I want to understand the real value of Cinder CBT backup.</p><p class="korean">Cinder CBT 백업의 실제 가치를 이해하고 싶습니다.</p></div>
+      <div class="pair"><p class="english">My company is interested in using it for a backup product.</p><p class="korean">우리 회사는 이 기능을 백업 제품에 사용하려고 관심을 가지고 있습니다.</p></div>
+      <h3>What I can say · 내가 말할 수 있는 문장</h3>
+      <div class="pair"><p class="english">One reason we are interested in CBT is backup performance.</p><p class="korean">우리가 CBT에 관심을 가지는 이유 중 하나는 백업 성능입니다.</p></div>
+      <div class="pair"><p class="english">With CBT, we only need to back up the changed blocks.</p><p class="korean">CBT를 사용하면 변경된 블록만 백업하면 됩니다.</p></div>
+      <div class="pair"><p class="english">So I think it can reduce backup time and data transfer.</p><p class="korean">그래서 백업 시간과 데이터 전송량을 줄일 수 있다고 생각합니다.</p></div>
+      <div class="pair"><p class="english">Do you think this is the main benefit?</p><p class="korean">이것이 가장 큰 장점이라고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Do you think CBT is ready to be used by a real backup product?</p><p class="korean">CBT가 실제 백업 제품에서 사용될 준비가 되었다고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">What do you think is still missing?</p><p class="korean">아직 부족한 점은 무엇이라고 생각하시나요?</p></div>
+      <h3>Follow-up questions · 이어서 물어볼 질문</h3>
+      <div class="pair"><p class="english">How would you use CBT in a backup product?</p><p class="korean">백업 제품에서 CBT를 어떻게 사용하시겠어요?</p></div>
+      <div class="pair"><p class="english">Would the backup software call the Cinder API directly?</p><p class="korean">백업 소프트웨어가 Cinder API를 직접 호출하게 될까요?</p></div>
+      <div class="pair"><p class="english">Do we need any more APIs for real backup products?</p><p class="korean">실제 백업 제품을 위해 더 필요한 API가 있을까요?</p></div>
+    </section>
+
+    <section class="section" id="storage">
+      <p class="section-kicker">03 · STORAGE VENDORS</p>
+      <h2>Storage-level CBT <small>스토리지 레벨 CBT</small></h2>
+      <div class="pair"><p class="english">Do you know any other storage companies working on storage-level CBT for Cinder backup?</p><p class="korean">Cinder 백업을 위한 스토리지 레벨 CBT를 개발하는 다른 스토리지 회사를 알고 계신가요?</p></div>
+      <div class="pair"><p class="english">Are NetApp, Dell, or other storage vendors interested in this?</p><p class="korean">NetApp, Dell 또는 다른 스토리지 업체들도 이것에 관심이 있나요?</p></div>
+      <div class="pair"><p class="english">Have you talked with other storage developers about CBT?</p><p class="korean">CBT에 대해 다른 스토리지 개발자들과 이야기해 본 적이 있나요?</p></div>
+      <div class="pair"><p class="english">Do you think more storage drivers will support CBT later?</p><p class="korean">앞으로 더 많은 스토리지 드라이버가 CBT를 지원할 것이라고 생각하시나요?</p></div>
+    </section>
+
+    <section class="section" id="everpure">
+      <p class="section-kicker">04 · EVERPURE / PURE STORAGE</p>
+      <h2>Everpure Storage and Cinder <small>Everpure Storage와 Cinder</small></h2>
+      <div class="pair"><p class="english">I also want to understand what Cinder features Everpure Storage supports.</p><p class="korean">Everpure Storage가 어떤 Cinder 기능을 지원하는지도 알고 싶습니다.</p></div>
+      <div class="pair"><p class="english">What Cinder features does Everpure support today?</p><p class="korean">Everpure는 현재 어떤 Cinder 기능을 지원하나요?</p></div>
+      <div class="pair"><p class="english">Which features are most important for your customers?</p><p class="korean">고객에게 가장 중요한 기능은 무엇인가요?</p></div>
+      <div class="pair"><p class="english">Are there any Cinder features that are difficult to support on Everpure?</p><p class="korean">Everpure에서 지원하기 어려운 Cinder 기능이 있나요?</p></div>
+      <div class="pair"><p class="english">Are there any new Cinder features that you want to add?</p><p class="korean">추가하고 싶은 새로운 Cinder 기능이 있나요?</p></div>
+      <div class="pair"><p class="english">Besides CBT, what Cinder feature are you working on now?</p><p class="korean">CBT 외에 지금 작업 중인 Cinder 기능은 무엇인가요?</p></div>
+      <h3>CSP and upstream contribution · CSP와 upstream contribution</h3>
+      <div class="pair"><p class="english">Our company provides CSP services by wrapping OpenStack.</p><p class="korean">우리 회사는 OpenStack을 래핑해서 CSP 서비스를 제공합니다.</p></div>
+      <div class="pair"><p class="english">We are working hard to add the features our customers want to Cinder and Manila.</p><p class="korean">우리는 고객이 원하는 기능을 Cinder와 Manila에 추가하기 위해 많은 노력을 하고 있습니다.</p></div>
+      <div class="pair"><p class="english">Whenever possible, we try to avoid local changes.</p><p class="korean">가능하면 로컬 변경을 피하려고 합니다.</p></div>
+      <div class="pair"><p class="english">We prefer to contribute our changes to upstream OpenStack.</p><p class="korean">우리는 변경 사항을 OpenStack upstream에 기여하는 것을 선호합니다.</p></div>
+      <div class="pair"><p class="english">So we hope vendors can add the features we need, or work with us so that we can add them.</p><p class="korean">그래서 vendor가 필요한 기능을 추가해 주거나, 우리가 그 기능을 추가할 수 있도록 함께 협력하기를 바랍니다.</p></div>
+      <div class="pair"><p class="english">In that sense, I am very happy to see how actively Everpure contributes to OpenStack.</p><p class="korean">그런 의미에서 Everpure가 OpenStack에 매우 적극적으로 기여하는 모습을 보니 정말 좋습니다.</p></div>
+      <div class="pair"><p class="english">From a developer’s point of view, I would like to use Everpure Storage whenever possible.</p><p class="korean">개발자의 입장에서 가능하면 Everpure Storage를 사용하고 싶습니다.</p></div>
+      <h3>Volume Migration · 볼륨 마이그레이션</h3>
+      <div class="pair"><p class="english">I checked the Cinder support matrix, and I noticed that one feature is missing from the Everpure drivers: Volume Migration (Storage Assisted).</p><p class="korean">Cinder 지원 매트릭스를 확인했는데 Everpure 드라이버에서 한 가지 기능이 빠져 있는 것을 발견했습니다: Volume Migration (Storage Assisted)입니다.</p></div>
+      <div class="pair"><p class="english">Is Everpure planning to support this feature?</p><p class="korean">Everpure는 이 기능을 지원할 계획이 있나요?</p></div>
+      <div class="pair"><p class="english">When do you expect to support it?</p><p class="korean">언제 지원할 예정인가요?</p></div>
+      <div class="pair"><p class="english">Is there a target release or timeline?</p><p class="korean">목표 릴리스나 일정이 있나요?</p></div>
+      <div class="pair"><p class="english">Could we help with the upstream contribution if needed?</p><p class="korean">필요하다면 upstream 기여를 우리가 도울 수 있을까요?</p></div>
+      <div class="pair"><p class="english">Are there any technical issues that we should understand?</p><p class="korean">우리가 알아야 할 기술적인 문제가 있나요?</p></div>
+    </section>
+
+    <section class="section" id="schedule">
+      <p class="section-kicker">05 · BACKUP SCHEDULING</p>
+      <h2>Backup scheduling <small>백업 스케줄링</small></h2>
+      <div class="pair"><p class="english">I think Cinder backup scheduling could be useful.</p><p class="korean">Cinder 백업 스케줄링이 유용할 수 있다고 생각합니다.</p></div>
+      <div class="pair"><p class="english">Cinder already has backup APIs, but users need another system to run backups on a schedule.</p><p class="korean">Cinder에는 이미 백업 API가 있지만, 사용자가 일정에 따라 백업을 실행하려면 다른 시스템이 필요합니다.</p></div>
+      <h3>What I can say · 내가 말할 수 있는 문장</h3>
+      <div class="pair"><p class="english">I was thinking about backup scheduling in Cinder.</p><p class="korean">Cinder의 백업 스케줄링에 대해 생각해 보았습니다.</p></div>
+      <div class="pair"><p class="english">It would be useful if users could create a backup schedule directly.</p><p class="korean">사용자가 직접 백업 일정을 만들 수 있다면 유용할 것 같습니다.</p></div>
+      <div class="pair"><p class="english">For example, they could say, “Back up this volume every day at 2 AM.”</p><p class="korean">예를 들어, “이 볼륨을 매일 오전 2시에 백업해 주세요”라고 설정할 수 있습니다.</p></div>
+      <div class="pair"><p class="english">What do you think about adding this kind of feature?</p><p class="korean">이런 기능을 추가하는 것에 대해 어떻게 생각하시나요?</p></div>
+      <h3>Mitaka spec · Mitaka 스펙</h3>
+      <div class="pair"><p class="english">I found an old Mitaka spec for the scalable backup service.</p><p class="korean">Scalable Backup Service에 대한 오래된 Mitaka 스펙을 찾았습니다.</p></div>
+      <div class="pair"><p class="english">It mentioned scheduled backup workloads, but scheduling itself was outside the scope.</p><p class="korean">그 문서는 예약된 백업 작업을 언급했지만, 스케줄링 자체는 범위 밖이었습니다.</p></div>
+      <div class="pair"><p class="english">Do you know if there was any follow-up work after that?</p><p class="korean">그 이후에 후속 작업이 있었는지 알고 계신가요?</p></div>
+      <h3>More questions · 추가 질문</h3>
+      <div class="pair"><p class="english">Was there a reason Cinder did not add backup scheduling?</p><p class="korean">Cinder가 백업 스케줄링을 추가하지 않은 이유가 있었나요?</p></div>
+      <div class="pair"><p class="english">Was it because scheduling should be handled outside Cinder?</p><p class="korean">스케줄링은 Cinder 외부에서 처리해야 하기 때문이었나요?</p></div>
+      <div class="pair"><p class="english">Do you think that idea is still true today?</p><p class="korean">지금도 그 생각이 유효하다고 보시나요?</p></div>
+      <div class="pair"><p class="english">Would you support a new proposal for backup scheduling?</p><p class="korean">백업 스케줄링에 대한 새 제안을 지지해 주실 수 있나요?</p></div>
+    </section>
+
+    <section class="section" id="qos">
+      <p class="section-kicker">06 · PER-VOLUME QOS</p>
+      <h2>Per-volume QoS <small>볼륨별 QoS</small></h2>
+      <div class="pair"><p class="english">Today, Cinder QoS is mainly connected to volume types.</p><p class="korean">현재 Cinder QoS는 주로 볼륨 유형에 연결되어 있습니다.</p></div>
+      <div class="pair"><p class="english">I was thinking about allowing users to set QoS for each volume.</p><p class="korean">사용자가 각 볼륨에 QoS를 설정할 수 있도록 하는 것을 생각해 보았습니다.</p></div>
+      <h3>What I can say · 내가 말할 수 있는 문장</h3>
+      <div class="pair"><p class="english">I have another idea about QoS.</p><p class="korean">QoS에 대한 다른 아이디어도 있습니다.</p></div>
+      <div class="pair"><p class="english">Today, QoS is mainly based on the volume type.</p><p class="korean">현재 QoS는 주로 볼륨 유형을 기준으로 합니다.</p></div>
+      <div class="pair"><p class="english">What do you think about setting QoS for each volume?</p><p class="korean">각 볼륨에 QoS를 설정하는 것에 대해 어떻게 생각하시나요?</p></div>
+      <div class="pair"><p class="english">For example, a user could set IOPS or bandwidth when creating a volume.</p><p class="korean">예를 들어, 사용자가 볼륨을 만들 때 IOPS나 대역폭을 설정할 수 있습니다.</p></div>
+      <div class="pair"><p class="english">It could also be useful to change the QoS value later.</p><p class="korean">나중에 QoS 값을 변경할 수 있어도 유용할 것 같습니다.</p></div>
+      <h3>AWS comparison · AWS와 비교</h3>
+      <div class="pair"><p class="english">AWS allows users to choose some performance values for each volume.</p><p class="korean">AWS에서는 사용자가 각 볼륨의 일부 성능 값을 선택할 수 있습니다.</p></div>
+      <div class="pair"><p class="english">Why did OpenStack choose a volume-type-based model instead?</p><p class="korean">OpenStack은 왜 대신 볼륨 유형 기반 모델을 선택했나요?</p></div>
+      <div class="pair"><p class="english">Was there a technical reason?</p><p class="korean">기술적인 이유가 있었나요?</p></div>
+      <div class="pair"><p class="english">Or was it mainly an API design decision?</p><p class="korean">아니면 주로 API 설계상의 결정이었나요?</p></div>
+      <h3>Dynamic QoS · 동적 QoS</h3>
+      <div class="pair"><p class="english">What do you think about changing QoS values while the volume is being used?</p><p class="korean">볼륨을 사용하는 동안 QoS 값을 변경하는 것에 대해 어떻게 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Do storage backends usually support that?</p><p class="korean">스토리지 백엔드는 보통 이를 지원하나요?</p></div>
+      <div class="pair"><p class="english">Would this be difficult to add to Cinder?</p><p class="korean">이것을 Cinder에 추가하기 어려울까요?</p></div>
+      <h3>Manila comparison · Manila와 비교</h3>
+      <div class="pair"><p class="english">Manila also mainly uses share types for this kind of setting.</p><p class="korean">Manila도 이런 설정에는 주로 공유 유형을 사용합니다.</p></div>
+      <div class="pair"><p class="english">Do you think Cinder and Manila should keep the type-based model?</p><p class="korean">Cinder와 Manila가 유형 기반 모델을 계속 유지해야 한다고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Or do you think per-volume settings would be useful?</p><p class="korean">아니면 볼륨별 설정이 유용하다고 생각하시나요?</p></div>
+    </section>
+
+    <section class="section" id="kms">
+      <p class="section-kicker">07 · ENCRYPTION / KMS</p>
+      <h2>KMS — one key per volume <small>KMS — 볼륨별 키</small></h2>
+      <div class="pair"><p class="english">I am also interested in encryption key support.</p><p class="korean">암호화 키 지원에도 관심이 있습니다.</p></div>
+      <div class="pair"><p class="english">Manila already has a model where a user can provide an encryption key reference.</p><p class="korean">Manila에는 사용자가 암호화 키 참조를 제공할 수 있는 모델이 이미 있습니다.</p></div>
+      <div class="pair"><p class="english">I was thinking about using a similar model in Cinder.</p><p class="korean">Cinder에도 비슷한 모델을 사용하는 것을 생각해 보았습니다.</p></div>
+      <h3>What I can say · 내가 말할 수 있는 문장</h3>
+      <div class="pair"><p class="english">I have been looking at Manila’s encryption key support.</p><p class="korean">Manila의 암호화 키 지원을 살펴보고 있습니다.</p></div>
+      <div class="pair"><p class="english">Manila can accept a user-provided encryption key reference.</p><p class="korean">Manila는 사용자가 제공한 암호화 키 참조를 받을 수 있습니다.</p></div>
+      <div class="pair"><p class="english">I think Cinder could use a similar model.</p><p class="korean">Cinder도 비슷한 모델을 사용할 수 있다고 생각합니다.</p></div>
+      <div class="pair"><p class="english">The API does not need to depend on one KMS.</p><p class="korean">API가 하나의 KMS에 의존할 필요는 없습니다.</p></div>
+      <div class="pair"><p class="english">It could use Barbican or another backend through Castellan.</p><p class="korean">Castellan을 통해 Barbican이나 다른 백엔드를 사용할 수 있습니다.</p></div>
+      <h3>Questions · 질문</h3>
+      <div class="pair"><p class="english">What do you think about adding this model to Cinder?</p><p class="korean">이 모델을 Cinder에 추가하는 것에 대해 어떻게 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Do you see any problem with it?</p><p class="korean">이 방식에 문제가 있다고 보시나요?</p></div>
+      <div class="pair"><p class="english">Would a user-provided key reference be useful for Cinder users?</p><p class="korean">사용자가 제공하는 키 참조가 Cinder 사용자에게 유용할까요?</p></div>
+      <div class="pair"><p class="english">Should Cinder support a different encryption key for each volume?</p><p class="korean">Cinder가 각 볼륨마다 다른 암호화 키를 지원해야 할까요?</p></div>
+      <div class="pair"><p class="english">Do you think the API should stay independent from a specific KMS?</p><p class="korean">API가 특정 KMS로부터 독립된 상태를 유지해야 한다고 생각하시나요?</p></div>
+      <h3>BYOK · 고객 키 사용</h3>
+      <div class="pair"><p class="english">Some enterprise customers want to use their own encryption keys.</p><p class="korean">일부 엔터프라이즈 고객은 자신의 암호화 키를 사용하고 싶어 합니다.</p></div>
+      <div class="pair"><p class="english">So I think BYOK could be useful for Cinder.</p><p class="korean">그래서 BYOK가 Cinder에 유용할 수 있다고 생각합니다.</p></div>
+      <div class="pair"><p class="english">Have you seen this requirement from customers?</p><p class="korean">고객에게서 이런 요구사항을 본 적이 있나요?</p></div>
+      <div class="pair"><p class="english">Does Everpure have customers asking for BYOK?</p><p class="korean">Everpure에 BYOK를 요청하는 고객이 있나요?</p></div>
+    </section>
+
+    <section class="section" id="career">
+      <p class="section-kicker">08 · SIMON’S CAREER</p>
+      <h2>Simon’s career <small>Simon의 경력</small></h2>
+      <h3>Starting the topic · 화제 시작하기</h3>
+      <div class="pair"><p class="english">Can I ask you something a little personal?</p><p class="korean">조금 개인적인 질문을 해도 될까요?</p></div>
+      <div class="pair"><p class="english">How long have you been working as a developer?</p><p class="korean">개발자로 일한 지 얼마나 되셨나요?</p></div>
+      <h3>Still coding · 아직도 직접 개발하는지 묻기</h3>
+      <div class="pair"><p class="english">You have a lot of experience, but you still write code yourself.</p><p class="korean">경험이 많으신데도 아직 직접 코드를 작성하시네요.</p></div>
+      <div class="pair"><p class="english">Is that common in your company?</p><p class="korean">회사에서도 이런 일이 일반적인가요?</p></div>
+      <div class="pair"><p class="english">Do you still enjoy coding?</p><p class="korean">아직도 코딩을 즐기시나요?</p></div>
+      <h3>Korea comparison · 한국과 비교하기</h3>
+      <div class="pair"><p class="english">In Korea, many engineers move into management as they get more experience.</p><p class="korean">한국에서는 많은 엔지니어가 경력이 쌓이면 관리직으로 이동합니다.</p></div>
+      <div class="pair"><p class="english">After some years, they often spend less time writing code.</p><p class="korean">몇 년이 지나면 보통 코드를 작성하는 시간이 줄어듭니다.</p></div>
+      <div class="pair"><p class="english">So I was interested to see that you are still very active in development.</p><p class="korean">그래서 아직도 개발을 매우 활발히 하시는 것을 보고 흥미로웠습니다.</p></div>
+      <div class="pair"><p class="english">Do you want to keep working as an engineer?</p><p class="korean">계속 엔지니어로 일하고 싶으신가요?</p></div>
+      <div class="pair"><p class="english">Or do you also do management work?</p><p class="korean">아니면 관리 업무도 하시나요?</p></div>
+    </section>
+
+    <section class="section" id="hobbies">
+      <p class="section-kicker">09 · HOBBIES</p>
+      <h2>Hobbies <small>취미</small></h2>
+      <div class="pair"><p class="english">What do you usually do in your free time?</p><p class="korean">여가 시간에는 보통 무엇을 하시나요?</p></div>
+      <div class="pair"><p class="english">Do you have any hobbies?</p><p class="korean">취미가 있으신가요?</p></div>
+      <p class="label">As a joke · 농담처럼 말하기</p>
+      <div class="pair"><p class="english">Or is coding your hobby too?</p><p class="korean">아니면 코딩도 취미인가요?</p></div>
+      <div class="pair"><p class="english">You do a lot of OpenStack work, so sometimes I wonder if your hobby is also coding.</p><p class="korean">OpenStack 일을 많이 하셔서, 가끔은 코딩도 취미인지 궁금합니다.</p></div>
+      <p class="label">A more natural version · 조금 더 자연스러운 표현</p>
+      <div class="pair"><p class="english">You seem to be very active in OpenStack. Do you still have time for hobbies?</p><p class="korean">OpenStack에서 매우 활발하게 활동하시는 것 같은데, 그래도 취미를 즐길 시간이 있나요?</p></div>
+    </section>
+
+    <section class="section" id="openstack-work">
+      <p class="section-kicker">10 · OPENSTACK WORK</p>
+      <h2>Questions about Simon’s OpenStack work <small>Simon의 OpenStack 업무에 대해 묻기</small></h2>
+      <div class="pair"><p class="english">Are you the main OpenStack storage developer at Everpure?</p><p class="korean">Everpure에서 OpenStack 스토리지 개발을 주로 담당하시나요?</p></div>
+      <div class="pair"><p class="english">Are there other developers working on Cinder with you?</p><p class="korean">함께 Cinder를 개발하는 다른 개발자들도 있나요?</p></div>
+      <div class="pair"><p class="english">Do you work on both Cinder and Manila?</p><p class="korean">Cinder와 Manila를 모두 작업하시나요?</p></div>
+      <div class="pair"><p class="english">How much of your work is OpenStack development?</p><p class="korean">업무 중 OpenStack 개발은 어느 정도인가요?</p></div>
+      <div class="pair"><p class="english">Do you spend most of your time on customer issues or new features?</p><p class="korean">대부분의 시간을 고객 문제와 새 기능 중 어느 쪽에 더 많이 쓰시나요?</p></div>
+      <div class="pair"><p class="english">How do you decide which Cinder features to work on?</p><p class="korean">어떤 Cinder 기능을 작업할지 어떻게 결정하시나요?</p></div>
+    </section>
+
+    <section class="section" id="follow-up">
+      <p class="section-kicker">11 · FOLLOW-UP EXPRESSIONS</p>
+      <h2>Very useful follow-up expressions <small>대화를 이어 가는 표현</small></h2>
+      <div class="pair"><p class="english">Why do you think so?</p><p class="korean">왜 그렇게 생각하시나요?</p></div>
+      <div class="pair"><p class="english">What is the main reason?</p><p class="korean">가장 큰 이유는 무엇인가요?</p></div>
+      <div class="pair"><p class="english">What would be the problem?</p><p class="korean">어떤 문제가 생길까요?</p></div>
+      <div class="pair"><p class="english">What would we need to change?</p><p class="korean">무엇을 바꿔야 할까요?</p></div>
+      <div class="pair"><p class="english">Do you think it is possible?</p><p class="korean">가능하다고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Would it be difficult to implement?</p><p class="korean">구현하기 어려울까요?</p></div>
+      <div class="pair"><p class="english">Have you tried something similar before?</p><p class="korean">이전에 비슷한 것을 시도해 본 적이 있나요?</p></div>
+      <div class="pair"><p class="english">Do you know why it was designed this way?</p><p class="korean">왜 이렇게 설계되었는지 알고 계신가요?</p></div>
+    </section>
+
+    <section class="section" id="not-understand">
+      <p class="section-kicker">12 · WHEN I DON’T UNDERSTAND</p>
+      <h2>When I don’t understand Simon <small>Simon의 말을 이해하지 못했을 때</small></h2>
+      <div class="pair"><p class="english">Sorry, could you say that again?</p><p class="korean">죄송하지만 다시 말해 주시겠어요?</p></div>
+      <div class="pair"><p class="english">Could you say that a little more slowly?</p><p class="korean">조금 더 천천히 말해 주시겠어요?</p></div>
+      <div class="pair"><p class="english">Sorry, I didn’t catch the last part.</p><p class="korean">죄송하지만 마지막 부분을 잘 듣지 못했습니다.</p></div>
+      <div class="pair"><p class="english">Do you mean that Cinder should not handle it directly?</p><p class="korean">Cinder가 이것을 직접 처리하면 안 된다는 뜻인가요?</p></div>
+      <div class="pair"><p class="english">So, if I understand correctly, you mean…</p><p class="korean">제가 올바르게 이해했다면, …라는 뜻이군요.</p></div>
+      <div class="pair"><p class="english">Let me check if I understood you correctly.</p><p class="korean">제가 제대로 이해했는지 확인해 보겠습니다.</p></div>
+      <h3>Technical confirmation · 기술적인 내용 확인</h3>
+      <div class="pair"><p class="english">So you’re saying the main problem is the API design, right?</p><p class="korean">그러니까 가장 큰 문제는 API 설계라는 말씀이시죠?</p></div>
+      <div class="pair"><p class="english">So the backend can support it, but Cinder cannot expose it today. Is that right?</p><p class="korean">그러면 백엔드는 지원할 수 있지만, 현재 Cinder는 이를 API로 제공할 수 없다는 뜻인가요?</p></div>
+      <div class="pair"><p class="english">So technically it is possible, but you are not sure if it belongs in Cinder. Right?</p><p class="korean">기술적으로는 가능하지만 Cinder의 범위에 들어가는지는 확실하지 않다는 뜻이죠?</p></div>
+    </section>
+
+    <section class="section numbered" id="important">
+      <p class="section-kicker">13 · TOP TEN QUESTIONS</p>
+      <h2>My most important questions <small>가장 중요한 질문</small></h2>
+      <div class="pair"><p class="english">After we finish CBT backup, what do you think we can do next?</p><p class="korean">CBT 백업을 완성한 뒤, 다음에는 무엇을 할 수 있다고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Do you think CBT can be used directly by a backup product?</p><p class="korean">CBT를 백업 제품에서 직접 사용할 수 있다고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">What do you think is still missing from the current CBT design?</p><p class="korean">현재 CBT 설계에서 아직 부족한 점은 무엇이라고 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Do you know any other storage vendors interested in CBT?</p><p class="korean">CBT에 관심 있는 다른 스토리지 업체를 알고 계신가요?</p></div>
+      <div class="pair"><p class="english">What do you think about adding backup scheduling to Cinder?</p><p class="korean">Cinder에 백업 스케줄링을 추가하는 것에 대해 어떻게 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Was there a reason scheduling was kept outside Cinder?</p><p class="korean">스케줄링을 Cinder 외부에 두었던 이유가 있었나요?</p></div>
+      <div class="pair"><p class="english">What do you think about setting QoS for each volume instead of only using volume types?</p><p class="korean">볼륨 유형만 사용하는 대신 각 볼륨에 QoS를 설정하는 것에 대해 어떻게 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Would dynamic QoS changes be difficult for storage backends?</p><p class="korean">스토리지 백엔드에서 동적으로 QoS를 변경하기 어려울까요?</p></div>
+      <div class="pair"><p class="english">What do you think about adding a user-provided encryption key reference to Cinder?</p><p class="korean">Cinder에 사용자 제공 암호화 키 참조를 추가하는 것에 대해 어떻게 생각하시나요?</p></div>
+      <div class="pair"><p class="english">Do you think Cinder should support one encryption key for each volume?</p><p class="korean">Cinder가 각 볼륨마다 하나의 암호화 키를 지원해야 한다고 생각하시나요?</p></div>
+    </section>
+
+    <section class="section" id="keywords">
+      <p class="section-kicker">14 · KEY WORDS</p>
+      <h2>Key words to remember <small>기억할 핵심 단어</small></h2>
+      <p class="section-intro">짧은 단어를 먼저 익힌 뒤 위의 문장을 소리 내어 말해 보세요.</p>
+
+      <p class="label">CBT / Backup · CBT / 백업</p>
+      <div class="terms">
+        <div class="term"><p class="english">changed block</p><p class="korean">변경된 블록</p></div>
+        <div class="term"><p class="english">backup</p><p class="korean">백업</p></div>
+        <div class="term"><p class="english">restore</p><p class="korean">복구</p></div>
+        <div class="term"><p class="english">full backup</p><p class="korean">전체 백업</p></div>
+        <div class="term"><p class="english">incremental backup</p><p class="korean">증분 백업</p></div>
+        <div class="term"><p class="english">changed data</p><p class="korean">변경된 데이터</p></div>
+        <div class="term"><p class="english">backup time</p><p class="korean">백업 시간</p></div>
+        <div class="term"><p class="english">data transfer</p><p class="korean">데이터 전송</p></div>
+        <div class="term"><p class="english">backup product</p><p class="korean">백업 제품</p></div>
+        <div class="term"><p class="english">disaster recovery</p><p class="korean">재해 복구</p></div>
+        <div class="term"><p class="english">VM recovery</p><p class="korean">VM 복구</p></div>
+        <div class="term"><p class="english">storage driver</p><p class="korean">스토리지 드라이버</p></div>
+        <div class="term"><p class="english">storage backend</p><p class="korean">스토리지 백엔드</p></div>
+      </div>
+
+      <p class="label">Scheduling · 스케줄링</p>
+      <div class="terms">
+        <div class="term"><p class="english">schedule</p><p class="korean">일정, 스케줄</p></div>
+        <div class="term"><p class="english">scheduled backup</p><p class="korean">예약 백업</p></div>
+        <div class="term"><p class="english">daily backup</p><p class="korean">일일 백업</p></div>
+        <div class="term"><p class="english">run a backup</p><p class="korean">백업을 실행하다</p></div>
+        <div class="term"><p class="english">automatically</p><p class="korean">자동으로</p></div>
+        <div class="term"><p class="english">every day</p><p class="korean">매일</p></div>
+        <div class="term"><p class="english">outside Cinder</p><p class="korean">Cinder 외부에서</p></div>
+        <div class="term"><p class="english">follow-up work</p><p class="korean">후속 작업</p></div>
+      </div>
+
+      <p class="label">QoS · QoS</p>
+      <div class="terms">
+        <div class="term"><p class="english">QoS</p><p class="korean">서비스 품질</p></div>
+        <div class="term"><p class="english">IOPS</p><p class="korean">초당 입출력 작업 수</p></div>
+        <div class="term"><p class="english">bandwidth</p><p class="korean">대역폭</p></div>
+        <div class="term"><p class="english">volume type</p><p class="korean">볼륨 유형</p></div>
+        <div class="term"><p class="english">per-volume</p><p class="korean">볼륨별</p></div>
+        <div class="term"><p class="english">change the value</p><p class="korean">값을 변경하다</p></div>
+        <div class="term"><p class="english">performance</p><p class="korean">성능</p></div>
+        <div class="term"><p class="english">limit</p><p class="korean">제한</p></div>
+        <div class="term"><p class="english">backend support</p><p class="korean">백엔드 지원</p></div>
+      </div>
+
+      <p class="label">Encryption / KMS · 암호화 / KMS</p>
+      <div class="terms">
+        <div class="term"><p class="english">encryption</p><p class="korean">암호화</p></div>
+        <div class="term"><p class="english">encryption key</p><p class="korean">암호화 키</p></div>
+        <div class="term"><p class="english">key reference</p><p class="korean">키 참조</p></div>
+        <div class="term"><p class="english">user-provided key</p><p class="korean">사용자 제공 키</p></div>
+        <div class="term"><p class="english">BYOK</p><p class="korean">고객 키 사용</p></div>
+        <div class="term"><p class="english">KMS</p><p class="korean">키 관리 시스템</p></div>
+        <div class="term"><p class="english">Castellan</p><p class="korean">Castellan</p></div>
+        <div class="term"><p class="english">Barbican</p><p class="korean">Barbican</p></div>
+        <div class="term"><p class="english">backend</p><p class="korean">백엔드</p></div>
+        <div class="term"><p class="english">per-volume key</p><p class="korean">볼륨별 키</p></div>
+      </div>
+
+      <p class="label">Discussion · 대화</p>
+      <div class="terms">
+        <div class="term"><p class="english">possible</p><p class="korean">가능한</p></div>
+        <div class="term"><p class="english">difficult</p><p class="korean">어려운</p></div>
+        <div class="term"><p class="english">useful</p><p class="korean">유용한</p></div>
+        <div class="term"><p class="english">support</p><p class="korean">지원하다</p></div>
+        <div class="term"><p class="english">add</p><p class="korean">추가하다</p></div>
+        <div class="term"><p class="english">change</p><p class="korean">변경하다</p></div>
+        <div class="term"><p class="english">design</p><p class="korean">설계</p></div>
+        <div class="term"><p class="english">reason</p><p class="korean">이유</p></div>
+        <div class="term"><p class="english">problem</p><p class="korean">문제</p></div>
+        <div class="term"><p class="english">requirement</p><p class="korean">요구사항</p></div>
+        <div class="term"><p class="english">customer</p><p class="korean">고객</p></div>
+        <div class="term"><p class="english">use case</p><p class="korean">사용 사례</p></div>
+        <div class="term"><p class="english">similar</p><p class="korean">비슷한</p></div>
+      </div>
+
+      <p class="label">CSP / Contribution · CSP / 기여</p>
+      <div class="terms">
+        <div class="term"><p class="english">CSP service</p><p class="korean">CSP 서비스</p></div>
+        <div class="term"><p class="english">wrap OpenStack</p><p class="korean">OpenStack을 래핑하다</p></div>
+        <div class="term"><p class="english">local change</p><p class="korean">로컬 변경</p></div>
+        <div class="term"><p class="english">upstream contribution</p><p class="korean">upstream 기여</p></div>
+        <div class="term"><p class="english">support matrix</p><p class="korean">지원 매트릭스</p></div>
+        <div class="term"><p class="english">Volume Migration</p><p class="korean">볼륨 마이그레이션</p></div>
+        <div class="term"><p class="english">storage-assisted</p><p class="korean">스토리지 지원 방식의</p></div>
+        <div class="term"><p class="english">target release</p><p class="korean">목표 릴리스</p></div>
+        <div class="term"><p class="english">timeline</p><p class="korean">일정</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <a href="./index.html">Hong-p Docs</a> · Simon meeting agenda · Cinder CBT / OpenStack
+    </div>
+  </footer>
+
+  <script>
+    const button = document.querySelector("#toggleKorean");
+    button.addEventListener("click", () => {
+      const hidden = document.body.classList.toggle("hide-korean");
+      button.textContent = hidden ? "한국어 보이기" : "한국어 숨기기";
+      button.setAttribute("aria-pressed", String(hidden));
+    });
+  </script>
+</body>
+</html>
