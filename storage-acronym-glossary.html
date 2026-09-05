@@ -1,0 +1,2922 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenStack Cinder와 스토리지 개발자 영어 대화를 위한 SAN, FC, HBA, LUN 등 스토리지 약어 단어장">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b5b52'/%3E%3Ctext x='32' y='44' text-anchor='middle' fill='white' font-size='36' font-family='Arial'%3ES%3C/text%3E%3C/svg%3E">
+  <title>Storage Acronym Glossary · Cinder English Prep</title>
+  <style>
+    :root {
+      --ink: #18332d;
+      --ink-soft: #3f5a53;
+      --muted: #6c7e78;
+      --paper: #f5f8f6;
+      --card: #ffffff;
+      --line: #dbe7e1;
+      --teal: #087f72;
+      --teal-dark: #075a52;
+      --mint: #dff3ea;
+      --mint-soft: #eef9f4;
+      --gold: #e8b45d;
+      --gold-soft: #fff4df;
+      --blue: #3c6f9d;
+      --blue-soft: #edf5fc;
+      --violet: #7567a5;
+      --violet-soft: #f3f0fb;
+      --shadow: 0 18px 55px rgba(20, 67, 57, 0.08);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", "Segoe UI", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      color: #effcf7;
+      background:
+        radial-gradient(circle at 85% 12%, rgba(96, 208, 164, 0.25), transparent 30%),
+        radial-gradient(circle at 12% 90%, rgba(41, 138, 122, 0.36), transparent 32%),
+        linear-gradient(130deg, #123d35 0%, #14554a 52%, #0a312d 100%);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      right: -180px;
+      bottom: -260px;
+      border: 1px solid rgba(224, 255, 242, 0.18);
+      border-radius: 50%;
+      box-shadow: 0 0 0 34px rgba(224, 255, 242, 0.04), 0 0 0 68px rgba(224, 255, 242, 0.03);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      padding: 58px 0 74px;
+    }
+
+    .eyebrow,
+    .section-kicker {
+      margin: 0 0 12px;
+      color: #8ce2bf;
+      font-size: 0.73rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      max-width: 720px;
+      margin: 0;
+      font-size: clamp(2.55rem, 7vw, 5.8rem);
+      font-weight: 800;
+      letter-spacing: -0.065em;
+      line-height: 0.98;
+    }
+
+    .hero h1 span { color: #8ce2bf; }
+
+    .hero-copy {
+      max-width: 680px;
+      margin: 24px 0 0;
+      color: #c8e8dc;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 28px;
+    }
+
+    .hero-tag {
+      padding: 8px 13px;
+      border: 1px solid rgba(224, 255, 242, 0.2);
+      border-radius: 999px;
+      color: #e4fff3;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    main { padding: 34px 0 72px; }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .route-panel {
+      position: relative;
+      z-index: 2;
+      padding: clamp(24px, 4vw, 42px);
+      margin-top: -62px;
+    }
+
+    h2,
+    h3,
+    p { overflow-wrap: anywhere; }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      letter-spacing: -0.045em;
+      line-height: 1.15;
+    }
+
+    .section-intro {
+      max-width: 780px;
+      margin: 12px 0 0;
+      color: var(--ink-soft);
+    }
+
+    .flow {
+      display: flex;
+      align-items: stretch;
+      gap: 10px;
+      margin: 30px 0 18px;
+    }
+
+    .flow-step {
+      display: flex;
+      flex: 1 1 0;
+      min-width: 0;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 108px;
+      padding: 16px;
+      border: 1px solid #c8e5d8;
+      border-radius: 17px;
+      background: var(--mint-soft);
+    }
+
+    .flow-step strong {
+      font-size: 1.07rem;
+      letter-spacing: -0.02em;
+    }
+
+    .flow-step small {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.79rem;
+      line-height: 1.45;
+    }
+
+    .flow-arrow {
+      align-self: center;
+      flex: 0 0 auto;
+      color: var(--teal);
+      font-size: 1.65rem;
+      font-weight: 800;
+    }
+
+    .dual-path {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .path-line {
+      padding: 13px 16px;
+      border-left: 4px solid var(--gold);
+      border-radius: 12px;
+      color: var(--ink-soft);
+      background: var(--gold-soft);
+      font-size: 0.87rem;
+      font-weight: 700;
+    }
+
+    .path-line span {
+      display: block;
+      margin-bottom: 2px;
+      color: #9a6b24;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .plane-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .plane {
+      padding: 16px 18px;
+      border-radius: 15px;
+      background: #f8fbfa;
+    }
+
+    .plane strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.83rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .plane p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.87rem;
+    }
+
+    .plane.control { border: 1px solid #cddcf0; background: var(--blue-soft); }
+    .plane.control strong { color: var(--blue); }
+    .plane.data { border: 1px solid #cde9dc; background: var(--mint-soft); }
+    .plane.data strong { color: var(--teal); }
+
+    .compare-section { margin-top: 42px; }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .compare-card {
+      padding: 21px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--card);
+    }
+
+    .compare-card h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: -0.035em;
+    }
+
+    .compare-card h3 span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .compare-card p {
+      margin: 8px 0 0;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+    }
+
+    .glossary-section { margin-top: 48px; }
+
+    .glossary-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .glossary-heading .section-intro { margin-bottom: 0; }
+
+    .count {
+      flex: 0 0 auto;
+      padding: 8px 13px;
+      border: 1px solid #c8e5d8;
+      border-radius: 999px;
+      color: var(--teal-dark);
+      background: var(--mint);
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1 1 360px;
+    }
+
+    .search-wrap::before {
+      content: "⌕";
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      color: var(--teal);
+      font-size: 1.35rem;
+      line-height: 1;
+      transform: translateY(-54%);
+    }
+
+    #search {
+      width: 100%;
+      padding: 15px 48px 15px 45px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      outline: none;
+      color: var(--ink);
+      background: var(--card);
+      font: inherit;
+      font-size: 0.94rem;
+      box-shadow: 0 8px 24px rgba(20, 67, 57, 0.04);
+    }
+
+    #search:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(8, 127, 114, 0.12); }
+
+    kbd {
+      position: absolute;
+      top: 50%;
+      right: 13px;
+      padding: 2px 7px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--muted);
+      background: #f9fbfa;
+      font-size: 0.72rem;
+      transform: translateY(-50%);
+    }
+
+    .filters {
+      display: flex;
+      flex: 0 1 auto;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .filter {
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink-soft);
+      background: var(--card);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      transition: 160ms ease;
+    }
+
+    .filter:hover { border-color: #9bcdb9; color: var(--teal-dark); }
+    .filter.active { border-color: var(--teal); color: #fff; background: var(--teal); }
+
+    .terms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 15px;
+      margin-top: 18px;
+    }
+
+    .term-card {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      min-height: 340px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--card);
+      box-shadow: 0 10px 30px rgba(20, 67, 57, 0.045);
+      animation: rise 280ms ease both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .category {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .category.architecture { color: #82601e; background: var(--gold-soft); }
+    .category.connectivity { color: #22618d; background: var(--blue-soft); }
+    .category.protocol { color: #276e57; background: var(--mint); }
+    .category.media { color: #805640; background: #fbefe9; }
+    .category.vendor { color: #65558f; background: var(--violet-soft); }
+    .category.operation { color: #3e6871; background: #eaf5f7; }
+    .category.fundamental { color: #82601e; background: #fff7e8; }
+    .category.performance { color: #7b4c2d; background: #fbefe9; }
+    .category.protection { color: #8a4b64; background: #fbeef4; }
+    .category.openstack { color: #a64d22; background: #fff0e6; }
+    .category.development { color: #4e5f9e; background: #eef1fc; }
+
+    .card-number {
+      color: #a5b6b0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.71rem;
+      font-weight: 700;
+    }
+
+    .term-card h3 {
+      margin: 17px 0 0;
+      color: var(--ink);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 1.55rem;
+      letter-spacing: -0.07em;
+      line-height: 1.1;
+    }
+
+    .fullname {
+      min-height: 2.7em;
+      margin: 7px 0 0;
+      color: var(--teal-dark);
+      font-size: 0.84rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .meaning {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid #edf2ef;
+    }
+
+    .label {
+      padding-top: 2px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .meaning p {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .description {
+      margin: 11px 0 0;
+      color: var(--ink-soft);
+      font-size: 0.87rem;
+      line-height: 1.58;
+    }
+
+    .example {
+      margin: auto 0 0;
+      padding: 14px 15px;
+      border-left: 3px solid #77caa8;
+      border-radius: 0 12px 12px 0;
+      color: #28584a;
+      background: var(--mint-soft);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .example strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--teal);
+      font-size: 0.68rem;
+      letter-spacing: 0.11em;
+    }
+
+    .empty {
+      padding: 36px 20px;
+      border: 1px dashed #b9d5c9;
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      background: #fbfdfc;
+      text-align: center;
+    }
+
+    .phrases {
+      display: grid;
+      grid-template-columns: 0.78fr 1.22fr;
+      gap: 20px;
+      align-items: stretch;
+      margin-top: 48px;
+    }
+
+    .phrase-intro,
+    .phrase-list {
+      padding: 28px;
+      border-radius: var(--radius-lg);
+    }
+
+    .phrase-intro {
+      color: #edfff8;
+      background: linear-gradient(135deg, #14564b, #0b3933);
+    }
+
+    .phrase-intro h2 { color: #f4fff9; }
+    .phrase-intro p { color: #bfdfd3; }
+
+    .phrase-list {
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+
+    .phrase-list p {
+      margin: 0;
+      padding: 10px 0;
+      border-bottom: 1px solid #edf2ef;
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+      font-weight: 650;
+    }
+
+    .phrase-list p:last-child { border-bottom: 0; padding-bottom: 0; }
+    .phrase-list p:first-child { padding-top: 0; }
+
+    .phrase-list span {
+      display: inline-block;
+      width: 28px;
+      color: var(--teal);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    footer {
+      padding: 26px 0 48px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    footer p { margin: 6px 0; }
+    footer a { color: var(--teal-dark); font-weight: 700; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 930px) {
+      .terms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { align-items: stretch; flex-direction: column; }
+      .filters { justify-content: flex-start; }
+    }
+
+    @media (max-width: 700px) {
+      .shell { width: min(100% - 28px, 620px); }
+      .hero-inner { padding: 42px 0 70px; }
+      .route-panel { margin-top: -48px; }
+      .flow { align-items: center; flex-wrap: wrap; justify-content: center; }
+      .flow-step { flex: 1 1 calc(50% - 30px); min-width: 125px; }
+      .flow-arrow { transform: rotate(0deg); }
+      .dual-path,
+      .plane-grid,
+      .compare-grid,
+      .phrases { grid-template-columns: 1fr; }
+      .glossary-heading { align-items: start; flex-direction: column; gap: 12px; }
+    }
+
+    @media (max-width: 500px) {
+      .hero h1 { font-size: 3.15rem; }
+      .route-panel { padding: 22px 18px; }
+      .flow { display: grid; grid-template-columns: 1fr; gap: 5px; }
+      .flow-step { min-height: 76px; }
+      .flow-arrow { justify-self: center; font-size: 1.35rem; transform: rotate(90deg); }
+      .terms-grid { grid-template-columns: 1fr; }
+      .term-card { min-height: 0; }
+      .phrase-intro,
+      .phrase-list { padding: 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="shell hero-inner">
+      <p class="eyebrow">OpenStack Cinder · Storage English Prep</p>
+      <h1>Storage <span>Acronym</span><br>Glossary</h1>
+      <p class="hero-copy">SAN, FC, HBA부터 ONTAP, FlashArray, multipath까지. 스토리지 개발자와의 리뷰·회의에서 바로 꺼내 쓸 수 있도록 쉬운 한국어 설명과 짧은 영어 문장으로 정리했습니다.</p>
+      <div class="hero-tags" aria-label="단어장 요약">
+        <span class="hero-tag" id="termCountHero">259 terms</span>
+        <span class="hero-tag">Block · File · Fabric</span>
+        <span class="hero-tag">Works offline</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="panel route-panel" aria-labelledby="route-title">
+      <p class="section-kicker">The core path</p>
+      <h2 id="route-title">Server → HBA → FC Switch → Storage Array</h2>
+      <p class="section-intro">FC SAN에서 호스트가 블록 스토리지에 접근하는 대표 경로입니다. HBA는 서버의 FC 연결 장치이고, FC Switch는 fabric을 구성하며, Storage Array는 LUN을 제공합니다.</p>
+
+      <div class="flow" aria-label="서버에서 스토리지 어레이까지의 데이터 경로">
+        <div class="flow-step"><strong>Server</strong><small>Nova compute node<br>VM이 실행되는 호스트</small></div>
+        <div class="flow-arrow" aria-hidden="true">→</div>
+        <div class="flow-step"><strong>HBA</strong><small>Host Bus Adapter<br>FC 포트와 WWPN</small></div>
+        <div class="flow-arrow" aria-hidden="true">→</div>
+        <div class="flow-step"><strong>FC Switch</strong><small>Fabric A / Fabric B<br>zoning이 적용되는 곳</small></div>
+        <div class="flow-arrow" aria-hidden="true">→</div>
+        <div class="flow-step"><strong>Storage Array</strong><small>Pure FlashArray / NetApp<br>LUN을 호스트에 매핑</small></div>
+      </div>
+
+      <div class="dual-path">
+        <div class="path-line"><span>Path A</span>HBA A → Fabric A → Storage port A</div>
+        <div class="path-line"><span>Path B</span>HBA B → Fabric B → Storage port B</div>
+      </div>
+
+      <div class="plane-grid">
+        <div class="plane control"><strong>Control plane · Cinder</strong><p>Cinder가 volume 생성·삭제와 attachment 정보를 조정합니다.</p></div>
+        <div class="plane data"><strong>Data plane · Compute</strong><p>실제 VM I/O는 연결이 완료된 compute node에서 SAN을 통해 흐릅니다.</p></div>
+      </div>
+    </section>
+
+    <section class="compare-section" aria-labelledby="compare-title">
+      <p class="section-kicker">Three useful distinctions</p>
+      <h2 id="compare-title">헷갈리기 쉬운 세 가지 구분</h2>
+      <div class="compare-grid">
+        <article class="compare-card">
+          <h3>SAN <span>vs</span> NAS</h3>
+          <p>SAN은 서버에 블록 장치를 제공하고, NAS는 네트워크 파일 공유를 제공합니다.</p>
+        </article>
+        <article class="compare-card">
+          <h3>FC <span>vs</span> Fibre</h3>
+          <p>Fibre Channel은 기술·프로토콜 이름입니다. 실제 FC 연결에는 광케이블과 SFP를 자주 사용합니다.</p>
+        </article>
+        <article class="compare-card">
+          <h3>FC <span>vs</span> iSCSI</h3>
+          <p>둘 다 블록 스토리지 경로지만, FC는 전용 fabric을, iSCSI는 TCP/IP Ethernet을 사용합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="glossary-section" id="glossary" aria-labelledby="glossary-title">
+      <div class="glossary-heading">
+        <div>
+          <p class="section-kicker">The glossary</p>
+          <h2 id="glossary-title">용어 카드</h2>
+          <p class="section-intro">약어·제품명, 풀네임, 한국어 뜻, 쉬운 설명, 실무 영어 예문을 한 카드에 담았습니다.</p>
+        </div>
+        <div class="count" id="resultCount" aria-live="polite">27개 용어</div>
+      </div>
+
+      <div class="toolbar">
+        <label class="search-wrap">
+          <span class="sr-only">용어 검색</span>
+          <input id="search" type="search" placeholder="예: WWPN, multipath, zoning" autocomplete="off">
+          <kbd>/</kbd>
+        </label>
+        <div class="filters" aria-label="카테고리 필터">
+          <button class="filter active" type="button" data-filter="all">전체</button>
+          <button class="filter" type="button" data-filter="architecture">구조</button>
+          <button class="filter" type="button" data-filter="connectivity">연결</button>
+          <button class="filter" type="button" data-filter="protocol">프로토콜</button>
+          <button class="filter" type="button" data-filter="media">미디어</button>
+          <button class="filter" type="button" data-filter="vendor">제품/플랫폼</button>
+          <button class="filter" type="button" data-filter="operation">운영</button>
+          <button class="filter" type="button" data-filter="fundamental">기초</button>
+          <button class="filter" type="button" data-filter="performance">성능</button>
+          <button class="filter" type="button" data-filter="protection">보호</button>
+          <button class="filter" type="button" data-filter="openstack">OpenStack</button>
+          <button class="filter" type="button" data-filter="development">개발</button>
+        </div>
+      </div>
+
+      <div class="terms-grid" id="glossaryGrid"></div>
+      <div class="empty" id="emptyState" hidden>검색어와 일치하는 용어가 없습니다. 다른 약어나 카테고리를 선택해 보세요.</div>
+    </section>
+
+    <section class="phrases" aria-labelledby="phrases-title">
+      <div class="phrase-intro">
+        <p class="section-kicker">Use it in a meeting</p>
+        <h2 id="phrases-title">리뷰에서 바로 쓰는 질문</h2>
+        <p>짧게 말하고, 상대방의 설명을 정확히 확인하는 데 초점을 둔 문장입니다.</p>
+      </div>
+      <div class="phrase-list">
+        <p><span>01</span>Which protocol is the host using, FC or iSCSI?</p>
+        <p><span>02</span>Can you confirm the compute node's WWPNs?</p>
+        <p><span>03</span>Are both paths active and available for failover?</p>
+        <p><span>04</span>Is the LUN mapped to the correct initiator group?</p>
+        <p><span>05</span>Does this driver require multipath on the compute node?</p>
+        <p><span>06</span>What happens if one FC fabric goes down?</p>
+        <p><span>07</span>Is this a block-storage workflow or a file-sharing workflow?</p>
+        <p><span>08</span>Can we verify the volume mapping from the array side?</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <p>Standalone HTML · 외부 라이브러리 없이 동작합니다.</p>
+    <p>용어 확인: <a href="https://docs.openstack.org/cinder/latest/" target="_blank" rel="noreferrer">OpenStack Cinder</a> · <a href="https://nvmexpress.org/specification/nvme-of-specification/" target="_blank" rel="noreferrer">NVM Express</a> · <a href="https://docs.netapp.com/us-en/ontap-restapi/svm_overview.html" target="_blank" rel="noreferrer">NetApp ONTAP</a> · <a href="https://code.purestorage.com/swagger/" target="_blank" rel="noreferrer">Pure Storage</a></p>
+  </footer>
+
+  <script>
+    const terms = [
+      {
+        term: "SAN",
+        full: "Storage Area Network",
+        meaning: "스토리지 전용 네트워크 구조",
+        description: "서버가 원격 스토리지를 로컬 블록 장치처럼 사용하도록 연결하는 구조입니다. FC, iSCSI, NVMe-oF 등으로 구현할 수 있습니다.",
+        example: "The volume is exposed to the compute node through the SAN.",
+        category: "architecture"
+      },
+      {
+        term: "FC",
+        full: "Fibre Channel",
+        meaning: "파이버 채널",
+        description: "스토리지 트래픽에 많이 사용하는 고속 네트워크 기술입니다. FC SAN에서는 HBA, FC switch, storage array가 함께 동작합니다.",
+        example: "We use FC for low-latency block storage access.",
+        category: "connectivity"
+      },
+      {
+        term: "HBA",
+        full: "Host Bus Adapter",
+        meaning: "호스트 버스 어댑터",
+        description: "서버를 FC fabric이나 스토리지에 연결하는 전용 어댑터입니다. FC HBA 포트는 고유한 WWPN을 가집니다.",
+        example: "Please check whether the host HBA sees both fabrics.",
+        category: "connectivity"
+      },
+      {
+        term: "WWPN",
+        full: "World Wide Port Name",
+        meaning: "FC 포트의 전 세계 고유 이름",
+        description: "FC 포트를 식별하는 고유 식별자입니다. zoning과 LUN masking을 설정할 때 호스트와 스토리지 포트를 구분하는 데 사용합니다.",
+        example: "The zoning rule must include the compute node's WWPN.",
+        category: "connectivity"
+      },
+      {
+        term: "LUN",
+        full: "Logical Unit Number",
+        meaning: "논리 장치 번호·논리 블록 장치",
+        description: "스토리지 array가 호스트에 제공하는 논리 블록 장치와 그 식별자를 가리킵니다. Cinder volume이 LUN으로 매핑될 수 있습니다.",
+        example: "The array created a new LUN for the Cinder volume.",
+        category: "architecture"
+      },
+      {
+        term: "NAS",
+        full: "Network Attached Storage",
+        meaning: "네트워크 연결 파일 스토리지",
+        description: "파일 수준의 공유 서비스를 네트워크로 제공하는 방식입니다. 대표적인 접근 프로토콜은 NFS와 SMB입니다.",
+        example: "NAS presents shared files, while SAN presents block devices.",
+        category: "architecture"
+      },
+      {
+        term: "NFS",
+        full: "Network File System",
+        meaning: "네트워크 파일 시스템",
+        description: "Linux와 Unix 환경에서 네트워크 디렉터리를 mount해 사용하는 파일 공유 프로토콜입니다.",
+        example: "The backup service mounts the NFS export.",
+        category: "protocol"
+      },
+      {
+        term: "SMB",
+        full: "Server Message Block",
+        meaning: "서버 메시지 블록",
+        description: "Windows 환경에서 파일과 프린터를 공유하는 대표 프로토콜입니다. 예전에는 CIFS라는 이름도 많이 사용했습니다.",
+        example: "The Windows host connects to the SMB share.",
+        category: "protocol"
+      },
+      {
+        term: "iSCSI",
+        full: "Internet Small Computer Systems Interface",
+        meaning: "IP 네트워크 기반 블록 스토리지 프로토콜",
+        description: "SCSI 명령을 TCP/IP 네트워크로 전달해 Ethernet 환경에서 블록 스토리지를 제공합니다.",
+        example: "The host connects to the target over iSCSI.",
+        category: "protocol"
+      },
+      {
+        term: "NVMe-oF",
+        full: "Non-Volatile Memory Express over Fabrics",
+        meaning: "네트워크 fabric을 통한 NVMe",
+        description: "NVMe 명령을 네트워크 fabric 너머의 SSD 또는 storage subsystem으로 전달하는 기술군입니다. FC, TCP, RDMA 같은 transport를 사용할 수 있습니다.",
+        example: "NVMe-oF lets the host access remote NVMe storage with low overhead.",
+        category: "protocol"
+      },
+      {
+        term: "NVMe-FC",
+        full: "NVMe over Fibre Channel (NVMe/FC)",
+        meaning: "Fibre Channel을 통한 NVMe",
+        description: "NVMe 명령을 Fibre Channel fabric으로 전달하는 NVMe-oF transport입니다. 문서에서는 NVMe/FC 또는 FC-NVMe라고도 표기합니다.",
+        example: "The array supports NVMe/FC on the existing Fibre Channel fabric.",
+        category: "protocol"
+      },
+      {
+        term: "NVMe-TCP",
+        full: "NVMe over TCP (NVMe/TCP)",
+        meaning: "TCP를 통한 NVMe",
+        description: "표준 TCP/IP Ethernet 위에서 NVMe 명령을 전달하는 NVMe-oF transport입니다. 전용 FC fabric 없이도 NVMe 기반 블록 접근을 구성할 수 있습니다.",
+        example: "We chose NVMe/TCP because the data center already uses Ethernet.",
+        category: "protocol"
+      },
+      {
+        term: "RAID",
+        full: "Redundant Array of Independent Disks",
+        meaning: "독립 디스크 중복 배열",
+        description: "여러 디스크를 하나의 논리 그룹으로 묶어 성능, 용량, 장애 보호를 얻는 방식입니다. RAID는 백업을 대신하지 않습니다.",
+        example: "The array uses RAID to protect data when a drive fails.",
+        category: "architecture"
+      },
+      {
+        term: "SSD",
+        full: "Solid-State Drive",
+        meaning: "반도체 저장 장치",
+        description: "NAND 플래시 같은 비휘발성 메모리를 사용하는 저장 장치입니다. 일반적으로 HDD보다 지연 시간이 짧고 움직이는 부품이 없습니다.",
+        example: "The workload needs the predictable latency of SSD storage.",
+        category: "media"
+      },
+      {
+        term: "HDD",
+        full: "Hard Disk Drive",
+        meaning: "하드 디스크 드라이브",
+        description: "회전하는 자기 디스크와 헤드를 사용하는 저장 장치입니다. 대용량을 비교적 낮은 비용으로 제공하는 데 자주 사용합니다.",
+        example: "HDD is still useful for capacity-oriented workloads.",
+        category: "media"
+      },
+      {
+        term: "QLC",
+        full: "Quad-Level Cell",
+        meaning: "셀 하나에 4비트를 저장하는 NAND 방식",
+        description: "한 셀에 4비트를 저장해 높은 밀도와 낮은 비용을 목표로 합니다. 실제 성능과 내구성은 제품 설계와 workload에 따라 확인해야 합니다.",
+        example: "QLC can lower the cost per terabyte for read-heavy workloads.",
+        category: "media"
+      },
+      {
+        term: "TLC",
+        full: "Triple-Level Cell",
+        meaning: "셀 하나에 3비트를 저장하는 NAND 방식",
+        description: "한 셀에 3비트를 저장하는 플래시 메모리 방식입니다. 성능, 내구성, 용량, 비용 사이에서 균형을 잡는 데 널리 사용됩니다.",
+        example: "This tier uses TLC flash for a balance of performance and endurance.",
+        category: "media"
+      },
+      {
+        term: "HA",
+        full: "High Availability",
+        meaning: "고가용성",
+        description: "장애가 발생해도 서비스가 계속 제공되도록 이중화와 failover를 설계하는 개념입니다. dual controller와 dual fabric이 예입니다.",
+        example: "The HA design keeps the volume available during a controller failure.",
+        category: "operation"
+      },
+      {
+        term: "SVM",
+        full: "Storage Virtual Machine",
+        meaning: "스토리지 가상 머신",
+        description: "NetApp ONTAP 안에서 볼륨, LIF, 프로토콜 서비스를 묶어 논리적인 스토리지 서버처럼 제공하는 단위입니다. CLI에서는 예전의 vserver라는 표현도 볼 수 있습니다.",
+        example: "The LUN is served by the data SVM.",
+        category: "vendor"
+      },
+      {
+        term: "AFF",
+        full: "All Flash FAS",
+        meaning: "NetApp 올플래시 스토리지 제품군",
+        description: "NetApp의 all-flash 스토리지 시스템 제품군입니다. ONTAP을 실행하며 블록, 파일, 오브젝트 접근을 지원하는 모델이 있습니다.",
+        example: "The customer runs the Cinder backend on an AFF system.",
+        category: "vendor"
+      },
+      {
+        term: "FAS",
+        full: "Fabric-Attached Storage",
+        meaning: "NetApp 스토리지 제품군",
+        description: "NetApp의 스토리지 시스템 제품군 이름입니다. 모델과 구성에 따라 HDD와 flash를 조합한 hybrid 구성이 사용될 수 있습니다.",
+        example: "The FAS cluster provides both NFS and block storage services.",
+        category: "vendor"
+      },
+      {
+        term: "ONTAP",
+        full: "NetApp ONTAP data management software",
+        meaning: "NetApp 데이터 관리 소프트웨어",
+        description: "NetApp 스토리지에서 볼륨, SVM, LUN, NFS, SMB, replication 등을 관리하는 소프트웨어 플랫폼입니다. 약어라기보다 제품명으로 이해하면 쉽습니다.",
+        example: "The driver uses the ONTAP API to provision the volume.",
+        category: "vendor"
+      },
+      {
+        term: "FlashArray",
+        full: "Pure Storage FlashArray",
+        meaning: "Pure Storage 블록 스토리지 제품군",
+        description: "Pure Storage의 all-flash storage array 제품군입니다. Cinder 같은 외부 시스템은 API와 지원되는 storage protocol을 통해 volume을 관리할 수 있습니다.",
+        example: "The FlashArray provisioned the volume in a few seconds.",
+        category: "vendor"
+      },
+      {
+        term: "Purity",
+        full: "Purity//FA · FlashArray operating environment",
+        meaning: "FlashArray용 스토리지 운영 소프트웨어",
+        description: "Pure Storage FlashArray에서 array 기능과 데이터 서비스를 제공하는 소프트웨어 이름입니다. FlashArray는 Purity//FA를 운영 환경으로 사용합니다.",
+        example: "The feature is available in the current Purity//FA release.",
+        category: "vendor"
+      },
+      {
+        term: "multipath",
+        full: "Multipath I/O (MPIO)",
+        meaning: "다중 경로 입출력",
+        description: "호스트와 스토리지 사이에 여러 경로를 만들고 하나의 장치처럼 관리하는 방식입니다. 장애 대응과 경우에 따라 부하 분산에 사용합니다.",
+        example: "Please enable multipath so the host can use both FC paths.",
+        category: "operation"
+      },
+      {
+        term: "zoning",
+        full: "Fibre Channel zoning",
+        meaning: "FC fabric 접근 구역 설정",
+        description: "FC switch에서 어떤 initiator와 target 포트가 서로 통신할 수 있는지 제한하는 설정입니다. 보안과 장애 범위 축소에 도움이 됩니다.",
+        example: "The zoning change allows the host HBA to reach the storage target.",
+        category: "operation"
+      },
+      {
+        term: "LUN masking",
+        full: "Logical Unit Number masking",
+        meaning: "LUN 호스트 접근 제어",
+        description: "스토리지 array에서 특정 호스트 또는 initiator group에만 LUN이 보이도록 제한하는 기능입니다. zoning이 네트워크 경로를 제한한다면 masking은 LUN 표시·접근을 제한합니다.",
+        example: "LUN masking ensures that only the intended host can see the volume.",
+        category: "operation"
+      },
+      {
+        term: "Block storage",
+        full: "Block-level storage",
+        meaning: "블록 스토리지",
+        description: "호스트에 디스크처럼 보이는 고정 크기 블록 장치를 제공하는 모델입니다. 파일 시스템은 보통 호스트가 직접 관리합니다.",
+        example: "The database requires block storage with predictable latency.",
+        category: "fundamental"
+      },
+      {
+        term: "File storage",
+        full: "File-level storage",
+        meaning: "파일 스토리지",
+        description: "디렉터리와 파일 단위로 데이터를 공유하는 모델입니다. NFS나 SMB처럼 파일 프로토콜을 통해 접근합니다.",
+        example: "File storage is a better fit for shared home directories.",
+        category: "fundamental"
+      },
+      {
+        term: "Object storage",
+        full: "Object-based storage",
+        meaning: "오브젝트 스토리지",
+        description: "데이터를 object와 metadata로 저장하고 API로 접근하는 모델입니다. 대규모 비정형 데이터와 백업에 자주 사용합니다.",
+        example: "Object storage is useful for backups and large media files.",
+        category: "fundamental"
+      },
+      {
+        term: "DAS",
+        full: "Direct-Attached Storage",
+        meaning: "직접 연결 스토리지",
+        description: "네트워크를 거치지 않고 서버에 직접 연결된 저장 장치입니다. SAN이나 NAS처럼 여러 호스트가 공유하는 구조와 구분합니다.",
+        example: "This server uses DAS for its local boot disks.",
+        category: "fundamental"
+      },
+      {
+        term: "Storage array",
+        full: "Storage array",
+        meaning: "스토리지 어레이",
+        description: "여러 드라이브, 컨트롤러, 캐시, 네트워크 포트를 묶어 스토리지 서비스를 제공하는 장비입니다.",
+        example: "The storage array presents the volume to two compute nodes.",
+        category: "fundamental"
+      },
+      {
+        term: "Storage controller",
+        full: "Storage controller",
+        meaning: "스토리지 컨트롤러",
+        description: "호스트 I/O와 드라이브 I/O 사이를 처리하고 캐시, RAID, failover를 담당하는 구성 요소입니다.",
+        example: "The second storage controller takes over after a failure.",
+        category: "fundamental"
+      },
+      {
+        term: "Storage shelf",
+        full: "Drive enclosure or storage shelf",
+        meaning: "디스크 인클로저·스토리지 선반",
+        description: "드라이브와 확장 연결 장치를 담는 하드웨어 인클로저입니다. 컨트롤러와 별도의 shelf로 용량을 확장할 수 있습니다.",
+        example: "We added a storage shelf to increase raw capacity.",
+        category: "fundamental"
+      },
+      {
+        term: "Storage pool",
+        full: "Storage pool",
+        meaning: "스토리지 풀",
+        description: "여러 디스크나 aggregate의 자원을 묶어 volume을 할당하는 논리적 용량 단위입니다.",
+        example: "The scheduler selected the storage pool with enough free capacity.",
+        category: "fundamental"
+      },
+      {
+        term: "Aggregate",
+        full: "Disk aggregate",
+        meaning: "디스크 aggregate·물리 저장소 그룹",
+        description: "특히 ONTAP에서 여러 디스크 또는 RAID group을 묶어 volume이 사용할 물리 저장소를 구성하는 단위입니다.",
+        example: "The volume is placed on an aggregate with sufficient performance.",
+        category: "vendor"
+      },
+      {
+        term: "Volume",
+        full: "Logical storage volume",
+        meaning: "논리 볼륨",
+        description: "호스트나 파일 프로토콜에 제공되는 논리적인 저장 공간입니다. Cinder volume, LUN, file share가 서로 다른 형태의 volume일 수 있습니다.",
+        example: "The driver creates a volume from the requested size and type.",
+        category: "fundamental"
+      },
+      {
+        term: "Thin provisioning",
+        full: "Thin provisioning",
+        meaning: "씬 프로비저닝·지연 할당",
+        description: "호스트에 논리 용량을 먼저 제공하고 실제 물리 공간은 데이터가 기록될 때 할당하는 방식입니다.",
+        example: "Thin provisioning lets us present more logical capacity than the current allocation.",
+        category: "operation"
+      },
+      {
+        term: "Thick provisioning",
+        full: "Thick or fully provisioned storage",
+        meaning: "씩 프로비저닝·전체 선할당",
+        description: "volume을 만들 때 요청한 물리 저장 공간을 미리 예약하는 방식입니다. 용량 보장이 단순하지만 초기 공간 사용량이 큽니다.",
+        example: "This workload uses thick provisioning for a guaranteed capacity reservation.",
+        category: "operation"
+      },
+      {
+        term: "Overprovisioning",
+        full: "Storage overprovisioning",
+        meaning: "오버프로비저닝",
+        description: "실제 물리 용량보다 큰 논리 용량을 여러 사용자에게 할당하는 방식입니다. 사용률을 지속적으로 모니터링해야 합니다.",
+        example: "Overprovisioning is safe only when capacity alerts are configured.",
+        category: "operation"
+      },
+      {
+        term: "Raw capacity",
+        full: "Raw capacity",
+        meaning: "원시 용량",
+        description: "RAID, spare, metadata, filesystem, data reduction 등의 overhead를 빼기 전 드라이브의 총 물리 용량입니다.",
+        example: "The shelf adds 100 terabytes of raw capacity.",
+        category: "fundamental"
+      },
+      {
+        term: "Usable capacity",
+        full: "Usable capacity",
+        meaning: "사용 가능 용량",
+        description: "보호 방식과 시스템 overhead를 반영한 뒤 사용자가 실제로 할당할 수 있는 용량입니다. vendor마다 계산 기준을 확인해야 합니다.",
+        example: "Please compare usable capacity, not only raw capacity.",
+        category: "fundamental"
+      },
+      {
+        term: "Effective capacity",
+        full: "Effective capacity",
+        meaning: "데이터 절감 반영 유효 용량",
+        description: "압축·중복 제거 같은 data reduction 효과까지 가정해 표현한 용량입니다. workload에 따라 실제 값이 달라질 수 있습니다.",
+        example: "Effective capacity depends on the workload's data reduction ratio.",
+        category: "fundamental"
+      },
+      {
+        term: "Metadata",
+        full: "Metadata",
+        meaning: "메타데이터",
+        description: "데이터 자체가 아니라 위치, 크기, 권한, 상태, 매핑 정보를 설명하는 관리 정보입니다. 저장 시스템의 성능과 일관성에 영향을 줍니다.",
+        example: "The metadata tracks which blocks belong to the snapshot.",
+        category: "fundamental"
+      },
+      {
+        term: "Initiator",
+        full: "Storage initiator",
+        meaning: "스토리지 요청을 시작하는 호스트 측 주체",
+        description: "I/O 요청을 시작하는 서버 측 포트나 소프트웨어입니다. FC initiator, iSCSI initiator처럼 target과 짝을 이룹니다.",
+        example: "The initiator must be registered before the host can see the LUN.",
+        category: "connectivity"
+      },
+      {
+        term: "Target",
+        full: "Storage target",
+        meaning: "스토리지 서비스를 제공하는 대상 측 주체",
+        description: "호스트의 I/O 요청을 받아 volume이나 LUN을 제공하는 스토리지 측 포트 또는 서비스입니다.",
+        example: "The host connects to the target through both fabrics.",
+        category: "connectivity"
+      },
+      {
+        term: "Endpoint",
+        full: "Network or storage endpoint",
+        meaning: "통신 종단점",
+        description: "연결의 한쪽 끝을 식별하는 주소나 포트입니다. IP, WWPN, NVMe subsystem NQN 등이 endpoint를 식별하는 데 사용됩니다.",
+        example: "The connector discovers the remote endpoint before attaching the volume.",
+        category: "connectivity"
+      },
+      {
+        term: "SCSI",
+        full: "Small Computer System Interface",
+        meaning: "소형 컴퓨터 시스템 인터페이스",
+        description: "서버와 블록 장치 사이에서 명령과 데이터를 교환하는 표준 계열입니다. iSCSI와 FC는 SCSI 명령을 네트워크로 전달할 수 있습니다.",
+        example: "The connector sends SCSI commands to the exported device.",
+        category: "protocol"
+      },
+      {
+        term: "SAS",
+        full: "Serial Attached SCSI",
+        meaning: "직렬 연결 SCSI",
+        description: "서버나 storage array 내부에서 드라이브를 연결하는 직렬 인터페이스입니다. 엔터프라이즈 HDD와 SSD에서 자주 볼 수 있습니다.",
+        example: "The enclosure uses SAS links to connect the drives.",
+        category: "connectivity"
+      },
+      {
+        term: "SATA",
+        full: "Serial ATA (Serial Advanced Technology Attachment)",
+        meaning: "직렬 ATA 인터페이스",
+        description: "주로 PC와 비교적 저비용 저장 장치에 사용되는 직렬 드라이브 인터페이스입니다.",
+        example: "The archive tier uses high-capacity SATA disks.",
+        category: "connectivity"
+      },
+      {
+        term: "PCIe",
+        full: "Peripheral Component Interconnect Express",
+        meaning: "고속 주변 장치 연결 버스",
+        description: "CPU와 장치를 고속으로 연결하는 버스입니다. 로컬 NVMe SSD와 일부 고속 NIC·HBA가 PCIe를 사용합니다.",
+        example: "The NVMe device is attached directly through PCIe.",
+        category: "connectivity"
+      },
+      {
+        term: "WWNN",
+        full: "World Wide Node Name",
+        meaning: "FC 노드의 전 세계 고유 이름",
+        description: "FC 장치나 node 전체를 식별하는 고유 이름입니다. WWPN이 포트를 식별한다면 WWNN은 더 큰 장치나 node를 식별합니다.",
+        example: "The WWNN identifies the HBA node, while the WWPN identifies each port.",
+        category: "connectivity"
+      },
+      {
+        term: "FCID",
+        full: "Fibre Channel Identifier",
+        meaning: "FC fabric 안의 주소",
+        description: "Fibre Channel fabric에서 포트나 장치를 식별하는 주소입니다. 스위치와 호스트 로그에서 문제를 추적할 때 볼 수 있습니다.",
+        example: "The switch log shows the FCID of the affected target port.",
+        category: "connectivity"
+      },
+      {
+        term: "Fabric",
+        full: "Fibre Channel fabric",
+        meaning: "FC 스위치로 구성된 연결망",
+        description: "FC switch들이 연결되어 initiator와 target 사이의 경로를 제공하는 논리적 네트워크입니다. 운영 환경에서는 Fabric A와 B를 분리하는 경우가 많습니다.",
+        example: "The host has one independent path through each fabric.",
+        category: "connectivity"
+      },
+      {
+        term: "CNA",
+        full: "Converged Network Adapter",
+        meaning: "통합 네트워크 어댑터",
+        description: "Ethernet 데이터와 FCoE 같은 storage traffic을 하나의 어댑터로 처리하는 장치입니다.",
+        example: "The CNA carries both regular Ethernet and storage traffic.",
+        category: "connectivity"
+      },
+      {
+        term: "FCoE",
+        full: "Fibre Channel over Ethernet",
+        meaning: "Ethernet을 통한 Fibre Channel",
+        description: "Fibre Channel 프레임을 Ethernet 네트워크로 전달하는 기술입니다. FC SAN과 Ethernet 인프라를 일부 통합할 수 있습니다.",
+        example: "FCoE requires a network that can carry lossless storage traffic.",
+        category: "protocol"
+      },
+      {
+        term: "TCP/IP",
+        full: "Transmission Control Protocol / Internet Protocol",
+        meaning: "인터넷 통신 프로토콜 묶음",
+        description: "IP 주소로 목적지를 찾고 TCP로 신뢰성 있는 연결을 제공하는 네트워크 프로토콜 조합입니다. iSCSI와 NVMe/TCP가 사용합니다.",
+        example: "The iSCSI traffic runs over the existing TCP/IP network.",
+        category: "protocol"
+      },
+      {
+        term: "Ethernet",
+        full: "Ethernet networking",
+        meaning: "이더넷 네트워크 기술",
+        description: "데이터센터와 LAN에서 가장 널리 쓰이는 네트워크 기술입니다. iSCSI, NVMe/TCP, RoCE의 기반이 될 수 있습니다.",
+        example: "The design uses Ethernet for both management and storage traffic.",
+        category: "connectivity"
+      },
+      {
+        term: "RDMA",
+        full: "Remote Direct Memory Access",
+        meaning: "원격 직접 메모리 접근",
+        description: "한 호스트가 다른 호스트의 메모리로 낮은 CPU overhead로 데이터를 전달하는 기술입니다. NVMe-oF transport로 사용할 수 있습니다.",
+        example: "RDMA can reduce CPU overhead for high-throughput storage traffic.",
+        category: "protocol"
+      },
+      {
+        term: "RoCE",
+        full: "RDMA over Converged Ethernet",
+        meaning: "Converged Ethernet을 통한 RDMA",
+        description: "Ethernet 네트워크에서 RDMA를 제공하는 기술입니다. 지연 시간이 중요한 storage fabric을 설계할 때 고려합니다.",
+        example: "The NVMe/RDMA design uses RoCE for the data path.",
+        category: "protocol"
+      },
+      {
+        term: "NVMe",
+        full: "Non-Volatile Memory Express",
+        meaning: "비휘발성 메모리용 고속 저장 인터페이스",
+        description: "PCIe 기반 flash storage의 병렬성과 낮은 지연을 활용하도록 설계된 명령 인터페이스입니다. NVMe-oF의 기본 명령 모델이기도 합니다.",
+        example: "The local device exposes an NVMe namespace to the host.",
+        category: "protocol"
+      },
+      {
+        term: "NVMe/RDMA",
+        full: "NVMe over RDMA",
+        meaning: "RDMA를 통한 NVMe",
+        description: "NVMe-oF에서 RDMA를 transport로 사용하는 방식입니다. RoCE나 InfiniBand 같은 RDMA 네트워크가 필요합니다.",
+        example: "NVMe/RDMA provides low latency when the fabric is properly configured.",
+        category: "protocol"
+      },
+      {
+        term: "IQN",
+        full: "iSCSI Qualified Name",
+        meaning: "iSCSI initiator·target 이름",
+        description: "iSCSI endpoint를 식별하는 문자열 형식의 이름입니다. initiator와 target을 설정하고 ACL을 만들 때 사용합니다.",
+        example: "The target IQN must match the value returned by discovery.",
+        category: "connectivity"
+      },
+      {
+        term: "NQN",
+        full: "NVMe Qualified Name",
+        meaning: "NVMe subsystem의 고유 이름",
+        description: "NVMe-oF에서 host와 storage subsystem을 식별하는 이름입니다. NVMe/TCP와 NVMe/FC 연결 설정에 사용합니다.",
+        example: "The host connects to the subsystem using its NQN.",
+        category: "connectivity"
+      },
+      {
+        term: "Target portal",
+        full: "iSCSI target portal",
+        meaning: "iSCSI target의 접속 주소",
+        description: "iSCSI target에 접속하기 위한 IP 주소와 TCP port 조합입니다. 여러 portal을 등록하면 다중 경로를 구성할 수 있습니다.",
+        example: "Add both target portals before creating the multipath device.",
+        category: "connectivity"
+      },
+      {
+        term: "CHAP",
+        full: "Challenge-Handshake Authentication Protocol",
+        meaning: "iSCSI 인증 프로토콜",
+        description: "iSCSI initiator와 target이 공유 secret을 사용해 서로를 인증하는 방식입니다.",
+        example: "The iSCSI connection uses CHAP authentication.",
+        category: "operation"
+      },
+      {
+        term: "SCSI-3 PR",
+        full: "SCSI-3 Persistent Reservations",
+        meaning: "SCSI 영구 예약",
+        description: "여러 호스트가 공유 블록 장치를 사용할 때 특정 호스트의 접근 권한을 예약하는 SCSI 기능입니다. 클러스터 fencing에 활용됩니다.",
+        example: "The clustered service uses SCSI-3 PR to protect shared storage access.",
+        category: "protocol"
+      },
+      {
+        term: "ALUA",
+        full: "Asymmetric Logical Unit Access",
+        meaning: "비대칭 LUN 접근",
+        description: "경로마다 성능이나 최적화 상태가 다를 수 있음을 호스트에 알려주는 방식입니다. 호스트가 optimized path를 우선 선택하도록 돕습니다.",
+        example: "ALUA helps the host prefer the optimized path to the LUN.",
+        category: "operation"
+      },
+      {
+        term: "ANA",
+        full: "Asymmetric Namespace Access",
+        meaning: "비대칭 NVMe namespace 접근",
+        description: "NVMe 환경에서 각 path의 namespace 접근 상태를 알려주는 기능입니다. ALUA와 비슷한 목적을 NVMe에서 수행합니다.",
+        example: "The NVMe host uses ANA to select an optimized controller path.",
+        category: "operation"
+      },
+      {
+        term: "DM-Multipath",
+        full: "Device Mapper Multipath",
+        meaning: "Linux device-mapper 다중 경로",
+        description: "Linux에서 여러 SCSI 경로를 하나의 multipath block device로 묶는 기능입니다. multipathd와 multipath.conf가 함께 사용됩니다.",
+        example: "DM-Multipath presents one stable device name despite multiple paths.",
+        category: "operation"
+      },
+      {
+        term: "Optimized path",
+        full: "Active optimized path",
+        meaning: "최적화된 활성 경로",
+        description: "현재 storage controller나 target에 가장 효율적으로 연결되는 경로입니다. ALUA에서 preferred path로 선택됩니다.",
+        example: "The host should send I/O through the active optimized path.",
+        category: "operation"
+      },
+      {
+        term: "Non-optimized path",
+        full: "Active non-optimized path",
+        meaning: "비최적 활성 경로",
+        description: "접속은 가능하지만 다른 controller를 거쳐 성능상 우선순위가 낮은 경로입니다. 최적 경로 장애 시 사용할 수 있습니다.",
+        example: "The non-optimized path remains available for failover.",
+        category: "operation"
+      },
+      {
+        term: "Path failover",
+        full: "Storage path failover",
+        meaning: "스토리지 경로 장애 전환",
+        description: "현재 경로가 끊기면 host가 다른 경로로 I/O를 계속 보내는 동작입니다. multipath와 controller HA가 함께 관여합니다.",
+        example: "Path failover should be transparent to the application.",
+        category: "operation"
+      },
+      {
+        term: "Host group",
+        full: "Storage host group",
+        meaning: "스토리지 호스트 그룹",
+        description: "여러 initiator를 하나의 호스트 또는 클러스터 단위로 묶은 array-side 객체입니다. LUN 매핑을 단순화합니다.",
+        example: "Map the LUN to the host group instead of a single port.",
+        category: "operation"
+      },
+      {
+        term: "Initiator group",
+        full: "Storage initiator group",
+        meaning: "initiator 그룹",
+        description: "FC WWPN이나 iSCSI IQN처럼 호스트의 initiator를 묶어 volume 접근 권한을 부여하는 설정 단위입니다.",
+        example: "The driver maps the volume to the correct initiator group.",
+        category: "operation"
+      },
+      {
+        term: "CIFS",
+        full: "Common Internet File System",
+        meaning: "SMB의 예전 명칭",
+        description: "SMB의 초기 Microsoft 명칭으로, NetApp CLI와 문서에서 여전히 protocol 또는 service 이름으로 자주 보입니다.",
+        example: "The legacy configuration still refers to the SMB service as CIFS.",
+        category: "protocol"
+      },
+      {
+        term: "POSIX",
+        full: "Portable Operating System Interface",
+        meaning: "Unix 계열 운영체제 인터페이스 표준",
+        description: "파일 권한, 사용자, 그룹, system call 같은 Unix 계열 동작의 공통 기준입니다. NFS 파일 접근 설명에서 자주 나옵니다.",
+        example: "The NFS export follows POSIX permission semantics.",
+        category: "protocol"
+      },
+      {
+        term: "ACL",
+        full: "Access Control List",
+        meaning: "접근 제어 목록",
+        description: "파일, share, LUN 또는 API resource에 누가 어떤 작업을 할 수 있는지 정의하는 권한 목록입니다.",
+        example: "The share ACL allows the application account to read and write.",
+        category: "operation"
+      },
+      {
+        term: "Export policy",
+        full: "NFS export policy",
+        meaning: "NFS export 접근 정책",
+        description: "어떤 client가 NFS volume을 mount할 수 있고 어떤 권한으로 접근할 수 있는지 정의하는 규칙입니다.",
+        example: "Update the export policy before mounting the NFS volume.",
+        category: "operation"
+      },
+      {
+        term: "Share",
+        full: "File share",
+        meaning: "파일 공유",
+        description: "SMB나 다른 파일 프로토콜로 client에 노출한 공유 이름과 경로입니다.",
+        example: "The application writes its reports to the SMB share.",
+        category: "protocol"
+      },
+      {
+        term: "Mount",
+        full: "Filesystem mount",
+        meaning: "파일 시스템 연결",
+        description: "원격 파일 시스템이나 블록 장치의 파일 시스템을 호스트의 디렉터리 트리에 연결하는 작업입니다.",
+        example: "The compute node mounts the NFS export at boot time.",
+        category: "operation"
+      },
+      {
+        term: "S3",
+        full: "Simple Storage Service API",
+        meaning: "오브젝트 스토리지 API 방식",
+        description: "bucket과 object를 HTTP API로 다루는 사실상의 표준 인터페이스입니다. Cinder의 block volume과는 다른 object storage 모델입니다.",
+        example: "The backup service uploads the image to an S3 bucket.",
+        category: "protocol"
+      },
+      {
+        term: "NFSv4.1",
+        full: "Network File System version 4.1",
+        meaning: "NFS 버전 4.1",
+        description: "세션, 보안, state 관리가 개선된 NFS 버전입니다. VMware NFS datastore나 엔터프라이즈 파일 서비스에서 볼 수 있습니다.",
+        example: "The datastore is exported through NFSv4.1.",
+        category: "protocol"
+      },
+      {
+        term: "Kerberos",
+        full: "Kerberos network authentication protocol",
+        meaning: "티켓 기반 네트워크 인증",
+        description: "비밀번호를 직접 보내지 않고 ticket으로 client와 storage service를 인증하는 방식입니다. SMB와 NFS 보안 구성에 사용됩니다.",
+        example: "The NFS service uses Kerberos for user authentication.",
+        category: "operation"
+      },
+      {
+        term: "IOPS",
+        full: "Input/Output Operations Per Second",
+        meaning: "초당 입출력 횟수",
+        description: "스토리지가 1초에 처리하는 I/O operation 수입니다. 작은 random I/O workload의 성능을 말할 때 자주 사용합니다.",
+        example: "The benchmark reaches 100,000 IOPS at a 4K block size.",
+        category: "performance"
+      },
+      {
+        term: "Latency",
+        full: "I/O latency",
+        meaning: "입출력 지연 시간",
+        description: "I/O 요청을 보낸 뒤 완료 응답을 받을 때까지 걸리는 시간입니다. 보통 ms 또는 μs로 표현합니다.",
+        example: "The new design reduces average latency below one millisecond.",
+        category: "performance"
+      },
+      {
+        term: "Throughput",
+        full: "Data throughput",
+        meaning: "데이터 처리량",
+        description: "일정 시간 동안 전송하거나 처리한 데이터의 양입니다. MB/s나 GB/s로 표현하며 큰 sequential I/O에서 중요합니다.",
+        example: "The backup job is limited by sequential throughput.",
+        category: "performance"
+      },
+      {
+        term: "Bandwidth",
+        full: "Network or storage bandwidth",
+        meaning: "전송 대역폭",
+        description: "네트워크나 storage path가 이론적으로 전달할 수 있는 데이터 전송 용량입니다. 실제 throughput과는 다를 수 있습니다.",
+        example: "The link has enough bandwidth for the replication stream.",
+        category: "performance"
+      },
+      {
+        term: "Queue depth",
+        full: "I/O queue depth",
+        meaning: "동시에 대기 중인 I/O 수",
+        description: "호스트나 장치가 한 번에 처리 대기시키는 I/O request의 수입니다. 너무 낮거나 높으면 성능에 영향을 줍니다.",
+        example: "Increase the queue depth only after checking device latency.",
+        category: "performance"
+      },
+      {
+        term: "Block size",
+        full: "I/O block size",
+        meaning: "I/O 한 번의 데이터 크기",
+        description: "하나의 read 또는 write request가 다루는 데이터 크기입니다. 4K, 16K, 64K처럼 workload에 따라 달라집니다.",
+        example: "Please run the test with the same block size as production.",
+        category: "performance"
+      },
+      {
+        term: "Random I/O",
+        full: "Random input/output workload",
+        meaning: "무작위 입출력",
+        description: "연속되지 않은 위치를 불규칙하게 읽고 쓰는 workload입니다. 데이터베이스와 VM 디스크에서 자주 나타납니다.",
+        example: "Random I/O is usually more sensitive to latency than bandwidth.",
+        category: "performance"
+      },
+      {
+        term: "Sequential I/O",
+        full: "Sequential input/output workload",
+        meaning: "순차 입출력",
+        description: "연속된 위치를 순서대로 읽고 쓰는 workload입니다. 백업, 로그, 대용량 파일 복사에서 흔합니다.",
+        example: "Sequential I/O can achieve higher throughput than random I/O.",
+        category: "performance"
+      },
+      {
+        term: "Read/write ratio",
+        full: "Read-to-write ratio",
+        meaning: "읽기와 쓰기의 비율",
+        description: "workload에서 read와 write가 차지하는 비율입니다. cache와 media 선택, benchmark 조건을 정할 때 중요합니다.",
+        example: "The test uses a 70-to-30 read/write ratio.",
+        category: "performance"
+      },
+      {
+        term: "Tail latency",
+        full: "High-percentile or tail latency",
+        meaning: "상위 구간 지연 시간",
+        description: "평균이 아니라 느린 요청들의 지연을 말합니다. 장애나 queue congestion이 있을 때 사용자 경험을 더 잘 보여줄 수 있습니다.",
+        example: "We need to investigate the tail latency, not only the average.",
+        category: "performance"
+      },
+      {
+        term: "p99",
+        full: "99th percentile latency",
+        meaning: "99퍼센타일 지연 시간",
+        description: "전체 요청 중 99%가 이 값 이하로 완료되고, 가장 느린 1%가 이 값보다 느리다는 통계 지표입니다.",
+        example: "The p99 latency increased during the controller failover.",
+        category: "performance"
+      },
+      {
+        term: "QoS",
+        full: "Quality of Service",
+        meaning: "서비스 품질 제어",
+        description: "volume이나 tenant별로 IOPS, throughput, latency 같은 성능 한도나 보장치를 설정하는 기능입니다.",
+        example: "The volume type applies a QoS limit of 5,000 IOPS.",
+        category: "performance"
+      },
+      {
+        term: "Throttle",
+        full: "I/O throttling",
+        meaning: "입출력 속도 제한",
+        description: "특정 workload가 사용할 수 있는 IOPS나 bandwidth를 제한해 다른 workload를 보호하는 동작입니다.",
+        example: "The system throttles rebuild traffic to protect application latency.",
+        category: "performance"
+      },
+      {
+        term: "Cache",
+        full: "Storage cache",
+        meaning: "스토리지 캐시",
+        description: "자주 쓰는 데이터나 아직 media에 기록하지 않은 데이터를 빠른 메모리에 임시 저장하는 영역입니다.",
+        example: "The controller cache absorbs short bursts of write traffic.",
+        category: "performance"
+      },
+      {
+        term: "Read cache",
+        full: "Read cache",
+        meaning: "읽기 캐시",
+        description: "최근 또는 자주 읽는 데이터를 메모리에 보관해 다음 read의 지연을 줄이는 캐시입니다.",
+        example: "Read cache improves performance for frequently accessed blocks.",
+        category: "performance"
+      },
+      {
+        term: "Write-back cache",
+        full: "Write-back cache",
+        meaning: "지연 기록 캐시",
+        description: "데이터를 먼저 보호된 cache에 기록하고 host에 완료를 응답한 뒤 media에 나중에 기록하는 방식입니다. 전원 보호가 중요합니다.",
+        example: "Write-back cache requires battery or flash-backed protection.",
+        category: "performance"
+      },
+      {
+        term: "Write-through",
+        full: "Write-through cache",
+        meaning: "동시 기록 캐시",
+        description: "데이터를 cache와 backend storage에 함께 기록한 뒤 완료를 응답하는 방식입니다. 보통 안정성을 위해 지연 시간이 더 커질 수 있습니다.",
+        example: "Write-through mode favors safety over peak write latency.",
+        category: "performance"
+      },
+      {
+        term: "Cache hit",
+        full: "Cache hit ratio",
+        meaning: "캐시 적중·적중률",
+        description: "요청한 데이터가 cache에 있어 backend media까지 읽지 않아도 되는 상황 또는 그 비율입니다.",
+        example: "A higher cache hit ratio reduced the read latency.",
+        category: "performance"
+      },
+      {
+        term: "FIO",
+        full: "Flexible I/O Tester",
+        meaning: "스토리지 I/O 부하 테스트 도구",
+        description: "block size, queue depth, read/write ratio 등을 지정해 Linux storage 성능을 측정하는 널리 쓰이는 도구입니다.",
+        example: "We used FIO to reproduce the production I/O pattern.",
+        category: "development"
+      },
+      {
+        term: "Benchmark",
+        full: "Storage benchmark",
+        meaning: "성능 측정 시험",
+        description: "정해진 조건과 workload로 시스템 성능을 측정하고 비교하는 시험입니다. 조건을 함께 기록해야 결과가 의미 있습니다.",
+        example: "The benchmark is not comparable because the block sizes are different.",
+        category: "development"
+      },
+      {
+        term: "SLA",
+        full: "Service Level Agreement",
+        meaning: "서비스 수준 계약",
+        description: "서비스 제공자와 사용자가 합의한 가용성, 성능, 복구 시간 같은 공식 약속입니다.",
+        example: "The storage SLA promises 99.99 percent availability.",
+        category: "operation"
+      },
+      {
+        term: "SLO",
+        full: "Service Level Objective",
+        meaning: "서비스 수준 목표",
+        description: "SLA를 달성하기 위해 운영팀이 목표로 삼는 측정 가능한 수준입니다. latency나 error rate로 정의할 수 있습니다.",
+        example: "Our SLO is to keep volume attach latency below ten seconds.",
+        category: "operation"
+      },
+      {
+        term: "Saturation",
+        full: "Resource saturation",
+        meaning: "자원 포화",
+        description: "device, controller, link, CPU 같은 자원이 처리 한계에 도달해 queue와 latency가 증가하는 상태입니다.",
+        example: "The latency spike started when the backend reached saturation.",
+        category: "performance"
+      },
+      {
+        term: "RAID 0",
+        full: "Redundant Array of Independent Disks, level 0",
+        meaning: "스트라이핑만 사용하는 RAID",
+        description: "데이터를 여러 디스크에 나누어 성능과 용량을 높이지만 redundancy가 없어 한 디스크 장애 시 전체 데이터가 영향을 받습니다.",
+        example: "RAID 0 improves throughput, but it provides no fault tolerance.",
+        category: "protection"
+      },
+      {
+        term: "RAID 1",
+        full: "Redundant Array of Independent Disks, level 1",
+        meaning: "미러링 RAID",
+        description: "같은 데이터를 두 디스크에 복제하는 방식입니다. 한 디스크 장애를 견디지만 usable capacity는 raw capacity보다 작습니다.",
+        example: "RAID 1 keeps a mirror copy on the second drive.",
+        category: "protection"
+      },
+      {
+        term: "RAID 5",
+        full: "Redundant Array of Independent Disks, level 5",
+        meaning: "분산 parity를 사용하는 RAID",
+        description: "데이터와 parity를 여러 디스크에 분산해 한 디스크 장애를 복구할 수 있는 방식입니다.",
+        example: "RAID 5 can survive one drive failure, but rebuild performance matters.",
+        category: "protection"
+      },
+      {
+        term: "RAID 6",
+        full: "Redundant Array of Independent Disks, level 6",
+        meaning: "이중 parity RAID",
+        description: "두 개의 독립적인 parity를 저장해 보통 두 디스크 장애까지 견디는 방식입니다.",
+        example: "RAID 6 offers more protection for large disk groups.",
+        category: "protection"
+      },
+      {
+        term: "RAID 10",
+        full: "RAID 1+0",
+        meaning: "미러링과 스트라이핑을 조합한 RAID",
+        description: "먼저 데이터를 mirror하고 그 mirror 세트를 stripe하는 방식입니다. 성능과 장애 보호가 좋지만 용량 효율은 낮습니다.",
+        example: "The database tier uses RAID 10 for random write performance.",
+        category: "protection"
+      },
+      {
+        term: "Parity",
+        full: "Parity data",
+        meaning: "장애 복구용 parity 정보",
+        description: "원본 데이터 일부가 손실돼도 나머지 데이터로 복구할 수 있도록 계산해 저장하는 정보입니다.",
+        example: "The controller recalculates the missing block from parity.",
+        category: "protection"
+      },
+      {
+        term: "Hot spare",
+        full: "Hot spare drive",
+        meaning: "대기 중인 예비 디스크",
+        description: "장애가 난 드라이브를 대신해 자동 rebuild에 사용되도록 미리 예약한 드라이브입니다.",
+        example: "The hot spare started rebuilding the failed disk automatically.",
+        category: "protection"
+      },
+      {
+        term: "Rebuild",
+        full: "RAID rebuild",
+        meaning: "RAID 데이터 재구성",
+        description: "장애가 난 드라이브의 데이터를 parity나 mirror 정보로 복원하는 과정입니다. 진행 중에는 성능과 장애 위험을 함께 고려합니다.",
+        example: "The rebuild is throttled to protect the production workload.",
+        category: "protection"
+      },
+      {
+        term: "Scrub",
+        full: "Data scrub",
+        meaning: "데이터 무결성 점검·복구 작업",
+        description: "저장된 데이터를 읽어 checksum과 parity를 검사하고 latent error를 미리 발견하는 백그라운드 작업입니다.",
+        example: "The array runs a weekly scrub to detect silent corruption.",
+        category: "protection"
+      },
+      {
+        term: "Deep scrub",
+        full: "Deep data scrub",
+        meaning: "전체 범위 무결성 점검",
+        description: "일반 scrub보다 더 넓은 범위의 object나 block을 읽어 데이터 손상을 확인하는 점검 작업입니다. Ceph에서 자주 듣습니다.",
+        example: "The Ceph cluster schedules a deep scrub during a quiet period.",
+        category: "protection"
+      },
+      {
+        term: "Checksum",
+        full: "Data checksum",
+        meaning: "데이터 무결성 확인값",
+        description: "데이터에서 계산한 값을 저장해 나중에 읽은 데이터가 바뀌었는지 확인하는 방법입니다.",
+        example: "The checksum detects corruption before the block reaches the application.",
+        category: "protection"
+      },
+      {
+        term: "CRC",
+        full: "Cyclic Redundancy Check",
+        meaning: "순환 중복 검사",
+        description: "전송이나 저장 중 발생한 bit error를 찾기 위해 계산하는 오류 검출 코드입니다.",
+        example: "The link reported a CRC error on the affected frame.",
+        category: "protection"
+      },
+      {
+        term: "Bit rot",
+        full: "Data bit rot",
+        meaning: "시간이 지나며 발생하는 데이터 손상",
+        description: "애플리케이션이 데이터를 덮어쓰지 않아도 media 열화나 오류로 bit가 바뀌는 현상입니다. checksum과 scrub으로 탐지합니다.",
+        example: "Regular scrubbing helps detect bit rot early.",
+        category: "protection"
+      },
+      {
+        term: "URE",
+        full: "Unrecoverable Read Error",
+        meaning: "복구할 수 없는 읽기 오류",
+        description: "드라이브가 특정 sector를 읽지 못하고 내부 오류 복구도 실패한 상태입니다. RAID rebuild 위험을 평가할 때 고려합니다.",
+        example: "A URE during rebuild can increase the risk of data loss.",
+        category: "protection"
+      },
+      {
+        term: "Write hole",
+        full: "RAID write hole",
+        meaning: "RAID 부분 기록 불일치 문제",
+        description: "전원 장애가 stripe의 일부 block만 기록한 순간 발생해 data와 parity가 서로 맞지 않게 되는 문제입니다.",
+        example: "The journal protects the RAID metadata from a write hole.",
+        category: "protection"
+      },
+      {
+        term: "Journal",
+        full: "Storage journal",
+        meaning: "변경 기록 영역",
+        description: "실제 data 영역에 반영하기 전 변경 내용을 순서대로 기록하는 영역입니다. crash recovery와 metadata 일관성에 사용합니다.",
+        example: "The journal replays pending metadata updates after a crash.",
+        category: "protection"
+      },
+      {
+        term: "WAL",
+        full: "Write-Ahead Logging",
+        meaning: "선행 기록 로그",
+        description: "데이터 변경을 본체에 반영하기 전에 로그에 먼저 기록하는 일관성 기법입니다. 데이터베이스와 storage metadata에서 사용합니다.",
+        example: "The database uses WAL to recover committed writes after a restart.",
+        category: "protection"
+      },
+      {
+        term: "Snapshot",
+        full: "Point-in-time snapshot",
+        meaning: "특정 시점 복사본",
+        description: "특정 시점의 데이터 상태를 보존하는 논리적 복사본입니다. 보통 변경된 block만 추적하므로 일반 backup과 목적이 다릅니다.",
+        example: "Create a snapshot before upgrading the application.",
+        category: "protection"
+      },
+      {
+        term: "Clone",
+        full: "Storage clone",
+        meaning: "스토리지 기반 복제 볼륨",
+        description: "기존 volume이나 snapshot을 기반으로 만든 별도의 writable 복사본입니다. 테스트와 개발 환경에 유용합니다.",
+        example: "The test environment was created from a clone of production data.",
+        category: "protection"
+      },
+      {
+        term: "Copy-on-write",
+        full: "Copy-on-write (CoW)",
+        meaning: "쓰기 시 원본 보존 복사 방식",
+        description: "기존 block을 덮어쓰기 전에 원본을 다른 위치에 보존하는 snapshot 구현 방식입니다.",
+        example: "Copy-on-write snapshots preserve the original block before an update.",
+        category: "protection"
+      },
+      {
+        term: "Redirect-on-write",
+        full: "Redirect-on-write (RoW)",
+        meaning: "새 위치 기록 방식",
+        description: "기존 block을 덮어쓰는 대신 새 위치에 변경 데이터를 기록하고 mapping을 바꾸는 방식입니다.",
+        example: "Redirect-on-write avoids copying the old block for every update.",
+        category: "protection"
+      },
+      {
+        term: "Consistency group",
+        full: "Storage consistency group",
+        meaning: "일관성 그룹",
+        description: "여러 volume을 하나의 시점에 함께 snapshot하거나 replicate해 애플리케이션 데이터의 write order를 보존하는 단위입니다.",
+        example: "Put the database volumes in one consistency group.",
+        category: "protection"
+      },
+      {
+        term: "Crash-consistent",
+        full: "Crash-consistent copy",
+        meaning: "장애 직전 상태와 같은 복사본",
+        description: "애플리케이션을 멈추지 않고 순간적으로 만든 복사본으로, 전원 장애 후 재부팅한 것과 비슷한 상태를 보장합니다.",
+        example: "The backup is crash-consistent but not application-consistent.",
+        category: "protection"
+      },
+      {
+        term: "Application-consistent",
+        full: "Application-consistent copy",
+        meaning: "애플리케이션 상태를 반영한 복사본",
+        description: "데이터베이스 flush나 애플리케이션 quiesce 같은 절차를 거쳐 복구 가능한 애플리케이션 상태를 보장하는 복사본입니다.",
+        example: "The database backup is application-consistent after the flush completes.",
+        category: "protection"
+      },
+      {
+        term: "Replication",
+        full: "Storage replication",
+        meaning: "스토리지 간 데이터 복제",
+        description: "한 storage system의 volume이나 dataset 변경 내용을 다른 system으로 전달하는 보호 방식입니다.",
+        example: "Replication keeps a secondary copy at the disaster recovery site.",
+        category: "protection"
+      },
+      {
+        term: "Synchronous replication",
+        full: "Synchronous replication",
+        meaning: "동기식 복제",
+        description: "primary와 replica에 변경이 기록된 뒤 host에 완료를 응답하는 방식입니다. 낮은 RPO를 위해 지연 시간을 감수할 수 있습니다.",
+        example: "Synchronous replication requires a low-latency link between sites.",
+        category: "protection"
+      },
+      {
+        term: "Asynchronous replication",
+        full: "Asynchronous replication",
+        meaning: "비동기식 복제",
+        description: "primary에 먼저 완료를 응답하고 replica에는 나중에 변경을 전달하는 방식입니다. 원거리 복제에 적합하지만 RPO가 0이 아닐 수 있습니다.",
+        example: "Asynchronous replication can support a longer distance between sites.",
+        category: "protection"
+      },
+      {
+        term: "RPO",
+        full: "Recovery Point Objective",
+        meaning: "복구 시 허용 가능한 데이터 손실 시점",
+        description: "장애가 발생했을 때 얼마나 이전 시점까지의 데이터 손실을 허용할지 나타내는 목표입니다.",
+        example: "The business requires an RPO of less than five minutes.",
+        category: "protection"
+      },
+      {
+        term: "RTO",
+        full: "Recovery Time Objective",
+        meaning: "복구 목표 시간",
+        description: "장애 후 서비스를 다시 사용할 수 있게 될 때까지 허용하는 최대 시간입니다.",
+        example: "The recovery design must meet a one-hour RTO.",
+        category: "protection"
+      },
+      {
+        term: "DR",
+        full: "Disaster Recovery",
+        meaning: "재해 복구",
+        description: "사이트 장애나 큰 사고 이후 서비스와 데이터를 복구하기 위한 기술과 운영 계획입니다.",
+        example: "The replicated volume is part of the disaster recovery plan.",
+        category: "protection"
+      },
+      {
+        term: "Failover",
+        full: "Storage service failover",
+        meaning: "대체 구성 요소로 전환",
+        description: "장애가 난 controller, path, node 대신 standby 또는 다른 active 구성 요소가 서비스를 이어받는 동작입니다.",
+        example: "The controller failover was transparent to the host.",
+        category: "protection"
+      },
+      {
+        term: "Failback",
+        full: "Storage service failback",
+        meaning: "원래 구성 요소로 복귀",
+        description: "장애가 복구된 뒤 서비스나 workload를 원래 controller, node, site로 되돌리는 동작입니다.",
+        example: "We performed a controlled failback after repairing the controller.",
+        category: "protection"
+      },
+      {
+        term: "Active-active",
+        full: "Active-active configuration",
+        meaning: "두 구성 요소가 동시에 서비스하는 구성",
+        description: "두 controller나 site가 동시에 I/O를 처리하고 한쪽 장애 시 다른 쪽이 계속 서비스하는 구성입니다.",
+        example: "The active-active design allows both controllers to serve I/O.",
+        category: "protection"
+      },
+      {
+        term: "Active-passive",
+        full: "Active-passive configuration",
+        meaning: "한쪽만 서비스하고 다른 쪽은 대기하는 구성",
+        description: "한 구성 요소가 traffic을 처리하고 다른 구성 요소는 장애 시 takeover할 준비를 하는 구성입니다.",
+        example: "The active-passive pair switches ownership during failover.",
+        category: "protection"
+      },
+      {
+        term: "Quorum",
+        full: "Cluster quorum",
+        meaning: "클러스터 의사결정에 필요한 과반수",
+        description: "split-brain을 피하기 위해 클러스터가 정상 상태라고 판단하는 데 필요한 node나 vote의 기준입니다.",
+        example: "The cluster stops writes when it loses quorum.",
+        category: "protection"
+      },
+      {
+        term: "Witness",
+        full: "Cluster witness",
+        meaning: "클러스터 판단을 돕는 외부 witness",
+        description: "두 site가 서로 살아 있다고 주장하는 상황에서 어느 쪽이 서비스를 유지할지 판단하도록 vote를 제공하는 외부 구성 요소입니다.",
+        example: "The witness helps the stretched cluster avoid split-brain.",
+        category: "protection"
+      },
+      {
+        term: "Erasure coding",
+        full: "Erasure coding",
+        meaning: "데이터와 복구 조각을 분산 저장하는 방식",
+        description: "data chunk와 parity chunk를 여러 장치에 분산해 replication보다 적은 overhead로 장애 복구를 제공하는 방식입니다.",
+        example: "Erasure coding improves capacity efficiency for object storage.",
+        category: "protection"
+      },
+      {
+        term: "Deduplication",
+        full: "Data deduplication",
+        meaning: "중복 제거",
+        description: "같은 데이터를 한 번만 저장하고 여러 logical block이 그 사본을 참조하도록 해 물리 공간을 절약하는 기능입니다.",
+        example: "Deduplication saves space when many volumes contain identical blocks.",
+        category: "protection"
+      },
+      {
+        term: "Compression",
+        full: "Data compression",
+        meaning: "데이터 압축",
+        description: "데이터를 더 작은 표현으로 변환해 저장 공간과 전송량을 줄이는 기능입니다.",
+        example: "Inline compression reduces the amount of data written to flash.",
+        category: "protection"
+      },
+      {
+        term: "Data reduction",
+        full: "Data reduction",
+        meaning: "데이터 절감",
+        description: "deduplication, compression, pattern removal 등을 묶어 physical capacity를 줄이는 기능군을 말합니다.",
+        example: "The effective capacity estimate includes data reduction.",
+        category: "protection"
+      },
+      {
+        term: "Encryption at rest",
+        full: "Data-at-rest encryption",
+        meaning: "저장 데이터 암호화",
+        description: "디스크나 flash에 기록된 데이터를 암호화해 드라이브가 유출돼도 내용을 바로 읽지 못하게 하는 보호 기능입니다.",
+        example: "Encryption at rest is enabled for all customer volumes.",
+        category: "protection"
+      },
+      {
+        term: "KMS",
+        full: "Key Management Service",
+        meaning: "암호화 키 관리 서비스",
+        description: "암호화 키의 생성, 저장, rotation, 폐기를 관리하는 서비스입니다. storage array와 연동해 key를 보호할 수 있습니다.",
+        example: "The array retrieves encryption keys from the KMS.",
+        category: "operation"
+      },
+      {
+        term: "TLS",
+        full: "Transport Layer Security",
+        meaning: "전송 구간 암호화 프로토콜",
+        description: "API나 management connection에서 client와 server 사이의 통신을 암호화하고 인증하는 프로토콜입니다.",
+        example: "The driver connects to the array API over TLS.",
+        category: "operation"
+      },
+      {
+        term: "Cinder",
+        full: "OpenStack Block Storage service",
+        meaning: "OpenStack 블록 스토리지 서비스",
+        description: "OpenStack에서 volume, snapshot, backup, attachment를 관리하는 프로젝트입니다. storage driver는 Cinder backend로 연결됩니다.",
+        example: "Cinder creates the volume and coordinates its attachment.",
+        category: "openstack"
+      },
+      {
+        term: "Nova",
+        full: "OpenStack Compute service",
+        meaning: "OpenStack 컴퓨트 서비스",
+        description: "VM 인스턴스와 compute host를 관리하는 프로젝트입니다. volume attach 시 compute node에서 connector와 hypervisor를 사용합니다.",
+        example: "Nova attaches the Cinder volume to the compute instance.",
+        category: "openstack"
+      },
+      {
+        term: "Glance",
+        full: "OpenStack Image service",
+        meaning: "OpenStack 이미지 서비스",
+        description: "VM image를 저장하고 제공하는 OpenStack 서비스입니다. Cinder는 image에서 volume을 만들거나 volume을 image로 복사할 수 있습니다.",
+        example: "The volume was created from a Glance image.",
+        category: "openstack"
+      },
+      {
+        term: "os-brick",
+        full: "OpenStack block storage connector library",
+        meaning: "OpenStack 블록 연결 라이브러리",
+        description: "compute host에서 iSCSI, FC, NVMe-oF 같은 volume 연결을 준비하고 해제하는 Python 라이브러리입니다.",
+        example: "os-brick discovers the device and returns the connection path.",
+        category: "openstack"
+      },
+      {
+        term: "libvirt",
+        full: "libvirt virtualization management library",
+        meaning: "가상화 관리 라이브러리",
+        description: "Nova가 KVM 같은 hypervisor와 VM의 디스크 attachment를 관리할 때 사용하는 표준 API 라이브러리입니다.",
+        example: "Libvirt attaches the multipath device to the guest.",
+        category: "openstack"
+      },
+      {
+        term: "KVM",
+        full: "Kernel-based Virtual Machine",
+        meaning: "Linux 커널 기반 가상 머신",
+        description: "Linux kernel의 virtualization 기능을 사용하는 hypervisor입니다. OpenStack compute node에서 흔히 libvirt와 함께 사용합니다.",
+        example: "The KVM guest sees the attached volume as a virtual disk.",
+        category: "openstack"
+      },
+      {
+        term: "cinder-api",
+        full: "Cinder API service",
+        meaning: "Cinder API 서비스",
+        description: "사용자와 다른 OpenStack 서비스의 volume API 요청을 받아 database와 RPC 흐름으로 전달하는 서비스입니다.",
+        example: "The request enters Cinder through the cinder-api service.",
+        category: "openstack"
+      },
+      {
+        term: "cinder-scheduler",
+        full: "Cinder scheduler service",
+        meaning: "Cinder 백엔드 선택 서비스",
+        description: "volume type, capacity, capability, availability zone 같은 조건을 사용해 요청을 처리할 backend를 선택합니다.",
+        example: "The cinder-scheduler selected the backend with the required capability.",
+        category: "openstack"
+      },
+      {
+        term: "cinder-volume",
+        full: "Cinder volume service",
+        meaning: "Cinder 스토리지 작업 서비스",
+        description: "실제 volume driver를 호출해 create, delete, attach, snapshot 같은 backend 작업을 수행하는 서비스입니다.",
+        example: "The cinder-volume service called the array API to create the volume.",
+        category: "openstack"
+      },
+      {
+        term: "cinder-backup",
+        full: "Cinder backup service",
+        meaning: "Cinder 백업 서비스",
+        description: "volume 데이터를 backup store로 복사하고 restore하는 Cinder 서비스입니다. object storage backend와 함께 사용하기도 합니다.",
+        example: "The cinder-backup service restored the volume from object storage.",
+        category: "openstack"
+      },
+      {
+        term: "Attachment",
+        full: "Cinder volume attachment",
+        meaning: "Cinder 볼륨 연결 객체",
+        description: "volume을 특정 instance나 host에 연결하는 작업과 그 상태를 나타내는 객체입니다. connector 정보와 연결 lifecycle을 포함합니다.",
+        example: "The attachment remains in error after the connector timed out.",
+        category: "openstack"
+      },
+      {
+        term: "connection_info",
+        full: "Volume connection information",
+        meaning: "볼륨 연결 정보",
+        description: "driver가 반환해 compute host가 volume에 연결할 때 사용하는 protocol, target, LUN, path 등의 정보입니다.",
+        example: "The driver returns connection_info for the os-brick connector.",
+        category: "openstack"
+      },
+      {
+        term: "Connector",
+        full: "Storage connector",
+        meaning: "호스트 측 스토리지 연결 모듈",
+        description: "compute host에서 특정 protocol의 volume을 discover, connect, disconnect하는 os-brick 구성 요소입니다.",
+        example: "The FC connector scans the host bus for the new LUN.",
+        category: "openstack"
+      },
+      {
+        term: "provider_id",
+        full: "Backend provider identifier",
+        meaning: "백엔드가 관리하는 volume 식별자",
+        description: "Cinder UUID와 별도로 storage array나 backend가 volume을 식별하는 값입니다. driver가 attach와 delete 때 일관되게 사용해야 합니다.",
+        example: "The driver stores the array volume name as the provider_id.",
+        category: "openstack"
+      },
+      {
+        term: "Backend",
+        full: "Cinder volume backend",
+        meaning: "Cinder 스토리지 백엔드",
+        description: "Cinder가 volume 작업을 위임하는 실제 storage system과 driver 구성입니다. LVM, Ceph, NetApp, Pure 등이 backend가 될 수 있습니다.",
+        example: "The scheduler placed the request on the Ceph backend.",
+        category: "openstack"
+      },
+      {
+        term: "Volume type",
+        full: "Cinder volume type",
+        meaning: "볼륨 특성 선택 프로파일",
+        description: "사용자가 원하는 backend, media, QoS, replication 같은 특성을 extra spec으로 표현하는 Cinder 객체입니다.",
+        example: "Create the volume with the high-performance volume type.",
+        category: "openstack"
+      },
+      {
+        term: "extra_specs",
+        full: "Volume type extra specifications",
+        meaning: "볼륨 타입 추가 사양",
+        description: "volume type에 backend capability나 vendor-specific policy를 key-value로 저장하는 설정입니다.",
+        example: "The extra_specs select an all-flash backend for this volume.",
+        category: "openstack"
+      },
+      {
+        term: "volume_backend_name",
+        full: "Cinder volume backend name",
+        meaning: "Cinder 백엔드 이름",
+        description: "driver backend가 자신의 이름이나 storage family를 scheduler에 알릴 때 사용하는 설정 값입니다.",
+        example: "The volume type is mapped to the backend through volume_backend_name.",
+        category: "openstack"
+      },
+      {
+        term: "Scheduler",
+        full: "Cinder scheduler",
+        meaning: "백엔드 선택기",
+        description: "volume 요청의 요구 조건과 backend 상태를 비교해 실제 작업을 수행할 host를 선택하는 컴포넌트입니다.",
+        example: "The scheduler rejected the backend because it lacked capacity.",
+        category: "openstack"
+      },
+      {
+        term: "Filter",
+        full: "Cinder scheduler filter",
+        meaning: "스케줄러 후보 필터",
+        description: "지원 protocol, capacity, availability zone, extra spec 같은 조건에 맞지 않는 backend를 후보에서 제거하는 규칙입니다.",
+        example: "The capability filter removed backends that do not support snapshots.",
+        category: "openstack"
+      },
+      {
+        term: "Weigher",
+        full: "Cinder scheduler weigher",
+        meaning: "스케줄러 후보 가중치 계산기",
+        description: "filter를 통과한 backend 중 capacity나 weight를 비교해 더 적합한 후보의 우선순위를 계산합니다.",
+        example: "The capacity weigher preferred the backend with more free space.",
+        category: "openstack"
+      },
+      {
+        term: "Capability",
+        full: "Backend capability",
+        meaning: "백엔드 지원 기능·상태",
+        description: "backend가 thin provisioning, QoS, replication, multiattach 등을 지원하는지 나타내는 속성입니다.",
+        example: "The driver reports its capabilities through get_volume_stats.",
+        category: "openstack"
+      },
+      {
+        term: "Availability zone",
+        full: "Availability zone (AZ)",
+        meaning: "가용 영역",
+        description: "host나 backend를 failure domain별로 묶은 논리적 영역입니다. 사용자는 volume을 원하는 AZ에 배치할 수 있습니다.",
+        example: "The volume must be created in the same availability zone as the compute host.",
+        category: "openstack"
+      },
+      {
+        term: "Multiattach",
+        full: "Multi-attach volume",
+        meaning: "여러 호스트에 동시 연결 가능한 볼륨",
+        description: "하나의 volume을 여러 instance나 host에 동시에 attach할 수 있는 기능입니다. 애플리케이션과 backend의 동시성 지원이 필요합니다.",
+        example: "This multiattach volume is used by two compute nodes.",
+        category: "openstack"
+      },
+      {
+        term: "Encrypted volume",
+        full: "Cinder encrypted volume",
+        meaning: "암호화된 Cinder 볼륨",
+        description: "volume data를 암호화해 저장하는 Cinder 기능입니다. key manager와 backend 또는 host-side encryption 구성을 확인해야 합니다.",
+        example: "The encrypted volume requires a configured key manager.",
+        category: "openstack"
+      },
+      {
+        term: "Retype",
+        full: "Volume retype operation",
+        meaning: "볼륨 타입 변경",
+        description: "기존 volume의 volume type이나 QoS policy를 변경하는 작업입니다. backend가 online retype을 지원하는지 확인합니다.",
+        example: "The operator retyped the volume to a higher-performance tier.",
+        category: "openstack"
+      },
+      {
+        term: "Manage",
+        full: "Manage an existing volume",
+        meaning: "기존 볼륨을 Cinder에 등록",
+        description: "이미 backend에 존재하는 volume을 Cinder database에 등록해 관리 대상으로 만드는 작업입니다.",
+        example: "The administrator managed the existing array volume into Cinder.",
+        category: "openstack"
+      },
+      {
+        term: "Unmanage",
+        full: "Unmanage a volume",
+        meaning: "Cinder 관리에서 볼륨 제거",
+        description: "volume data는 backend에 남겨둔 채 Cinder의 관리 대상과 database record에서 분리하는 작업입니다.",
+        example: "Unmanage removes the Cinder record without deleting the array volume.",
+        category: "openstack"
+      },
+      {
+        term: "initialize_connection",
+        full: "Driver initialize_connection API",
+        meaning: "연결 정보 초기화 API",
+        description: "driver가 host connector 정보를 받아 volume을 연결할 준비를 하고 connection_info를 반환하는 lifecycle API입니다.",
+        example: "initialize_connection returns the target portals and LUN mapping.",
+        category: "openstack"
+      },
+      {
+        term: "terminate_connection",
+        full: "Driver terminate_connection API",
+        meaning: "연결 종료 API",
+        description: "host가 volume을 detach한 뒤 backend-side mapping이나 export를 정리하는 lifecycle API입니다.",
+        example: "terminate_connection removes the host mapping after detach.",
+        category: "openstack"
+      },
+      {
+        term: "create_volume",
+        full: "Driver create_volume operation",
+        meaning: "볼륨 생성 작업",
+        description: "Cinder driver가 backend API나 CLI를 호출해 요청한 크기와 특성의 volume을 만드는 작업입니다.",
+        example: "create_volume returns the provider_id of the new volume.",
+        category: "openstack"
+      },
+      {
+        term: "delete_volume",
+        full: "Driver delete_volume operation",
+        meaning: "볼륨 삭제 작업",
+        description: "backend에서 volume과 관련된 export, snapshot 의존성을 확인한 뒤 volume을 삭제하는 작업입니다.",
+        example: "delete_volume must be safe to retry after a timeout.",
+        category: "openstack"
+      },
+      {
+        term: "extend_volume",
+        full: "Driver extend_volume operation",
+        meaning: "볼륨 확장 작업",
+        description: "backend volume의 크기를 늘리고 host와 guest가 새 용량을 인식할 수 있도록 하는 작업입니다.",
+        example: "The driver extended the volume without recreating it.",
+        category: "openstack"
+      },
+      {
+        term: "create_volume_from_snapshot",
+        full: "Create a volume from a snapshot",
+        meaning: "스냅샷 기반 볼륨 생성",
+        description: "기존 snapshot을 source로 사용해 새 volume을 만드는 Cinder 작업입니다. backend clone semantics를 확인해야 합니다.",
+        example: "The backend creates the new volume from the snapshot efficiently.",
+        category: "openstack"
+      },
+      {
+        term: "copy_volume_to_image",
+        full: "Copy a volume to an image",
+        meaning: "볼륨을 이미지로 복사",
+        description: "Cinder volume의 내용을 Glance image로 내보내는 작업입니다. image transfer 방식과 multipath 설정이 영향을 줄 수 있습니다.",
+        example: "The operator copied the boot volume to a reusable image.",
+        category: "openstack"
+      },
+      {
+        term: "Volume migration",
+        full: "Cinder volume migration",
+        meaning: "볼륨 백엔드·호스트 간 이동",
+        description: "volume을 다른 backend, pool, host로 이동하는 작업입니다. host-assisted와 storage-assisted 방식이 있습니다.",
+        example: "The migration moved the volume to a pool with more capacity.",
+        category: "openstack"
+      },
+      {
+        term: "get_volume_stats",
+        full: "Driver get_volume_stats API",
+        meaning: "백엔드 상태·용량 보고 API",
+        description: "driver가 total capacity, free capacity, backend name, capability를 scheduler에 보고하는 API입니다.",
+        example: "get_volume_stats reports the backend's free capacity and capabilities.",
+        category: "openstack"
+      },
+      {
+        term: "Connection properties",
+        full: "Storage connection properties",
+        meaning: "호스트 연결 속성",
+        description: "volume을 attach할 때 필요한 target address, port name, LUN, device path 같은 속성 묶음입니다.",
+        example: "The connector validates the connection properties before connecting.",
+        category: "openstack"
+      },
+      {
+        term: "Driver",
+        full: "Storage driver",
+        meaning: "스토리지 드라이버",
+        description: "상위 서비스의 공통 API를 특정 storage vendor의 REST API, CLI, SDK 호출로 연결하는 코드입니다.",
+        example: "The driver translates the generic request into an array API call.",
+        category: "development"
+      },
+      {
+        term: "API",
+        full: "Application Programming Interface",
+        meaning: "애플리케이션 프로그래밍 인터페이스",
+        description: "다른 프로그램이 기능이나 데이터에 접근할 수 있도록 정한 호출 규칙입니다. storage driver는 array API를 사용합니다.",
+        example: "The driver uses the array API to provision the volume.",
+        category: "development"
+      },
+      {
+        term: "REST",
+        full: "Representational State Transfer",
+        meaning: "HTTP 기반 자원 API 설계 방식",
+        description: "resource를 URL과 HTTP method로 표현하는 API 설계 스타일입니다. 많은 storage array가 REST API를 제공합니다.",
+        example: "The backend exposes a REST API for volume operations.",
+        category: "development"
+      },
+      {
+        term: "HTTP",
+        full: "Hypertext Transfer Protocol",
+        meaning: "웹·API 전송 프로토콜",
+        description: "client와 server 사이에서 request와 response를 주고받는 프로토콜입니다. storage management API의 기반으로 자주 사용됩니다.",
+        example: "The client sends an HTTP request to the management endpoint.",
+        category: "development"
+      },
+      {
+        term: "JSON",
+        full: "JavaScript Object Notation",
+        meaning: "구조화된 데이터 표현 형식",
+        description: "API request와 response에서 object와 list를 표현하는 가벼운 텍스트 형식입니다.",
+        example: "The API returns the volume details as JSON.",
+        category: "development"
+      },
+      {
+        term: "SDK",
+        full: "Software Development Kit",
+        meaning: "소프트웨어 개발 키트",
+        description: "특정 storage platform의 API를 쉽게 호출하도록 client library와 도구를 제공하는 패키지입니다.",
+        example: "The team uses the vendor SDK instead of building raw HTTP requests.",
+        category: "development"
+      },
+      {
+        term: "CLI",
+        full: "Command-Line Interface",
+        meaning: "명령줄 인터페이스",
+        description: "터미널 명령으로 storage system을 조회하고 설정하는 인터페이스입니다. 자동화에서 CLI의 exit code도 확인해야 합니다.",
+        example: "The deployment script calls the storage CLI to create a LUN.",
+        category: "development"
+      },
+      {
+        term: "RPC",
+        full: "Remote Procedure Call",
+        meaning: "원격 프로시저 호출",
+        description: "한 process가 다른 process의 함수를 호출하는 것처럼 메시지를 주고받는 방식입니다. Cinder 서비스 간 작업 전달에 사용됩니다.",
+        example: "The API service sends the request to cinder-volume over RPC.",
+        category: "development"
+      },
+      {
+        term: "Exception",
+        full: "Exception handling",
+        meaning: "예외 처리",
+        description: "API 오류, timeout, validation 실패 같은 비정상 상황을 코드에서 표현하고 상위 계층에 전달하는 방식입니다.",
+        example: "The driver raises a clear exception when the LUN is missing.",
+        category: "development"
+      },
+      {
+        term: "Validation",
+        full: "Input validation",
+        meaning: "입력값 검증",
+        description: "size, protocol, identifier, capability 같은 입력이 유효하고 안전한지 backend를 호출하기 전에 확인하는 과정입니다.",
+        example: "Validate the requested size before sending the create call.",
+        category: "development"
+      },
+      {
+        term: "Idempotency",
+        full: "Idempotent operation behavior",
+        meaning: "같은 요청을 반복해도 결과가 안전한 성질",
+        description: "network retry나 process restart로 같은 작업을 여러 번 수행해도 최종 상태가 중복 생성이나 손상으로 이어지지 않게 하는 설계입니다.",
+        example: "Delete must be idempotent when the volume is already gone.",
+        category: "development"
+      },
+      {
+        term: "Retry",
+        full: "Request retry",
+        meaning: "요청 재시도",
+        description: "일시적인 network error나 service unavailable에 대응해 요청을 다시 보내는 동작입니다. 모든 오류를 무조건 재시도하면 안 됩니다.",
+        example: "Retry the request only for transient errors.",
+        category: "development"
+      },
+      {
+        term: "Timeout",
+        full: "Operation timeout",
+        meaning: "작업 제한 시간",
+        description: "backend 응답을 기다리는 최대 시간입니다. timeout 뒤에는 작업이 실제로 성공했는지 확인하는 reconciliation이 필요할 수 있습니다.",
+        example: "The API timeout does not prove that the volume creation failed.",
+        category: "development"
+      },
+      {
+        term: "Exponential backoff",
+        full: "Exponential backoff retry strategy",
+        meaning: "점진적으로 간격을 늘리는 재시도",
+        description: "연속 실패 때 retry 간격을 점점 늘려 backend와 network에 추가 부하를 주지 않는 전략입니다.",
+        example: "Use exponential backoff when the array returns a busy response.",
+        category: "development"
+      },
+      {
+        term: "Reconciliation",
+        full: "State reconciliation",
+        meaning: "실제 상태와 기록 상태의 조정",
+        description: "Cinder database, driver cache, storage array의 상태를 비교해 누락·불일치를 바로잡는 과정입니다.",
+        example: "Reconciliation can repair a stale attachment after a service restart.",
+        category: "development"
+      },
+      {
+        term: "Source of truth",
+        full: "Authoritative source of truth",
+        meaning: "최종 기준이 되는 상태 출처",
+        description: "여러 시스템이 같은 resource를 기록할 때 어떤 시스템의 상태를 최종 사실로 볼지 정하는 개념입니다.",
+        example: "The array is the source of truth for the provider_id.",
+        category: "development"
+      },
+      {
+        term: "Backward compatibility",
+        full: "Backward compatibility",
+        meaning: "이전 버전과의 호환성",
+        description: "기존 API, database record, connection_info, configuration을 새 코드가 계속 처리할 수 있게 유지하는 성질입니다.",
+        example: "Keep backward compatibility with existing connection properties.",
+        category: "development"
+      },
+      {
+        term: "Deprecation",
+        full: "Feature or API deprecation",
+        meaning: "기능·API 사용 중단 예고",
+        description: "기존 기능을 당장 삭제하지 않고 대체 방법을 안내한 뒤 향후 제거할 수 있음을 알리는 과정입니다.",
+        example: "The old driver option is deprecated but still accepted for now.",
+        category: "development"
+      },
+      {
+        term: "CI",
+        full: "Continuous Integration",
+        meaning: "지속적 통합",
+        description: "코드 변경이 올라올 때마다 lint, unit test, integration test를 자동으로 실행해 문제를 빨리 발견하는 개발 방식입니다.",
+        example: "The patch must pass CI before it can be merged.",
+        category: "development"
+      },
+      {
+        term: "Unit test",
+        full: "Unit test",
+        meaning: "단위 테스트",
+        description: "driver 함수나 작은 모듈 하나를 외부 system 없이 독립적으로 검증하는 테스트입니다.",
+        example: "The unit test mocks the array response and checks the provider_id.",
+        category: "development"
+      },
+      {
+        term: "Integration test",
+        full: "Integration test",
+        meaning: "통합 테스트",
+        description: "여러 모듈이나 서비스가 실제 protocol과 데이터 형식으로 함께 동작하는지 검증하는 테스트입니다.",
+        example: "The integration test verifies the driver and connector contract.",
+        category: "development"
+      },
+      {
+        term: "Functional test",
+        full: "Functional test",
+        meaning: "기능 테스트",
+        description: "사용자 관점의 create, attach, detach, delete 같은 end-to-end 기능이 요구사항대로 동작하는지 확인하는 테스트입니다.",
+        example: "The functional test creates and attaches a real volume.",
+        category: "development"
+      },
+      {
+        term: "Contract test",
+        full: "API contract test",
+        meaning: "API 계약 테스트",
+        description: "driver가 반환하는 field, error, 호출 순서가 상위 component가 기대하는 interface와 맞는지 검증하는 테스트입니다.",
+        example: "The contract test checks the required connection_info fields.",
+        category: "development"
+      },
+      {
+        term: "Mock",
+        full: "Mock object",
+        meaning: "동작을 흉내 내는 테스트 객체",
+        description: "실제 storage array 대신 정해진 반환값과 호출 기록을 제공해 driver logic을 빠르게 검증하는 테스트 대역입니다.",
+        example: "The mock returns a successful volume creation response.",
+        category: "development"
+      },
+      {
+        term: "Fixture",
+        full: "Test fixture",
+        meaning: "테스트 준비 데이터·환경",
+        description: "테스트에 필요한 volume object, connector properties, fake response 같은 공통 준비물을 말합니다.",
+        example: "The fixture contains two FC WWPNs and one LUN.",
+        category: "development"
+      },
+      {
+        term: "Race condition",
+        full: "Race condition",
+        meaning: "실행 순서에 따라 결과가 달라지는 경쟁 상태",
+        description: "동시에 실행되는 작업의 순서가 달라져 duplicate create, stale state, 잘못된 delete 같은 문제가 생기는 상황입니다.",
+        example: "A race condition can attach the same volume twice.",
+        category: "development"
+      },
+      {
+        term: "Concurrency",
+        full: "Concurrent operations",
+        meaning: "동시 작업 처리",
+        description: "여러 요청이나 thread가 같은 resource를 동시에 처리하는 상황과 그 제어 방법을 말합니다.",
+        example: "The driver must handle concurrent volume updates safely.",
+        category: "development"
+      },
+      {
+        term: "Lock",
+        full: "Resource lock",
+        meaning: "리소스 잠금",
+        description: "같은 volume이나 backend 상태를 동시에 변경하지 못하도록 한 시점에 한 작업만 허용하는 제어 방식입니다.",
+        example: "Acquire a lock before changing the volume mapping.",
+        category: "development"
+      },
+      {
+        term: "Transaction",
+        full: "Database or storage transaction",
+        meaning: "작업 단위 트랜잭션",
+        description: "여러 변경을 하나의 논리적 작업으로 묶어 중간 상태를 줄이고 실패 시 처리 규칙을 명확히 하는 단위입니다.",
+        example: "The database transaction rolls back the attachment record on failure.",
+        category: "development"
+      },
+      {
+        term: "Atomicity",
+        full: "Atomic operation property",
+        meaning: "전부 성공하거나 전부 반영되지 않는 성질",
+        description: "작업이 중간 결과를 남기지 않고 하나의 indivisible operation처럼 처리되는 성질입니다.",
+        example: "The mapping update should be atomic from the controller's perspective.",
+        category: "development"
+      },
+      {
+        term: "Eventual consistency",
+        full: "Eventual consistency model",
+        meaning: "시간이 지나면 상태가 수렴하는 일관성 모델",
+        description: "모든 replica나 API view가 즉시 같지는 않지만 일정 시간이 지나면 같은 상태에 도달하는 모델입니다.",
+        example: "The API is eventually consistent after a replication update.",
+        category: "development"
+      },
+      {
+        term: "State machine",
+        full: "Resource state machine",
+        meaning: "리소스 상태 전이 모델",
+        description: "creating, available, attaching, in-use, deleting 같은 상태와 허용되는 전이를 명시적으로 모델링하는 방법입니다.",
+        example: "The attachment state machine rejects a second connect while detaching.",
+        category: "development"
+      },
+      {
+        term: "Feature flag",
+        full: "Feature flag or feature toggle",
+        meaning: "기능 on/off 제어 스위치",
+        description: "새 storage 기능을 배포한 뒤 설정값으로 활성화 범위를 조절하거나 문제가 있을 때 빠르게 끄는 방법입니다.",
+        example: "The feature flag enables the new NVMe connector gradually.",
+        category: "development"
+      },
+      {
+        term: "Observability",
+        full: "System observability",
+        meaning: "시스템 상태를 외부 신호로 파악하는 능력",
+        description: "logs, metrics, traces를 통해 storage workflow 내부에서 무슨 일이 일어났는지 추적하고 설명할 수 있는 성질입니다.",
+        example: "Better observability makes attach failures easier to diagnose.",
+        category: "operation"
+      },
+      {
+        term: "Metrics",
+        full: "Operational metrics",
+        meaning: "운영 측정 지표",
+        description: "latency, IOPS, error count, capacity, queue depth처럼 시스템 상태를 숫자로 나타내는 데이터입니다.",
+        example: "Monitor attach latency and backend error metrics.",
+        category: "operation"
+      },
+      {
+        term: "Tracing",
+        full: "Distributed request tracing",
+        meaning: "분산 요청 추적",
+        description: "하나의 volume 요청이 API, scheduler, volume service, driver를 거치는 흐름을 trace ID로 연결해 보는 방법입니다.",
+        example: "Tracing shows where the volume request spent most of its time.",
+        category: "operation"
+      },
+      {
+        term: "Health check",
+        full: "Backend health check",
+        meaning: "백엔드 상태 점검",
+        description: "backend가 API 요청과 storage operation을 정상적으로 처리할 수 있는지 주기적으로 확인하는 작업입니다.",
+        example: "The health check marks the backend down when the API is unreachable.",
+        category: "operation"
+      },
+      {
+        term: "Telemetry",
+        full: "Storage telemetry",
+        meaning: "스토리지 운영 원격 측정 데이터",
+        description: "성능, 용량, 오류, health 정보를 수집해 모니터링과 capacity planning에 사용하는 데이터입니다.",
+        example: "Telemetry reveals a gradual increase in controller latency.",
+        category: "operation"
+      },
+      {
+        term: "Schema migration",
+        full: "Database schema migration",
+        meaning: "데이터베이스 스키마 변경",
+        description: "새 기능에 맞춰 volume, attachment, provider 정보 같은 database table과 field를 안전하게 변경하는 작업입니다.",
+        example: "The release includes a schema migration for attachment records.",
+        category: "development"
+      },
+      {
+        term: "Ceph",
+        full: "Ceph distributed storage platform",
+        meaning: "분산 스토리지 플랫폼",
+        description: "block, file, object storage를 하나의 분산 클러스터에서 제공하는 오픈소스 스토리지 플랫폼입니다. Cinder backend로도 많이 사용합니다.",
+        example: "The deployment uses Ceph as the Cinder block storage backend.",
+        category: "vendor"
+      },
+      {
+        term: "RADOS",
+        full: "Reliable Autonomic Distributed Object Store",
+        meaning: "Ceph 분산 object 저장 계층",
+        description: "Ceph의 기본 분산 object store입니다. RBD와 CephFS 같은 상위 서비스가 RADOS 위에서 동작합니다.",
+        example: "RBD stores its data in the RADOS cluster.",
+        category: "vendor"
+      },
+      {
+        term: "RBD",
+        full: "RADOS Block Device",
+        meaning: "Ceph 블록 디바이스",
+        description: "Ceph RADOS object를 호스트에서 block device처럼 사용하는 서비스입니다. OpenStack Cinder와 통합할 수 있습니다.",
+        example: "The Cinder volume is backed by a Ceph RBD image.",
+        category: "vendor"
+      },
+      {
+        term: "OSD",
+        full: "Object Storage Daemon",
+        meaning: "Ceph 데이터 저장 daemon",
+        description: "Ceph에서 실제 데이터를 저장하고 replication, recovery, heartbeat를 처리하는 daemon입니다.",
+        example: "The cluster started recovery after one OSD went down.",
+        category: "vendor"
+      },
+      {
+        term: "MON",
+        full: "Ceph Monitor",
+        meaning: "Ceph cluster 상태 monitor",
+        description: "Ceph cluster map, authentication, quorum 정보를 관리하는 daemon입니다.",
+        example: "The MON quorum must be healthy before adding new OSDs.",
+        category: "vendor"
+      },
+      {
+        term: "MGR",
+        full: "Ceph Manager daemon",
+        meaning: "Ceph 관리 daemon",
+        description: "모니터링, orchestration module, metrics 같은 관리 기능을 제공하는 Ceph daemon입니다.",
+        example: "The MGR module exports storage metrics for monitoring.",
+        category: "vendor"
+      },
+      {
+        term: "CRUSH",
+        full: "Controlled Replication Under Scalable Hashing",
+        meaning: "Ceph 데이터 배치 알고리즘",
+        description: "중앙 lookup table 없이 object를 어떤 OSD에 배치할지 계산하는 Ceph 알고리즘입니다.",
+        example: "CRUSH places the replica on a different failure domain.",
+        category: "vendor"
+      },
+      {
+        term: "PG",
+        full: "Placement Group",
+        meaning: "Ceph object 배치 그룹",
+        description: "여러 RADOS object를 묶어 OSD에 배치하고 replication·recovery 상태를 관리하는 논리 단위입니다.",
+        example: "The pool is unhealthy because several PGs are degraded.",
+        category: "vendor"
+      },
+      {
+        term: "BlueStore",
+        full: "Ceph BlueStore storage backend",
+        meaning: "Ceph OSD 저장 backend",
+        description: "Ceph OSD가 object data와 metadata를 직접 block device에 저장하도록 설계된 storage backend입니다.",
+        example: "The OSDs use BlueStore on dedicated data devices.",
+        category: "vendor"
+      },
+      {
+        term: "librados",
+        full: "RADOS client library",
+        meaning: "RADOS client 라이브러리",
+        description: "애플리케이션이 Ceph RADOS cluster와 통신할 수 있도록 제공되는 client library입니다.",
+        example: "The service uses librados to access the Ceph cluster.",
+        category: "vendor"
+      },
+      {
+        term: "librbd",
+        full: "RADOS Block Device client library",
+        meaning: "Ceph RBD client 라이브러리",
+        description: "애플리케이션이나 driver가 Ceph RBD image를 생성·조회·수정하도록 돕는 library입니다.",
+        example: "The backup tool uses librbd to read the RBD image.",
+        category: "vendor"
+      },
+      {
+        term: "Flatten",
+        full: "RBD clone flatten operation",
+        meaning: "Ceph clone 의존성 제거",
+        description: "RBD clone이 parent snapshot을 계속 참조하지 않도록 필요한 block을 복사해 독립 image로 만드는 작업입니다.",
+        example: "Flatten the clone before deleting its parent snapshot.",
+        category: "vendor"
+      },
+      {
+        term: "Exclusive-lock",
+        full: "RBD exclusive lock",
+        meaning: "RBD 단일 writer 잠금",
+        description: "한 client만 RBD image를 write하도록 잠그는 기능입니다. client failure 때 lock을 회수하는 절차가 필요합니다.",
+        example: "The RBD image enables exclusive-lock for safe single-writer access.",
+        category: "vendor"
+      },
+      {
+        term: "Object-map",
+        full: "RBD object map",
+        meaning: "RBD object 존재 맵",
+        description: "RBD image의 어느 object에 실제 데이터가 있는지 기록해 zeroing, clone, diff 작업을 빠르게 하는 metadata입니다.",
+        example: "The object map makes the sparse image operation faster.",
+        category: "vendor"
+      },
+      {
+        term: "Fast-diff",
+        full: "RBD fast-diff feature",
+        meaning: "RBD 변경 블록 빠른 계산",
+        description: "두 snapshot 사이에서 변경된 object만 빠르게 찾도록 object map을 활용하는 기능입니다.",
+        example: "Fast-diff reduces the time needed for incremental backup.",
+        category: "vendor"
+      },
+      {
+        term: "LVM",
+        full: "Logical Volume Manager",
+        meaning: "Linux 논리 볼륨 관리자",
+        description: "여러 block device를 pool처럼 묶고 logical volume을 동적으로 만들고 확장하는 Linux 저장 관리 계층입니다.",
+        example: "The Cinder LVM driver creates volumes from the volume group.",
+        category: "vendor"
+      },
+      {
+        term: "PV",
+        full: "Physical Volume",
+        meaning: "LVM 물리 볼륨",
+        description: "LVM이 관리하도록 초기화한 disk나 partition입니다. 하나 이상의 PV가 VG를 구성합니다.",
+        example: "Initialize the new disk as an LVM physical volume.",
+        category: "vendor"
+      },
+      {
+        term: "VG",
+        full: "Volume Group",
+        meaning: "LVM 볼륨 그룹",
+        description: "여러 PV의 용량을 하나의 pool로 묶은 LVM 단위입니다. LV는 VG에서 할당됩니다.",
+        example: "The backend has enough free space in the volume group.",
+        category: "vendor"
+      },
+      {
+        term: "LV",
+        full: "Logical Volume",
+        meaning: "LVM 논리 볼륨",
+        description: "VG에서 생성한 논리 block device입니다. Cinder LVM driver가 volume으로 제공할 수 있습니다.",
+        example: "The driver created an LV with the requested size.",
+        category: "vendor"
+      },
+      {
+        term: "Thin pool",
+        full: "LVM thin pool",
+        meaning: "LVM 지연 할당 pool",
+        description: "여러 thin LV가 실제 block을 필요할 때 공유해서 할당하는 LVM 저장 pool입니다.",
+        example: "The thin pool is almost full even though the virtual volumes have free space.",
+        category: "vendor"
+      },
+      {
+        term: "dm-thin",
+        full: "Device-mapper thin provisioning",
+        meaning: "Linux device-mapper thin provisioning",
+        description: "Linux device-mapper가 thin pool과 thin volume을 구현하는 계층입니다.",
+        example: "The LVM backend uses dm-thin for sparse volumes.",
+        category: "vendor"
+      },
+      {
+        term: "LIF",
+        full: "Logical Interface",
+        meaning: "ONTAP 논리 네트워크 인터페이스",
+        description: "NetApp ONTAP에서 NFS, SMB, iSCSI, management traffic을 제공하는 논리 interface입니다. physical port와 별도로 failover할 수 있습니다.",
+        example: "The data LIF moved to another port during failover.",
+        category: "vendor"
+      },
+      {
+        term: "FlexVol",
+        full: "NetApp FlexVol volume",
+        meaning: "ONTAP 논리 볼륨",
+        description: "ONTAP aggregate에서 thin provisioning, snapshot, QoS 같은 기능을 제공하는 flexible volume입니다.",
+        example: "The LUN is hosted inside a FlexVol volume.",
+        category: "vendor"
+      },
+      {
+        term: "FlexGroup",
+        full: "NetApp FlexGroup volume",
+        meaning: "여러 constituent로 확장되는 ONTAP 볼륨",
+        description: "여러 constituent volume을 하나의 namespace로 묶어 대규모 파일과 높은 병렬성을 지원하는 ONTAP volume입니다.",
+        example: "The file workload is distributed across a FlexGroup volume.",
+        category: "vendor"
+      },
+      {
+        term: "SnapMirror",
+        full: "NetApp SnapMirror replication",
+        meaning: "ONTAP 데이터 복제 기능",
+        description: "ONTAP volume이나 SVM 데이터를 다른 cluster나 site로 복제하는 NetApp 기능입니다.",
+        example: "SnapMirror keeps the disaster recovery volume up to date.",
+        category: "vendor"
+      },
+      {
+        term: "WAFL",
+        full: "Write Anywhere File Layout",
+        meaning: "ONTAP 파일 시스템 레이아웃",
+        description: "NetApp ONTAP의 파일 시스템 기술로, metadata와 data를 유연하게 배치하고 snapshot을 효율적으로 지원합니다.",
+        example: "WAFL enables efficient snapshots without copying every block.",
+        category: "vendor"
+      },
+      {
+        term: "ASA",
+        full: "All SAN Array",
+        meaning: "NetApp SAN 전용 어레이 제품군",
+        description: "SAN workload와 block access에 초점을 둔 NetApp storage system 제품군입니다.",
+        example: "The ASA system is dedicated to the SAN workload.",
+        category: "vendor"
+      },
+      {
+        term: "DirectFlash",
+        full: "Pure Storage DirectFlash architecture",
+        meaning: "Pure Storage flash 관리 아키텍처",
+        description: "Pure Storage가 flash media를 직접 관리해 array software가 media 특성을 활용하도록 하는 아키텍처 이름입니다.",
+        example: "DirectFlash lets the platform manage flash at the media level.",
+        category: "vendor"
+      },
+      {
+        term: "Evergreen",
+        full: "Pure Storage Evergreen architecture",
+        meaning: "무중단 업그레이드 제품 전략",
+        description: "Pure Storage array의 hardware와 software를 서비스 중단을 줄이며 지속적으로 갱신한다는 제품 전략과 subscription 이름입니다.",
+        example: "The customer plans a non-disruptive upgrade through the Evergreen program.",
+        category: "vendor"
+      },
+      {
+        term: "ActiveCluster",
+        full: "Pure Storage ActiveCluster",
+        meaning: "Pure Storage active-active 복제 기능",
+        description: "두 FlashArray 사이에서 volume을 active-active로 제공하고 동기 복제를 사용하는 기능입니다.",
+        example: "ActiveCluster provides active-active access across the two arrays.",
+        category: "vendor"
+      },
+      {
+        term: "ActiveDR",
+        full: "Pure Storage ActiveDR",
+        meaning: "Pure Storage 비동기 재해 복구 기능",
+        description: "FlashArray volume을 다른 array로 비동기 복제해 disaster recovery를 지원하는 기능입니다.",
+        example: "ActiveDR keeps an asynchronous copy at the remote site.",
+        category: "vendor"
+      },
+      {
+        term: "SafeMode",
+        full: "Pure Storage SafeMode snapshots",
+        meaning: "삭제 방지 보호 모드",
+        description: "관리자나 공격자가 정해진 보존 기간 전에 보호된 snapshot을 삭제하지 못하게 하는 Pure Storage 기능입니다.",
+        example: "SafeMode protects the recovery snapshots from accidental deletion.",
+        category: "vendor"
+      }
+    ];
+
+    const categoryLabels = {
+      architecture: "구조",
+      connectivity: "연결",
+      protocol: "프로토콜",
+      media: "미디어",
+      vendor: "제품/플랫폼",
+      operation: "운영",
+      fundamental: "기초",
+      performance: "성능",
+      protection: "보호",
+      openstack: "OpenStack",
+      development: "개발"
+    };
+
+    const grid = document.getElementById("glossaryGrid");
+    const search = document.getElementById("search");
+    const resultCount = document.getElementById("resultCount");
+    const termCountHero = document.getElementById("termCountHero");
+    const emptyState = document.getElementById("emptyState");
+    let activeFilter = "all";
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function searchable(term) {
+      return [term.term, term.full, term.meaning, term.description, term.example, categoryLabels[term.category]]
+        .join(" ")
+        .toLocaleLowerCase("ko-KR");
+    }
+
+    function renderTerms() {
+      const query = search.value.trim().toLocaleLowerCase("ko-KR");
+      const filtered = terms.filter((term) => {
+        const matchesCategory = activeFilter === "all" || term.category === activeFilter;
+        const matchesQuery = !query || searchable(term).includes(query);
+        return matchesCategory && matchesQuery;
+      });
+
+      grid.innerHTML = filtered.map((term) => {
+        const index = terms.indexOf(term) + 1;
+        return `
+          <article class="term-card">
+            <div class="card-top">
+              <span class="category ${escapeHtml(term.category)}">${escapeHtml(categoryLabels[term.category])}</span>
+              <span class="card-number">${String(index).padStart(2, "0")}</span>
+            </div>
+            <h3>${escapeHtml(term.term)}</h3>
+            <p class="fullname">${escapeHtml(term.full)}</p>
+            <div class="meaning">
+              <span class="label">한국어 뜻</span>
+              <p>${escapeHtml(term.meaning)}</p>
+            </div>
+            <p class="description">${escapeHtml(term.description)}</p>
+            <div class="example"><strong>IN PRACTICE</strong>${escapeHtml(term.example)}</div>
+          </article>
+        `;
+      }).join("");
+
+      resultCount.textContent = `${filtered.length}개 용어`;
+      termCountHero.textContent = `${terms.length} terms`;
+      emptyState.hidden = filtered.length !== 0;
+    }
+
+    document.querySelectorAll(".filter").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter;
+        document.querySelectorAll(".filter").forEach((item) => item.classList.toggle("active", item === button));
+        renderTerms();
+      });
+    });
+
+    search.addEventListener("input", renderTerms);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "/" && document.activeElement !== search && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault();
+        search.focus();
+      }
+    });
+
+    renderTerms();
+  </script>
+</body>
+</html>

@@ -65,6 +65,10 @@
       <div id="status">문서 목록을 불러오는 중입니다…</div>
       <ul id="docs">
         <li>
+          <a href="./storage-acronym-glossary.html">Storage Developer Glossary · 259 terms</a>
+          <span class="path">storage-acronym-glossary.html</span>
+        </li>
+        <li>
           <a href="./specs/2026.2/incremental-backup-cbt.html">Incremental Backup with CBT</a>
           <span class="path">specs/2026.2/incremental-backup-cbt.html</span>
         </li>
@@ -87,10 +91,14 @@
     const status = document.querySelector("#status");
     const count = document.querySelector("#count");
     let documents = [{
+      path: "storage-acronym-glossary.html",
+      title: "Storage Developer Glossary · 259 terms"
+    }, {
       path: "specs/2026.2/incremental-backup-cbt.html",
       title: "Incremental Backup with CBT"
     }];
     const knownTitles = {
+      "storage-acronym-glossary.html": "Storage Developer Glossary · 259 terms",
       "specs/2026.2/incremental-backup-cbt.html": "Incremental Backup with CBT"
     };
 
