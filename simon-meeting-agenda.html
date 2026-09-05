@@ -360,6 +360,41 @@
       border-left-color: var(--orange);
       background: #fffdfb;
     }
+    .change-sources {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 16px 8px;
+      padding: 11px 13px;
+      border: 1px solid #d7e3f4;
+      border-radius: 12px;
+      background: #f7faff;
+    }
+    .change-sources .source-title {
+      flex: 0 0 100%;
+      margin: 0 0 1px;
+      color: #587092;
+      font-size: .76rem;
+      font-weight: 800;
+    }
+    .change-sources a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 9px;
+      border: 1px solid #cbdaf3;
+      border-radius: 8px;
+      color: var(--blue);
+      background: #fff;
+      font-size: .76rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .change-sources a:hover {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+    }
     .english, .korean { margin: 0; }
     .english {
       color: var(--ink);
@@ -439,7 +474,7 @@
     <div class="hero-inner">
       <span class="eyebrow">TOPIC-BY-TOPIC · EASY ENGLISH</span>
       <h1>Simon 미팅 영어 안건</h1>
-      <p>주제별로 대화의 흐름을 따라가며 Cinder CBT, 백업, QoS, KMS, Everpure와 OpenStack에 대해 연습하는 자료입니다.</p>
+      <p>주제별로 대화의 흐름을 따라가며 Cinder CBT, RBD 백업 개발, QoS, KMS, Everpure와 OpenStack에 대해 연습하는 자료입니다.</p>
       <div class="hero-actions">
         <button id="toggleKorean" type="button" aria-pressed="false">한국어 숨기기</button>
         <a class="back-link" href="./index.html">문서 목록으로 돌아가기</a>
@@ -522,8 +557,8 @@
       <h2>CBT backup — why is it useful? <small>CBT 백업은 왜 유용한가?</small></h2>
       <div class="flow-intro">
         <strong>Conversation flow · 대화 흐름</strong>
-        <p>First explain why CBT matters. Then ask whether it is ready for a real backup product.</p>
-        <p class="flow-korean">먼저 CBT가 왜 중요한지 설명하고, 실제 백업 제품에 사용할 준비가 되었는지 묻습니다.</p>
+        <p>First explain why CBT matters. Then explain two related RBD changes and ask whether they are ready for a real backup product.</p>
+        <p class="flow-korean">먼저 CBT가 왜 중요한지 설명하고, 관련된 두 RBD 변경을 설명한 뒤 실제 백업 제품에 사용할 준비가 되었는지 묻습니다.</p>
       </div>
       <h3>1. Set the context · 배경 설명하기</h3>
       <div class="pair"><p class="english">I want to understand the real value of Cinder CBT backup.</p><p class="korean">Cinder CBT 백업의 실제 가치를 이해하고 싶습니다.</p></div>
@@ -532,11 +567,34 @@
       <div class="pair"><p class="english">One reason we are interested in CBT is backup performance.</p><p class="korean">우리가 CBT에 관심을 가지는 이유 중 하나는 백업 성능입니다.</p></div>
       <div class="pair"><p class="english">With CBT, we only need to back up the changed blocks.</p><p class="korean">CBT를 사용하면 변경된 블록만 백업하면 됩니다.</p></div>
       <div class="pair"><p class="english">So I think it can reduce backup time and data transfer.</p><p class="korean">그래서 백업 시간과 데이터 전송량을 줄일 수 있다고 생각합니다.</p></div>
-      <h3>3. Ask about readiness · 준비 상태 묻기</h3>
+      <h3>3. Explain two related Cinder changes · 서로 관련된 두 Cinder 변경 설명하기</h3>
+      <div class="change-sources" aria-label="Gerrit changes">
+        <p class="source-title">Reference changes · 참고 변경사항</p>
+        <a href="https://review.opendev.org/c/openstack/cinder/+/1002961">1002961 · RBD CBT</a>
+        <a href="https://review.opendev.org/c/openstack/cinder/+/1004171">1004171 · Snapshot export/attach</a>
+      </div>
+      <div class="flow-intro">
+        <strong>My understanding · 제가 이해한 내용</strong>
+        <p>These two changes are connected, so I want to explain them together.</p>
+        <p class="flow-korean">이 두 변경은 서로 연결되어 있어서 함께 설명하고 싶습니다.</p>
+      </div>
+      <div class="pair"><p class="english">I would like to talk about two Cinder changes for RBD backup.</p><p class="korean">RBD 백업을 위한 두 가지 Cinder 변경에 대해 이야기하고 싶습니다.</p></div>
+      <div class="pair"><p class="english">The first change adds Changed Block Tracking to the RBD driver.</p><p class="korean">첫 번째 변경은 RBD 드라이버에 Changed Block Tracking을 추가합니다.</p></div>
+      <div class="pair"><p class="english">It can find only the blocks that changed between two snapshots.</p><p class="korean">두 스냅샷 사이에서 변경된 블록만 찾을 수 있습니다.</p></div>
+      <div class="pair"><p class="english">This means that an incremental backup does not need to scan the whole volume every time.</p><p class="korean">즉, 증분 백업은 매번 전체 볼륨을 검사할 필요가 없습니다.</p></div>
+      <div class="pair"><p class="english">It can send only the changed blocks, so backup time and data transfer can be reduced.</p><p class="korean">변경된 블록만 보낼 수 있으므로 백업 시간과 데이터 전송량을 줄일 수 있습니다.</p></div>
+      <div class="pair"><p class="english">The second change adds snapshot export and attach support for backups.</p><p class="korean">두 번째 변경은 백업을 위한 스냅샷 export 및 attach 지원을 추가합니다.</p></div>
+      <div class="pair"><p class="english">An RBD snapshot cannot be attached directly.</p><p class="korean">RBD 스냅샷은 직접 attach할 수 없습니다.</p></div>
+      <div class="pair"><p class="english">So it creates a temporary copy-on-write clone from the snapshot.</p><p class="korean">그래서 스냅샷으로부터 임시 copy-on-write clone을 만듭니다.</p></div>
+      <div class="pair"><p class="english">The backup flow can attach this temporary clone and use it as a source.</p><p class="korean">백업 흐름은 이 임시 clone을 attach해서 소스로 사용할 수 있습니다.</p></div>
+      <div class="pair"><p class="english">The CBT change depends on the snapshot export and attach change.</p><p class="korean">CBT 변경은 스냅샷 export 및 attach 변경에 의존합니다.</p></div>
+      <div class="pair"><p class="english">I think these two changes can make an efficient RBD backup flow.</p><p class="korean">저는 이 두 변경이 효율적인 RBD 백업 흐름을 만들 수 있다고 생각합니다.</p></div>
+      <div class="pair"><p class="english">CBT finds the changed blocks, and the temporary clone gives the backup a usable source.</p><p class="korean">CBT는 변경된 블록을 찾고, 임시 clone은 백업에 사용할 수 있는 소스를 제공합니다.</p></div>
+      <h3>4. Ask about readiness · 준비 상태 묻기</h3>
       <div class="pair"><p class="english">Do you think this is the main benefit?</p><p class="korean">이것이 가장 큰 장점이라고 생각하시나요?</p></div>
       <div class="pair"><p class="english">Do you think CBT is ready to be used by a real backup product?</p><p class="korean">CBT가 실제 백업 제품에서 사용될 준비가 되었다고 생각하시나요?</p></div>
       <div class="pair"><p class="english">What do you think is still missing?</p><p class="korean">아직 부족한 점은 무엇이라고 생각하시나요?</p></div>
-      <h3>4. Ask how to use it · 실제 사용 방법 묻기</h3>
+      <h3>5. Ask how to use it · 실제 사용 방법 묻기</h3>
       <div class="pair"><p class="english">How would you use CBT in a backup product?</p><p class="korean">백업 제품에서 CBT를 어떻게 사용하시겠어요?</p></div>
       <div class="pair"><p class="english">Would the backup software call the Cinder API directly?</p><p class="korean">백업 소프트웨어가 Cinder API를 직접 호출하게 될까요?</p></div>
       <div class="pair"><p class="english">Do we need any more APIs for real backup products?</p><p class="korean">실제 백업 제품을 위해 더 필요한 API가 있을까요?</p></div>
