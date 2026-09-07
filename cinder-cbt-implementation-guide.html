@@ -550,13 +550,29 @@ return True</code></pre>
       </p>
       <div class="grid two">
         <article class="card">
-          <div class="card-kicker">BACKUP REPOSITORY</div>
+          <div class="card-kicker">BACKUP REPOSITORY · S3 / SWIFT</div>
           <h3><code>_write_metadata</code>가 쓰는 JSON object</h3>
           <p>
-            chunkeddriver는 실제 byte를 별도 object로 저장하고, metadata object에는 object 이름과
-            각 object의 <code>offset</code>/<code>length</code>, volume 정보, parent 정보 등
-            복원에 필요한 실제 필드를 기록합니다. compression/checksum 관련 기존 logic도 이 경로에 남아 있습니다.
+            chunkeddriver는 실제 byte를 별도 object로 저장하고, 같은 backup repository의
+            <strong>container/bucket 안에 별도의 metadata object</strong>도 저장합니다.
+            이 metadata object의 body가 JSON이며, object 이름과 각 object의
+            <code>offset</code>/<code>length</code>, volume 정보, parent 정보 등 복원에 필요한
+            실제 필드를 기록합니다. compression/checksum 관련 기존 logic도 이 경로에 남아 있습니다.
           </p>
+          <div class="callout" style="margin-bottom:14px">
+            <strong>저장 위치를 정확히 말하면</strong>
+            <p>
+              제공된 구현에서 <code>_write_metadata(backup, ..., container, ...)</code>는
+              <code>filename = &lt;backup.service_metadata&gt;_metadata</code>를 만들고
+              <code>_get_object_writer(container, filename)</code>로 JSON bytes를 씁니다.
+              따라서 Swift를 쓰면 설정된 backup Swift container 안의 별도 object이고,
+              S3를 쓰면 설정된 backup bucket 안의 별도 object입니다.
+            </p>
+            <p style="margin-top:8px">
+              즉 각 데이터 object의 S3 object metadata header나 Swift user-metadata field에
+              JSON을 넣는 방식이 아닙니다. 이 메서드가 하는 일은 JSON을 object body로 저장하는 것입니다.
+            </p>
+          </div>
           <pre><code>{
   "objects": [
     {"chunk-0001": {"offset": 4096, "length": 4096}}
@@ -564,7 +580,7 @@ return True</code></pre>
   "parent_id": "...",
   "volume_meta": "..."
 }</code></pre>
-          <p class="mini-note">위 JSON은 구조를 이해하기 위한 단순화한 예시이며, 실제 저장 형식의 모든 필드를 나타내지 않습니다.</p>
+          <p class="mini-note">위 JSON은 metadata object body의 구조를 이해하기 위한 단순화한 예시이며, 실제 저장 형식의 모든 필드를 나타내지 않습니다.</p>
         </article>
         <article class="card">
           <div class="card-kicker">CINDER DATABASE</div>
