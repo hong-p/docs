@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenStack Cinder CBT 구현을 RBD와 Everpure FlashArray 코드 흐름으로 설명하는 한국어 해설 문서">
+  <title>Cinder CBT 백업 구조와 구현 | RBD · Everpure</title>
+  <style>
+    :root {
+      --ink: #172235;
+      --muted: #62738b;
+      --paper: #f3f6fb;
+      --card: #ffffff;
+      --line: #d9e2ee;
+      --navy: #0c1830;
+      --blue: #2867d7;
+      --blue-soft: #edf3ff;
+      --orange: #df7040;
+      --orange-soft: #fff2ea;
+      --green: #118476;
+      --green-soft: #eaf8f5;
+      --purple: #6d4bc3;
+      --purple-soft: #f2edff;
+      --shadow: 0 14px 34px rgba(28, 53, 91, .08);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+        "Noto Sans KR", "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.7;
+    }
+    a { color: #1759ad; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .hero {
+      color: #fff;
+      background:
+        radial-gradient(circle at 87% 10%, rgba(40, 103, 215, .48), transparent 32%),
+        radial-gradient(circle at 7% 94%, rgba(223, 112, 64, .3), transparent 27%),
+        linear-gradient(135deg, #0a142c, #142b58 58%, #1b4073);
+      padding: 46px 20px 58px;
+    }
+    .hero-inner, .content, .footer-inner { max-width: 1120px; margin: 0 auto; }
+    .hero-inner { position: relative; }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 28px;
+      color: #dce8ff;
+      font-size: .86rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .eyebrow {
+      display: inline-block;
+      padding: 5px 10px;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 999px;
+      color: #dce8ff;
+      background: rgba(255, 255, 255, .08);
+      font-size: .73rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 840px;
+      margin: 18px 0 14px;
+      font-size: clamp(2.15rem, 6vw, 4.7rem);
+      line-height: 1.06;
+      letter-spacing: -.065em;
+    }
+    .hero-lead {
+      max-width: 810px;
+      margin-bottom: 24px;
+      color: #d0ddf3;
+      font-size: clamp(1rem, 2vw, 1.17rem);
+    }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-tags span {
+      padding: 6px 10px;
+      border: 1px solid rgba(255, 255, 255, .2);
+      border-radius: 999px;
+      color: #eaf1ff;
+      background: rgba(255, 255, 255, .09);
+      font-size: .8rem;
+    }
+    .topnav {
+      position: sticky;
+      z-index: 5;
+      top: 0;
+      border-bottom: 1px solid rgba(23, 34, 53, .11);
+      background: rgba(255, 255, 255, .95);
+      box-shadow: 0 5px 18px rgba(27, 47, 78, .06);
+      backdrop-filter: blur(12px);
+    }
+    .nav-inner {
+      display: flex;
+      gap: 4px;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 8px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-inner a {
+      flex: 0 0 auto;
+      padding: 6px 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: .77rem;
+      font-weight: 750;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-inner a:hover { color: var(--blue); background: var(--blue-soft); }
+    .content { padding: 44px 18px 90px; }
+    .section { scroll-margin-top: 68px; margin-top: 48px; }
+    .section:first-child { margin-top: 0; }
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 11px;
+      margin-bottom: 18px;
+    }
+    .section-number {
+      color: var(--blue);
+      font-size: .82rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    h2 {
+      margin-bottom: 0;
+      font-size: clamp(1.45rem, 3vw, 2.15rem);
+      line-height: 1.2;
+      letter-spacing: -.045em;
+    }
+    h3 { margin-bottom: 8px; font-size: 1.12rem; line-height: 1.35; }
+    .lead { max-width: 850px; color: #465873; font-size: 1.03rem; }
+    .summary-hero {
+      margin-bottom: 28px;
+      padding: 24px;
+      border: 1px solid #c7d8f7;
+      border-left: 6px solid var(--blue);
+      border-radius: 18px;
+      background: linear-gradient(115deg, #edf3ff, #fff);
+      box-shadow: var(--shadow);
+    }
+    .summary-hero .label { margin-bottom: 5px; color: var(--blue); font-size: .75rem; font-weight: 900; letter-spacing: .1em; }
+    .summary-hero strong { display: block; margin-bottom: 8px; font-size: clamp(1.25rem, 3vw, 1.72rem); line-height: 1.35; }
+    .summary-hero p { margin: 0; color: #465873; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid.two { grid-template-columns: repeat(2, 1fr); }
+    .card {
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+    .card .card-kicker { margin-bottom: 6px; color: var(--blue); font-size: .73rem; font-weight: 900; letter-spacing: .08em; }
+    .card p, .card li { color: #52647d; font-size: .93rem; }
+    ul, ol { padding-left: 1.25rem; }
+    li + li { margin-top: 5px; }
+    .callout {
+      margin: 18px 0;
+      padding: 15px 17px;
+      border: 1px solid #cfe0f6;
+      border-left: 4px solid var(--blue);
+      border-radius: 12px;
+      background: var(--blue-soft);
+    }
+    .callout.orange { border-color: #f4d1c0; border-left-color: var(--orange); background: var(--orange-soft); }
+    .callout.green { border-color: #c9e7df; border-left-color: var(--green); background: var(--green-soft); }
+    .callout.purple { border-color: #ddd3fa; border-left-color: var(--purple); background: var(--purple-soft); }
+    .callout strong { display: block; margin-bottom: 4px; }
+    .callout p { margin-bottom: 0; color: #4c5e76; font-size: .92rem; }
+    .status {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 850;
+      vertical-align: 2px;
+    }
+    .status.confirmed { color: #0c7366; background: #d8f1eb; }
+    .status.spec { color: #3157a3; background: #dfe9ff; }
+    .status.caution { color: #93501e; background: #ffeadc; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 9px;
+      margin: 20px 0 10px;
+      padding: 0;
+      list-style: none;
+    }
+    .flow li { position: relative; min-height: 126px; padding: 15px 13px; border: 1px solid #d2deef; border-radius: 14px; background: #fff; }
+    .flow li:not(:last-child)::after { content: "→"; position: absolute; z-index: 1; top: 44px; right: -17px; color: var(--blue); font-size: 1.5rem; font-weight: 900; }
+    .flow .step { display: block; margin-bottom: 5px; color: var(--blue); font-size: .72rem; font-weight: 900; letter-spacing: .08em; }
+    .flow strong { display: block; margin-bottom: 5px; font-size: .96rem; line-height: 1.35; }
+    .flow span:last-child { color: #60718a; font-size: .8rem; }
+    .diagram-note { margin: 0; color: var(--muted); font-size: .82rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid #e4eaf1; text-align: left; vertical-align: top; }
+    th { color: #3e5572; background: #f6f9fd; font-size: .79rem; font-weight: 850; }
+    td { color: #52647d; }
+    tr:last-child td { border-bottom: 0; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); }
+    pre {
+      max-width: 100%;
+      margin: 14px 0;
+      padding: 16px;
+      overflow-x: auto;
+      border: 1px solid #263653;
+      border-radius: 12px;
+      color: #eaf1ff;
+      background: #111d35;
+      font-size: .79rem;
+      line-height: 1.65;
+      tab-size: 4;
+    }
+    .code-caption { margin: 14px 0 5px; color: #596b83; font-size: .82rem; font-weight: 800; }
+    .code-caption code, .inline-code { padding: 2px 5px; border-radius: 5px; color: #244f98; background: #e9f0fd; font-size: .86em; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .pair > div { padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .pair .en { color: #244f98; font-weight: 750; }
+    .pair .ko { color: #52647d; font-size: .9rem; }
+    .pair p { margin-bottom: 5px; }
+    .pair p:last-child { margin-bottom: 0; }
+    .memory {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 16px;
+      align-items: center;
+      padding: 18px;
+      border: 1px solid #d6dff0;
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .memory .bytes { padding: 13px 11px; border-radius: 10px; color: #fff; background: #172b52; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; text-align: center; letter-spacing: .08em; }
+    .memory .bytes small { display: block; margin-top: 6px; color: #b9c9e6; font-family: inherit; font-size: .68rem; letter-spacing: 0; }
+    .extent-example { margin-top: 14px; padding: 13px 15px; border-radius: 11px; color: #385273; background: #f5f8fd; font-size: .91rem; }
+    .extent-example strong { color: var(--blue); }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 15px; margin: 12px 0; color: #65758b; font-size: .81rem; }
+    .legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 5px; border-radius: 3px; background: var(--blue); }
+    .legend .orange::before { background: var(--orange); }
+    .legend .gray::before { background: #b9c4d2; }
+    .mini-note { color: #697a91; font-size: .82rem; }
+    details { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    summary { padding: 12px 15px; cursor: pointer; color: #31598f; font-weight: 800; }
+    details > div { padding: 0 15px 14px; color: #52647d; font-size: .9rem; }
+    .source-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; margin: 0; padding-left: 1.2rem; }
+    .source-list li { color: #52647d; font-size: .9rem; }
+    .source-list a { overflow-wrap: anywhere; }
+    .footer { padding: 22px 18px 45px; border-top: 1px solid var(--line); color: #718198; font-size: .82rem; }
+    .footer-inner p { margin-bottom: 7px; }
+    @media (max-width: 820px) {
+      .grid, .grid.two { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: 1fr; }
+      .flow li { min-height: 0; padding: 13px; }
+      .flow li:not(:last-child)::after { top: auto; right: auto; bottom: -17px; left: 50%; content: "↓"; }
+      .pair { grid-template-columns: 1fr; }
+      .source-list { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .hero { padding: 34px 16px 44px; }
+      .content { padding: 32px 14px 65px; }
+      .memory { grid-template-columns: 1fr; }
+      th, td { min-width: 145px; }
+      pre { font-size: .72rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="./index.html">← 문서 목록으로 돌아가기</a>
+      <span class="eyebrow">OPENSTACK CINDER · IMPLEMENTATION NOTES</span>
+      <h1>Cinder CBT 백업 구조와 구현</h1>
+      <p class="hero-lead">
+        RBD의 사전 버그 수정, Cinder 백업 프레임워크, 그리고 Everpure
+        FlashArray 구현을 실제 코드 흐름에 맞춰 설명합니다. 먼저 기억할
+        요약을 보고, 그 다음 wrapper·extent·snapshot·restore 수준으로 내려갑니다.
+      </p>
+      <div class="hero-tags">
+        <span>한국어 기술 해설</span>
+        <span>RBD 1004171 + 1002961</span>
+        <span>Everpure 990982</span>
+        <span>제공된 Gerrit diff 기준</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="topnav" aria-label="문서 목차">
+    <div class="nav-inner">
+      <a href="#summary">요약</a>
+      <a href="#story">설명 흐름</a>
+      <a href="#architecture">구조</a>
+      <a href="#wrapper">Wrapper</a>
+      <a href="#extents">Extents</a>
+      <a href="#lifecycle">Lifecycle</a>
+      <a href="#rbd">RBD</a>
+      <a href="#everpure">Everpure</a>
+      <a href="#compare">차이점</a>
+      <a href="#restore">Restore</a>
+      <a href="#api">REST API</a>
+      <a href="#review">검토 포인트</a>
+      <a href="#sources">자료</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <section id="summary" class="section">
+      <div class="summary-hero">
+        <div class="label">한 문장 요약</div>
+        <strong>이 작업은 “CBT가 유용하다”는 설명이 아니라, 백업이 읽을 범위를 스토리지의 변경 정보로 정하고 그 범위만 기존 chunk 저장 경로로 보내도록 연결한 구현입니다.</strong>
+        <p>
+          RBD에서는 먼저 snapshot export/attach가 빠져 있던 독립 버그를 고친 뒤
+          CBT를 올렸고, Everpure는 snapshot export와 CBT를 한 변경에 함께 넣었습니다.
+          두 driver 모두 같은 Cinder 계약을 지키지만, 실제 snapshot 생성·diff 조회·접속 방식은 다릅니다.
+        </p>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="card-kicker">01 · RBD PREREQUISITE</div>
+          <h3>먼저 백업이 읽을 수 있게 만들었다</h3>
+          <p>
+            <code>backup_use_temp_snapshot=True</code>일 때 RBD에는 snapshot을
+            export/attach하는 구현이 없었습니다. BaseVD의 기본 반환값이
+            <code>None</code>이라 실제 증상은 뒤 단계의 TypeError로 나타날 수 있었습니다.
+            이 문제는 CBT와 무관하게 snapshot 백업에서도 생기므로 별도 CR로 분리했습니다.
+          </p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">02 · CBT CHANGE</div>
+          <h3>그 다음 변경 범위를 backend에서 받았다</h3>
+          <p>
+            <code>create_cbt_snapshot</code>으로 기준점을 만들고,
+            <code>get_cbt_extents</code>가 두 snapshot 사이의
+            <code>offset / length</code>를 반환합니다. 백업은 각 extent에서
+            <code>seek → read → _backup_chunk</code>만 실행합니다.
+          </p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">03 · SAME CONTRACT, DIFFERENT API</div>
+          <h3>Everpure와 RBD의 공통점과 차이</h3>
+          <p>
+            공통으로 Cinder의 세 driver 메서드와 COW 기반 snapshot lifecycle을 사용합니다.
+            RBD는 librbd <code>diff_iterate</code>, Everpure는 FlashArray
+            <code>volumes/diff</code>를 사용하고, snapshot 이름·block granularity·window 처리도 다릅니다.
+          </p>
+        </article>
+      </div>
+
+      <div class="callout green">
+        <strong>구현을 한 문장으로 요약하면</strong>
+        <p>
+          RBD snapshot export/attach의 독립 버그를 먼저 수정하고, 그 다음 storage diff API를
+          이용해 CBT를 추가했습니다. Backup manager는 반환된 byte 범위만 읽어 기존
+          chunked backup 경로로 전달합니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="story" class="section">
+      <div class="section-heading"><span class="section-number">01</span><h2>구현을 읽는 순서</h2></div>
+      <p class="lead">
+        이 문서는 다음 순서로 읽으면 전체 맥락이 이어집니다. 먼저 독립 버그를 고쳐
+        백업 데이터 경로를 열고, 그 위에 backend diff를 연결한 뒤, 기존 chunk 저장과
+        restore가 그 결과를 어떻게 소비하는지 확인합니다.
+      </p>
+      <ol class="flow" aria-label="문서 읽기 순서">
+        <li><span class="step">01 · PREREQUISITE</span><strong>RBD snapshot export/attach bugfix</strong><span>CBT와 무관한 독립 문제를 먼저 해결</span></li>
+        <li><span class="step">02 · CONTRACT</span><strong>Cinder CBT driver 계약</strong><span>세 메서드와 RPC 연결</span></li>
+        <li><span class="step">03 · CONSUMPTION</span><strong>backup manager + wrapper</strong><span>extent로 읽기 범위를 계획</span></li>
+        <li><span class="step">04 · BACKEND</span><strong>RBD / Everpure 구현</strong><span>native diff API를 계약에 매핑</span></li>
+        <li><span class="step">05 · RESTORE</span><strong>offset write + zero 처리</strong><span>기존 restore path로 chain 재구성</span></li>
+      </ol>
+      <p class="mini-note">이 페이지는 제공된 patch와 스펙을 코드 흐름으로 읽기 위한 별도 기술 문서입니다.</p>
+    </section>
+
+    <section id="architecture" class="section">
+      <div class="section-heading"><span class="section-number">02</span><h2>전체 구조: driver diff가 백업 chunk가 되기까지</h2></div>
+      <p class="lead">
+        CBT의 핵심은 backend가 반환한 extent를 새로운 저장 포맷으로 바꾸는 것이 아닙니다.
+        기존 chunked backup의 파일 읽기·object 저장 경로에 “어디를 읽을지”만 주입합니다.
+      </p>
+      <ol class="flow" aria-label="CBT backup flow">
+        <li><span class="step">STEP 1</span><strong>Cinder volume driver</strong><span>snapshot 생성과 backend diff</span></li>
+        <li><span class="step">STEP 2</span><strong>Volume manager / RPC</strong><span>supports + 3 CBT calls</span></li>
+        <li><span class="step">STEP 3</span><strong>Backup manager</strong><span>reference와 extent 계획</span></li>
+        <li><span class="step">STEP 4</span><strong>CBTVolumeFileWrapper</strong><span>open file + extent list</span></li>
+        <li><span class="step">STEP 5</span><strong>Chunked driver</strong><span>seek, read, _backup_chunk</span></li>
+      </ol>
+      <p class="diagram-note">실제 데이터는 마지막 단계에서 storage backend object로 저장됩니다. wrapper 자체가 volume bytes를 저장하지는 않습니다.</p>
+
+      <div class="table-wrap" style="margin-top:18px">
+        <table>
+          <thead><tr><th>위치</th><th>확인된 구현</th><th>역할</th></tr></thead>
+          <tbody>
+            <tr><td><code>BaseVD</code></td><td><code>create_cbt_snapshot</code>, <code>get_cbt_extents</code>, <code>delete_cbt_snapshot</code></td><td>모든 volume driver가 따르는 기본 계약. 기본 구현은 지원하지 않음을 뜻합니다.</td></tr>
+            <tr><td><code>VolumeManager</code></td><td><code>supports_cbt</code> + 세 메서드 RPC handler</td><td>세 메서드가 모두 BaseVD와 다른지 class identity로 확인하고 driver에 위임합니다.</td></tr>
+            <tr><td><code>rpcapi</code></td><td>cinder-volume RPC API <code>3.21</code></td><td>capability, extent 조회, snapshot 생성·삭제를 volume host로 보냅니다.</td></tr>
+            <tr><td><code>BackupManager</code></td><td><code>_get_cbt_backup_info</code>, cleanup, wrapper 생성</td><td>full/incremental/re-bootstrap을 계획하고 reference provenance를 관리합니다.</td></tr>
+            <tr><td><code>ChunkedBackupDriver</code></td><td><code>_backup_cbt</code>와 metadata 저장</td><td>extent마다 file을 seek하고 chunk 단위로 읽어 기존 object writer를 사용합니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <strong>왜 “4개의 RPC 호출”이라고 말하는가?</strong>
+        <p>
+          기능 이름은 세 개(<code>create</code>, <code>get</code>, <code>delete</code>)지만,
+          capability를 확인하는 <code>supports_cbt</code>까지 volume manager/RPC에 추가됩니다.
+          따라서 Cinder volume RPC 표면에서는 네 메서드가 함께 움직입니다.
+        </p>
+      </div>
+      <div class="code-caption"><code>supports_cbt</code>의 핵심 로직을 단순화한 모습</div>
+      <pre><code>for name in ('create_cbt_snapshot', 'get_cbt_extents',
+             'delete_cbt_snapshot'):
+    implementation = getattr(type(self.driver), name, None)
+    base_stub = getattr(driver.BaseVD, name, None)
+    if implementation is None or implementation is base_stub:
+        return False
+return True</code></pre>
+      <p class="mini-note">실제 코드는 일부만 override한 driver를 CBT capable로 잘못 광고하지 않도록 세 메서드를 모두 검사합니다.</p>
+    </section>
+
+    <section id="wrapper" class="section">
+      <div class="section-heading"><span class="section-number">03</span><h2>Wrapper는 무엇을 들고 있는가?</h2></div>
+      <p class="lead">
+        <code>CBTVolumeFileWrapper</code>는 volume 전체를 메모리에 올리는 buffer가 아닙니다.
+        이미 attach되어 열린 block-device file reference를 감싸고, backend가 계산한 extent와
+        다음 reference 정보를 함께 전달하는 작은 adapter입니다.
+      </p>
+      <div class="grid two">
+        <article class="card">
+          <div class="card-kicker">WRAPPER STATE</div>
+          <h3>가지고 있는 것</h3>
+          <ul>
+            <li>열려 있는 file object 또는 보통 <code>tpool</code>로 보호된 proxy</li>
+            <li><code>offset</code>, <code>length</code>, <code>exists</code> extent list</li>
+            <li>이번 backup의 reference/backend snapshot ID</li>
+            <li>in-use snapshot을 adopt했다면 Cinder snapshot ID</li>
+          </ul>
+        </article>
+        <article class="card">
+          <div class="card-kicker">NOT IN MEMORY</div>
+          <h3>가지고 있지 않은 것</h3>
+          <ul>
+            <li>volume 전체 byte contents</li>
+            <li>각 extent의 데이터를 미리 읽어 둔 cache</li>
+            <li>새로운 staging local file</li>
+            <li>새로운 VM이나 filesystem mount</li>
+          </ul>
+        </article>
+      </div>
+      <div class="memory" style="margin-top:16px">
+        <div class="bytes">A B C D X Y Z H I J<small>0 .. 9 · 단순화한 메모리 예시</small></div>
+        <div>
+          <h3>seek와 read를 숫자로 말하기</h3>
+          <p>
+            volume의 일부가 <code>0..9 = ABCDXYZHIJ</code>라고 가정합니다.
+            <code>{offset: 4, length: 3, exists: true}</code>가 오면 wrapper는
+            <code>seek(4)</code> 후 <code>read(3)</code>을 실행합니다.
+            결과는 <strong>XYZ</strong>이고 cursor는 <code>tell() == 7</code>이 됩니다.
+          </p>
+          <div class="extent-example"><strong>실제 흐름:</strong> get extents → extent offset으로 seek → chunk-sized read → <code>_backup_chunk(data, offset)</code></div>
+        </div>
+      </div>
+      <div class="callout green">
+        <strong>중요한 오해 방지</strong>
+        <p>
+          CBT는 데이터를 다른 포맷으로 재구성해서 RAM에 쌓는 기능이 아닙니다.
+          driver가 “읽어야 할 byte 범위”를 주면 chunked driver가 그 위치에서 직접 읽습니다.
+          그래서 CBT 경로에도 새 local staging file이 필요하지 않습니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="extents" class="section">
+      <div class="section-heading"><span class="section-number">04</span><h2>Extent의 의미: byte 범위와 <code>exists</code></h2></div>
+      <p class="lead">
+        Cinder 계약에서 extent는 <code>offset</code>과 <code>length</code>가 byte 단위이며,
+        <code>exists</code>는 그 범위를 백업에 보낼지 판단하는 값입니다. backend API의 같은 이름과
+        의미가 항상 같지는 않으므로 driver에서 변환해야 합니다.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>필드</th><th>단위 / 값</th><th>백업에서의 의미</th></tr></thead>
+          <tbody>
+            <tr><td><code>offset</code></td><td>volume 시작점 기준 byte</td><td>file에서 <code>seek(offset)</code>할 위치</td></tr>
+            <tr><td><code>length</code></td><td>byte 길이</td><td>해당 범위에서 읽을 최대 byte 수</td></tr>
+            <tr><td><code>exists=True</code></td><td>할당/변경 범위</td><td>반드시 읽고 저장합니다. data→zero 변경도 포함됩니다.</td></tr>
+            <tr><td><code>exists=False</code></td><td>unallocated / sparse 범위</td><td>백업 driver는 보통 건너뜁니다. 단, incremental discard를 이 값으로 그대로 버리면 안 됩니다.</td></tr>
+            <tr><td><code>[]</code>와 <code>None</code></td><td>서로 다른 결과</td><td><code>[]</code>는 “변경 없음”, <code>None</code>은 “지원 안 함/계산 실패”이며 fallback 신호입니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout orange">
+        <strong>Ceph의 native flag와 Cinder shipping contract는 다르다</strong>
+        <p>
+          Ceph <code>diff_iterate</code> callback의 <code>exists=False</code>는 incremental에서
+          discard/data→zero 변화일 수 있습니다. RBD driver는 incremental에서는 이런 extent를
+          <code>exists=True</code>로 바꿔 zero bytes도 전송합니다. 그래야 restore 시 parent의
+          오래된 data가 남지 않습니다. 반대로 full allocation-map에서는 진짜 never-written hole만
+          생략합니다.
+        </p>
+      </div>
+      <div class="grid two">
+        <article class="card">
+          <h3>full allocation map</h3>
+          <p>
+            <code>from_snapshot=None</code>은 “target snapshot에 할당된 영역을 알려 달라”는 뜻입니다.
+            실제로 할당되어 0 byte가 들어 있는 영역은 값이 0이어도 포함될 수 있고,
+            never-written hole은 생략될 수 있습니다.
+          </p>
+        </article>
+        <article class="card">
+          <h3>incremental diff</h3>
+          <p>
+            base와 target 사이에 backend가 보고한 모든 변경을 보냅니다.
+            data→zero, discard, overwrite 모두 restore에 영향을 줄 수 있으므로
+            “값이 0처럼 보인다”는 이유로 생략하지 않습니다.
+          </p>
+        </article>
+      </div>
+      <div class="code-caption">인접하고 같은 종류인 extent는 payload를 줄이기 위해 합친다</div>
+      <pre><code>[{offset: 0,        length: 4 * MiB, exists: true},
+ {offset: 4 * MiB,  length: 4 * MiB, exists: true},
+ {offset: 12 * MiB, length: 4 * MiB, exists: true}]
+
+→ [{offset: 0, length: 8 * MiB, exists: true},
+   {offset: 12 * MiB, length: 4 * MiB, exists: true}]</code></pre>
+      <p class="mini-note">0–4 MiB와 4–8 MiB는 합쳐지지만, 8–12 MiB hole을 건너뛰고 12–16 MiB까지 합치면 안 됩니다. 합쳐진 extent는 storage object/chunk 크기와 같은 개념도 아닙니다.</p>
+    </section>
+
+    <section id="storage" class="section">
+      <div class="section-heading"><span class="section-number">05</span><h2>저장 형식과 metadata: 두 곳에 나누어 저장된다</h2></div>
+      <p class="lead">
+        CBT가 extent를 계산한다고 해서 extent list 자체가 backup repository의 데이터 object가 되는 것은 아닙니다.
+        실제 byte object와 복원용 metadata, 다음 CBT reference 정보는 서로 다른 경로로 기록됩니다.
+      </p>
+      <div class="grid two">
+        <article class="card">
+          <div class="card-kicker">BACKUP REPOSITORY</div>
+          <h3><code>_write_metadata</code>가 쓰는 JSON object</h3>
+          <p>
+            chunkeddriver는 실제 byte를 별도 object로 저장하고, metadata object에는 object 이름과
+            각 object의 <code>offset</code>/<code>length</code>, volume 정보, parent 정보 등
+            복원에 필요한 실제 필드를 기록합니다. compression/checksum 관련 기존 logic도 이 경로에 남아 있습니다.
+          </p>
+          <pre><code>{
+  "objects": [
+    {"chunk-0001": {"offset": 4096, "length": 4096}}
+  ],
+  "parent_id": "...",
+  "volume_meta": "..."
+}</code></pre>
+          <p class="mini-note">위 JSON은 구조를 이해하기 위한 단순화한 예시이며, 실제 저장 형식의 모든 필드를 나타내지 않습니다.</p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">CINDER DATABASE</div>
+          <h3><code>_save_cbt_metadata</code>가 DB에 쓰는 값</h3>
+          <p>
+            제공된 구현 diff에서는 <code>Backup.metadata</code>의 <code>cbt_metadata</code> 키에
+            다음 backup의 기준점과 backend 식별 정보를 JSON 문자열로 저장합니다.
+            변경 extent 목록 자체를 DB에 저장하는 구조는 확인되지 않습니다.
+          </p>
+          <pre><code>{
+  "reference_snapshot": "backend-id",
+  "cbt_backend": "host-backend",
+  "reference_snapshot_cinder_id": "..."  // adopt한 경우만
+}</code></pre>
+          <p class="mini-note"><code>cbt_backend</code>는 구현에서 volume host의 backend 문자열에서 파생되며, 항상 literal <code>ceph</code>나 <code>pure</code>라고 단정할 수 없습니다.</p>
+        </article>
+      </div>
+      <div class="callout purple">
+        <strong>스펙과 구현의 표현 차이</strong>
+        <p>
+          스펙은 framework가 backup metadata에 reference를 저장한다고 설명하지만,
+          제공된 실제 consumption diff에서는 chunkeddriver의 <code>_save_cbt_metadata</code>가
+            <code>Backup.metadata</code>를 저장합니다. 문서나 코드 설명에서는 “framework가 관리한다”와
+          “현재 코드에서 실제 write를 수행하는 위치”를 구분해 말하는 것이 정확합니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="lifecycle" class="section">
+      <div class="section-heading"><span class="section-number">06</span><h2>Snapshot lifecycle: reference를 언제 만들고 지우는가</h2></div>
+      <p class="lead">
+        reference는 데이터를 읽은 뒤에 만드는 것이 아니라, 읽을 시점과 맞는 point-in-time을 먼저 확보한 뒤 사용합니다.
+        특히 in-use volume에서는 백업이 이미 만든 temporary snapshot을 adopt해 읽은 데이터와 reference를 일치시킵니다.
+      </p>
+      <ol class="flow" aria-label="snapshot lifecycle">
+        <li><span class="step">FULL</span><strong>reference 생성</strong><span>detached면 driver snapshot, in-use면 temp snapshot adopt</span></li>
+        <li><span class="step">READ</span><strong>data 읽기</strong><span>같은 point-in-time의 device file</span></li>
+        <li><span class="step">NEXT</span><strong>reference 기록</strong><span>Backup.metadata의 cbt_metadata</span></li>
+        <li><span class="step">INCREMENTAL</span><strong>새 reference + diff</strong><span>parent 기준점과 새 기준점 비교</span></li>
+        <li><span class="step">CLEANUP</span><strong>이전 기준점 삭제</strong><span>adopted/driver-created provenance에 맞춰 삭제</span></li>
+      </ol>
+      <div class="table-wrap" style="margin-top:18px">
+        <table>
+          <thead><tr><th>상황</th><th>reference 처리</th><th>cleanup</th></tr></thead>
+          <tbody>
+            <tr><td>available volume full</td><td><code>create_cbt_snapshot</code>으로 backend snapshot 생성</td><td>다음 backup에 의해 superseded되면 <code>delete_cbt_snapshot</code></td></tr>
+            <tr><td>in-use volume</td><td>백업용 temporary Cinder snapshot의 <code>provider_id</code>를 adopt</td><td>성공 시 temp_snapshot ownership을 CBT로 넘기고, 나중에 Cinder snapshot API로 삭제</td></tr>
+            <tr><td>incremental diff 실패</td><td>새로 만든 driver reference만 orphan으로 정리</td><td>adopted snapshot은 temp-snapshot cleanup과 중복 삭제하지 않음</td></tr>
+            <tr><td>parent reference 유실</td><td>re-bootstrap하지만 parent가 있으므로 dense full scan</td><td>새 reference 성공 후 오래된 reference를 best-effort 삭제</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout green">
+        <strong>새 VM이나 mount가 필요한가?</strong>
+        <p>
+          제공된 구현은 백업마다 새 VM을 만드는 흐름이 아닙니다. snapshot을 export할 때 backend가
+          허용하는 COW clone/temporary volume을 만들고, backup host가 block device로 attach해 읽은 뒤 정리합니다.
+          RBD는 Ceph RBD block interface로 연결하고, Everpure는 driver variant에 따라 iSCSI/FC/NVMe 경로를 사용합니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="rbd-fix" class="section">
+      <div class="section-heading"><span class="section-number">07</span><h2>RBD의 별도 버그 수정: snapshot export/attach</h2></div>
+      <p class="lead">
+        이것이 사용자가 말한 “CBT 전에 먼저 고친 부분”입니다. CBT를 설명하기 전에, 왜 이 변경을 독립 CR로 두었는지부터 말해야 합니다.
+      </p>
+      <div class="callout orange">
+        <strong>문제</strong>
+        <p>
+          <code>backup_use_temp_snapshot</code> 경로가 선택되면 backup manager는 snapshot을 attach해 읽으려 합니다.
+          그런데 RBD driver는 <code>create_export_snapshot</code>와
+          <code>initialize_connection_snapshot</code>을 구현하지 않았고 BaseVD 기본값은
+          <code>None</code>을 반환했습니다. 그 결과 attach 정보가 비어 뒤 단계에서 TypeError가 발생할 수 있었습니다.
+          이 문제는 CBT를 사용하지 않는 snapshot backup에도 존재하므로 CBT CR에 섞지 않았습니다.
+        </p>
+      </div>
+      <div class="grid two">
+        <article class="card">
+          <h3>수정 방법</h3>
+          <ol>
+            <li>snapshot ID로부터 deterministic temporary volume object를 만듭니다.</li>
+            <li>snapshot의 backend name을 source로 사용해 COW RBD clone을 만듭니다.</li>
+            <li>export image는 Cinder volume이 아니므로 <code>_clone_image</code>를 사용하고 <code>_setup_volume</code>을 건너뜁니다.</li>
+            <li>backup host가 일반 <code>initialize_connection</code>으로 clone을 attach합니다.</li>
+            <li>연결을 끊은 뒤 <code>remove_export_snapshot</code>에서 temporary clone을 삭제합니다.</li>
+          </ol>
+        </article>
+        <article class="card">
+          <h3>왜 <code>_clone</code>을 분리했는가?</h3>
+          <p>
+            기존 <code>_clone</code>은 volume 생성 뒤 replication/type 설정을 위해
+            <code>_setup_volume</code>을 호출합니다. snapshot export image에는 Cinder volume type을
+            적용하면 안 되므로 clone 자체만 하는 <code>_clone_image</code>를 분리했습니다.
+            transient Volume object는 DB에 저장하지 않습니다.
+          </p>
+          <pre><code>create_export_snapshot(...):
+    temp = _snapshot_temp_volume(snapshot)
+    _clone_image(temp, rbd_pool,
+                 snapshot.volume_name,
+                 snapshot.provider_id or snapshot.name)
+
+initialize_connection_snapshot(...):
+    return initialize_connection(_snapshot_temp_volume(snapshot), connector)</code></pre>
+        </article>
+      </div>
+      <p class="mini-note">이 bugfix에서는 <code>backup_use_temp_snapshot</code>을 강제로 True로 바꾸지 않고 configuration 선택으로 남겼습니다. 이후 CBT 구현에서 RBD가 CBT를 위해 True를 반환하도록 한 점이 lifecycle상의 추가 변화입니다.</p>
+    </section>
+
+    <section id="rbd" class="section">
+      <div class="section-heading"><span class="section-number">08</span><h2>RBD CBT 구현: librbd diff_iterate</h2></div>
+      <p class="lead">
+        RBD CBT CR은 Cinder driver 계약의 세 메서드를 Ceph librbd primitive에 매핑합니다.
+        snapshot identifier는 RBD snapshot name이고, 일반 Cinder snapshot도 <code>provider_id</code>에 backend name을 노출하도록 맞춥니다.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>메서드</th><th>실제 동작</th><th>실패 시</th></tr></thead>
+          <tbody>
+            <tr><td><code>create_cbt_snapshot</code></td><td><code>RBDVolumeProxy</code>를 열고 <code>rbd_image.create_snap(snapshot)</code> 실행. 반환값은 snapshot name.</td><td>exception을 삼키고 <code>None</code> 반환 → plain full fallback</td></tr>
+            <tr><td><code>get_cbt_extents</code></td><td>target snapshot 시점으로 image를 열고 <code>diff_iterate(start, scan_len, from_snapshot, callback)</code> 호출</td><td>partial/추측 결과 대신 <code>None</code> → incremental fallback/re-bootstrap</td></tr>
+            <tr><td><code>delete_cbt_snapshot</code></td><td><code>remove_snap(snapshot)</code> 실행. ImageNotFound/ObjectNotFound는 이미 삭제된 것으로 처리</td><td>best-effort warning만 남김</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-caption">제공된 RBD 구현의 핵심을 설명하기 위한 축약 코드</div>
+      <pre><code>with RBDVolumeProxy(self, volume.name,
+                    snapshot=to_snapshot) as image:
+    size = image.size()
+    start = offset or 0
+    scan_len = min(length, size - start) if length else size - start
+
+    def callback(ext_offset, ext_length, ext_exists):
+        if from_snapshot is None and not ext_exists:
+            return                    # full allocation-map hole
+        # incremental에서는 discard도 ship해야 하므로 True로 기록
+        append_or_merge(ext_offset, ext_length, exists=True)
+
+    image.diff_iterate(start, scan_len, from_snapshot, callback)
+return volume_utils.window_cbt_page(extents, offset, length, marker, limit)</code></pre>
+      <div class="grid two">
+        <article class="card">
+          <h3>full</h3>
+          <p>
+            <code>from_snapshot=None</code>을 librbd에 넘겨 allocation map을 얻습니다.
+            <code>exists=False</code> hole은 생략하고, 보고된 allocated extent는 모두 True로 저장합니다.
+            그래서 첫 full도 sparse하게 만들 수 있습니다.
+          </p>
+        </article>
+        <article class="card">
+          <h3>incremental</h3>
+          <p>
+            <code>from_snapshot</code>과 <code>to_snapshot</code> 사이의 callback 결과를 모두 보냅니다.
+            Ceph가 discard를 False로 알려도 Cinder 출력에서는 True로 바꾸어 zero bytes를 전송합니다.
+          </p>
+        </article>
+      </div>
+      <div class="callout">
+        <strong>window 처리</strong>
+        <p>
+          RBD는 <code>offset</code>과 <code>length</code>를 scan 시작점과 길이로
+          <code>diff_iterate</code>에 내려 보낼 수 있습니다. 다만 Ceph API 호출에 고정 CBT block-size
+          인자를 넣는 구현은 아닙니다. <code>whole_object=False</code> 기본 동작으로 object 내부 delta도 반환할 수 있으므로
+          “항상 4 MiB 단위”라고 말하면 안 됩니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="everpure" class="section">
+      <div class="section-heading"><span class="section-number">09</span><h2>Everpure CBT 구현: FlashArray volumes/diff</h2></div>
+      <p class="lead">
+        Everpure는 같은 Cinder 계약을 FlashArray API에 연결합니다. 다만 framework가 주는 opaque name hint를
+        그대로 array 이름으로 쓰지 않고, 안전하고 길이가 제한된 deterministic snapshot name으로 변환합니다.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>단계</th><th>Everpure 구현</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td>reference 생성</td><td>name hint를 SHA-1 기반 <code>cbt-...</code> suffix로 변환 후 <code>post_volume_snapshots</code></td><td>array snapshot name을 반환하고, 이미 존재하면 retry 성공으로 취급합니다.</td></tr>
+            <tr><td>diff 조회</td><td><code>get_volumes_diff</code> with <code>base_name</code> and target name</td><td>응답의 offset/length를 모두 <code>exists=True</code> extent로 매핑합니다.</td></tr>
+            <tr><td>full map</td><td><code>from_snapshot=None</code>이면 <code>base_name</code> 없이 조회</td><td>array가 written block을 반환한다고 보고 sparse full을 만듭니다.</td></tr>
+            <tr><td>granularity</td><td><code>pure_cbt_diff_block_size</code>, 기본 1 MiB</td><td>512 byte의 배수로 올림 처리합니다. RBD의 diff_iterate 인자와는 별개입니다.</td></tr>
+            <tr><td>window</td><td>전체 volume diff 후 <code>window_cbt_page</code> 적용</td><td>현재 diff에서는 API block alignment 제약을 피하기 위해 native range pushdown을 하지 않습니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-caption">Everpure의 diff 계획을 단순화한 형태</div>
+      <pre><code>diff_kwargs = {
+    'block_size': rounded_pure_cbt_diff_block_size,
+    'segment_length': volume_size_bytes,
+    'segment_offset': 0,
+    'names': [to_snapshot],
+}
+if from_snapshot is not None:
+    diff_kwargs['base_name'] = from_snapshot
+
+items = current_array.get_volumes_diff(**diff_kwargs)
+extents = [{'offset': int(item.offset),
+            'length': int(item.length),
+            'exists': True} for item in items]
+return window_cbt_page(consolidate(extents), offset, length, marker, limit)</code></pre>
+      <div class="callout purple">
+        <strong>Everpure가 모든 결과를 <code>exists=True</code>로 표시하는 이유</strong>
+        <p>
+          FlashArray의 <code>volumes/diff</code>가 반환한 범위는 이 backup에 보내야 할 영역이라고 보고,
+          “반환되지 않은 영역”을 unchanged/skip으로 취급합니다. 이 방식이 data→unallocated/trim 변화를
+          diff로 보고한다는 array 동작에 의존하므로, 다른 backend로 이 패턴을 복사할 때는 그 보장을 확인해야 합니다.
+        </p>
+      </div>
+      <h3 style="margin-top:22px">snapshot attach는 어떻게 다른가?</h3>
+      <p>
+        Everpure FlashArray snapshot은 직접 attach하지 않고 <code>Reference(name=snapshot)</code>로
+        temporary COW volume을 materialize합니다. 이후 normal volume connection path를 재사용하고,
+        backup이 끝나면 temporary volume을 destroy합니다. 이 CR에서 CBT와 snapshot attach,
+        <code>backup_use_temp_snapshot=True</code>를 함께 넣은 점이 RBD의 분리 방식과 다릅니다.
+      </p>
+      <p class="mini-note">제공된 driver variant에는 iSCSI, FC, NVMe가 있으며, 이는 data path의 예입니다. backend management API와 host data access path를 하나로 단정하면 안 됩니다.</p>
+    </section>
+
+    <section id="compare" class="section">
+      <div class="section-heading"><span class="section-number">10</span><h2>Everpure와 RBD: 같은 점과 다른 점</h2></div>
+      <p class="lead">
+        두 구현은 “누가 더 낫다”의 비교가 아니라, 같은 Cinder 계약을 backend native capability에 맞게 구현한 두 방식의 비교입니다.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>비교 항목</th><th>RBD / Ceph</th><th>Everpure / FlashArray</th></tr></thead>
+          <tbody>
+            <tr><td>공통 framework</td><td colspan="2">세 CBT driver 메서드, RPC 3.21, backup wrapper, chunked backup, reference cleanup을 공유합니다.</td></tr>
+            <tr><td>reference 이름</td><td>RBD snapshot name을 그대로 반환하고 사용</td><td>opaque hint를 SHA-1 기반 길이 제한 suffix로 바꾼 array snapshot name을 반환</td></tr>
+            <tr><td>snapshot 생성/삭제</td><td>librbd <code>create_snap</code> / <code>remove_snap</code></td><td>FlashArray snapshot REST client의 post/patch/delete</td></tr>
+            <tr><td>diff API</td><td><code>rbd_image.diff_iterate</code>, target snapshot 시점 image</td><td><code>get_volumes_diff</code> / <code>volumes/diff</code></td></tr>
+            <tr><td>full allocation map</td><td>callback <code>exists=False</code> hole을 생략</td><td>base 없이 diff하여 array가 반환한 written block만 사용</td></tr>
+            <tr><td>discard 의미</td><td>native False를 incremental에서 True로 변환하여 zero를 전송</td><td>array가 data→unallocated를 diff로 보고한다는 동작에 의존하고 결과를 True로 표시</td></tr>
+            <tr><td>diff granularity</td><td>driver가 <code>diff_iterate</code>에 CBT block-size를 전달하지 않음</td><td><code>pure_cbt_diff_block_size</code> 기본 1 MiB, 512 배수로 반올림</td></tr>
+            <tr><td>window 최적화</td><td>offset/length를 diff scan 범위에 pushdown하고 helper로 다시 clip</td><td>전체 diff 후 helper로 clip; alignment 제약 때문에 현재 native pushdown은 하지 않음</td></tr>
+            <tr><td>in-use attach</td><td>snapshot에서 temporary RBD COW clone을 만들고 연결</td><td>snapshot에서 temporary FlashArray COW volume을 materialize하고 연결</td></tr>
+            <tr><td>CR 구성</td><td>snapshot export bugfix 1004171과 CBT 1002961을 분리</td><td>snapshot attach와 CBT를 990982에 함께 포함</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <strong>핵심 비교 문장</strong>
+        <p>
+          “The framework is the same, but the backend work is different. RBD uses librbd diff_iterate
+          and a clone of the RBD snapshot. Everpure uses volumes/diff and a temporary FlashArray volume.”
+        </p>
+      </div>
+    </section>
+
+    <section id="chunking" class="section">
+      <div class="section-heading"><span class="section-number">11</span><h2>Chunk size와 CBT diff block size는 다르다</h2></div>
+      <p class="lead">
+        “1 MiB로 diff한다”와 “backup object가 1 MiB다”는 같은 말이 아닙니다. backend가 변경 범위를 정하는 크기,
+        backup object를 나누는 크기, 기존 SHA 비교의 단위가 각각 다를 수 있습니다.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>설정/개념</th><th>제공된 코드·문서에서의 의미</th><th>CBT에서의 역할</th></tr></thead>
+          <tbody>
+            <tr><td><code>backup_swift_object_size</code> / <code>backup_s3_object_size</code></td><td>기본 52428800 bytes = 50 MiB로 설명됨</td><td>읽은 데이터를 backup repository object로 자르는 기준. compression 후 실제 object 크기는 달라질 수 있음</td></tr>
+            <tr><td><code>backup_swift_block_size</code> / <code>backup_s3_block_size</code></td><td>기본 32768 bytes = 32 KiB</td><td>기존 full-scan incremental의 SHA 비교 granularity. CBT incremental에서는 SHA 비교를 건너뜀</td></tr>
+            <tr><td><code>pure_cbt_diff_block_size</code></td><td>기본 1048576 bytes = 1 MiB, 512 배수로 반올림</td><td>FlashArray <code>volumes/diff</code> query granularity</td></tr>
+            <tr><td>RBD diff granularity</td><td><code>diff_iterate</code> 호출에 별도 CBT block-size 인자 없음</td><td>librbd가 반환한 extent를 merge하고 backup chunk size로 다시 나눔</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout orange">
+        <strong>검증된 구현상의 작은 주의점</strong>
+        <p>
+          CBT 경로는 SHA file을 만들지 않지만, 제공된 chunkeddriver 코드에는 시작 시
+          <code>chunk_size_bytes % sha_block_size_bytes</code> validation이 남아 있습니다.
+          따라서 “CBT에서는 SHA를 안 쓰니 관련 설정 검증도 모두 사라진다”고 말하면 안 됩니다.
+          이는 현재 diff에서 확인되는 동작입니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="restore" class="section">
+      <div class="section-heading"><span class="section-number">12</span><h2>Restore: offset write와 sparse full의 차이</h2></div>
+      <p class="lead">
+        CBT가 restore 전용 포맷을 새로 만드는 것은 아닙니다. 기존 object metadata의 offset을 사용해
+        chain을 재구성하고, 필요한 위치에 bytes를 씁니다. 단, sparse full의 “전혀 저장되지 않은 hole”은 예외 처리가 필요합니다.
+      </p>
+      <div class="grid two">
+        <article class="card">
+          <h3>incremental에서 data→zero</h3>
+          <p>
+            변경 extent가 <code>exists=True</code>로 전달되고, backup은 실제 device에서 zero bytes를 읽어 저장합니다.
+            restore 때 그 zero object를 해당 offset에 쓰므로 parent의 옛 data가 남지 않습니다.
+          </p>
+        </article>
+        <article class="card">
+          <h3>sparse full의 hole</h3>
+          <p>
+            첫 full allocation map은 never-written hole을 object로 저장하지 않을 수 있습니다.
+            새 volume은 원래 zero이지만, 기존 volume에 restore하면 stale data가 남을 수 있습니다.
+            그래서 metadata에 <code>sparse</code>를 기록하고 기존 target일 때만 uncovered 범위를 zero-fill합니다.
+          </p>
+        </article>
+      </div>
+      <pre><code>if metadata.get('sparse') and not volume_is_new:
+    _zero_fill_uncovered(volume_file, metadata_objects,
+                         int(backup['size']) * units.Gi)
+
+# 이 zero-fill은 sparse FULL에만 적용됩니다.
+# incremental의 모든 unchanged hole을 일괄 zero-fill하는 동작이 아닙니다.</code></pre>
+      <div class="callout green">
+        <strong>re-bootstrap은 왜 dense여야 하는가?</strong>
+        <p>
+          CBT parent의 reference가 사라지면 새 reference를 만들고 한 번 full scan으로 체인을 복구합니다.
+          이 backup은 여전히 <code>parent_id</code>를 가진 chain의 다음 레이어이므로 sparse allocation map을 보내면
+          parent에 남아 있는 stale data를 덮지 못합니다. 따라서 recovery re-bootstrap은 allocation map이 가능해도 dense scan이어야 합니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="api" class="section">
+      <div class="section-heading"><span class="section-number">13</span><h2>REST API와 paging: 외부 도구가 extent를 묻는 경로</h2></div>
+      <p class="lead">
+        <code>os-list_changed_blocks</code>는 cinder-backup 내부뿐 아니라 외부 backup tool도 같은 backend CBT 정보를 조회하게 하려는
+        스펙상의 volume action입니다. 제공된 계약은 microversion 3.72와 byte window, marker/limit을 정의합니다.
+      </p>
+      <div class="grid two">
+        <article class="card">
+          <div class="card-kicker">REQUEST</div>
+          <pre><code>POST /v3/{project_id}/volumes/{volume_id}/action
+OpenStack-API-Version: volume 3.72
+
+{
+  "os-list_changed_blocks": {
+    "base_snapshot_id": "...",  // full이면 생략/null
+    "target_snapshot_id": "...",
+    "offset": 0,
+    "length": 1048576,
+    "marker": 0,
+    "limit": 100
+  }
+}</code></pre>
+        </article>
+        <article class="card">
+          <div class="card-kicker">RESPONSE</div>
+          <pre><code>{
+  "changed_blocks": [
+    {"offset": 4096, "length": 4096, "exists": true}
+  ],
+  "changed_blocks_next_marker": 8192
+}</code></pre>
+          <p><code>None</code>이나 지원하지 않는 backend는 API layer에서 409 Conflict로 표시합니다.</p>
+        </article>
+      </div>
+      <div class="callout">
+        <strong>현재 제공된 구현에서 확인한 paging 범위</strong>
+        <p>
+          driver는 마지막에 <code>window_cbt_page</code>를 적용하고, API layer도 결과를 다시 clip해 next marker를 계산합니다.
+          REST API는 기본 <code>changed_blocks_max_limit=1000</code>으로 bounded limit을 driver에 전달합니다.
+          다만 제공된 내부 backup consumption 호출은 window/marker/page를 넘기지 않고 전체 extent list를 받아
+          <code>_backup_cbt</code>에서 순회합니다. 또한 Pure diff는 현재 전체 volume diff 후 helper를 적용합니다.
+          따라서 “RPC로 넘어가는 page는 제한된다”와 “backend/driver 내부가 언제나 page 크기만큼만 메모리에 가진다”를 구분해야 합니다.
+        </p>
+      </div>
+      <div class="callout purple">
+        <strong>스펙과 구현을 섞지 않기</strong>
+        <p>
+          <code>413</code>, <code>CBTPagingRequired</code>, 전용 timeout 같은 항목은 스펙/후속 paging 논의에 등장하지만,
+          이 문서에서 읽은 두 driver와 backup consumption diff에 모두 구현됐다고 단정하지 않습니다.
+          실제 API 동작을 말할 때는 확인한 patchset과 배포 버전을 함께 확인해야 합니다.
+        </p>
+      </div>
+    </section>
+
+    <section id="review" class="section">
+      <div class="section-heading"><span class="section-number">14</span><h2>코드와 스펙을 대조할 때의 검토 포인트</h2></div>
+      <p class="lead">
+        아래는 제공된 patch text에서 확인한 내용과, 아직 이 자료만으로 확정할 수 없는 내용을 분리한 것입니다.
+        검토할 때도 “confirmed”와 “I still need to check”를 나누면 정확합니다.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>확인된 내용</th><th>말할 때 주의할 점</th></tr></thead>
+          <tbody>
+            <tr><td>CBT capability</td><td>세 메서드 모두 override해야 True</td><td><code>get_cbt_extents</code> 하나만 있으면 지원한다고 말하지 않기</td></tr>
+            <tr><td>identifier</td><td>driver가 반환한 backend ID를 다음 diff와 metadata에 사용</td><td>Pure처럼 name hint와 backend ID가 다를 수 있으므로 hint를 재사용하면 안 됨</td></tr>
+            <tr><td>provider_id</td><td>일반 RBD/Pure snapshot도 backend snapshot ID를 노출하도록 구현</td><td>provider_id가 없는 snapshot은 API에서 diff 불가로 None 처리</td></tr>
+            <tr><td>reference 순서</td><td>새 reference를 만든 뒤 side-effect-free diff를 실행</td><td>diff 메서드가 snapshot을 몰래 만들거나 지우는 계약이 아님</td></tr>
+            <tr><td>non-chunked target</td><td>CBT는 chunked backup driver에서만 consume</td><td>Ceph backup driver 등에 wrapper만 씌우면 reference가 누수될 수 있음</td></tr>
+            <tr><td>non-CBT parent</td><td>parent에 CBT metadata가 없으면 기존 SHA path를 사용</td><td>모든 기존 chain을 자동으로 CBT chain으로 바꾸는 것은 아님</td></tr>
+            <tr><td>CBT parent diff 실패</td><td>새 reference로 dense re-bootstrap</td><td>recovery backup은 parent가 있으므로 sparse로 표시하지 않음</td></tr>
+            <tr><td>reference 삭제</td><td>adopted는 Cinder snapshot API, driver-created는 CBT delete RPC</td><td>provenance를 잃으면 잘못된 API로 지우거나 double-delete할 수 있음</td></tr>
+            <tr><td>spec wording</td><td>스펙의 의도와 실제 write 위치가 다를 수 있음</td><td>“framework가 관리한다”와 “chunkeddriver가 DB에 저장한다”를 구분</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 style="margin-top:24px">검토를 더 해야 하는 질문</h3>
+      <ul>
+        <li>배포 중인 Cinder 버전과 실제 patchset이 이 문서의 제공 diff와 같은가?</li>
+        <li>backend가 data→unallocated/trim을 실제 diff에 포함한다는 보장을 CI와 문서로 확인했는가?</li>
+        <li>대규모 fragmentation에서 raw diff list가 driver 내부 메모리를 얼마나 사용하는가?</li>
+        <li>support matrix의 Everpure driver별 “Volume Migration (Storage Assisted)” 계획은 담당자에게 직접 확인했는가?</li>
+      </ul>
+    </section>
+
+    <section id="other-backends" class="section">
+      <div class="section-heading"><span class="section-number">15</span><h2>다른 backend에 적용할 때의 경계</h2></div>
+      <div class="grid two">
+        <article class="card">
+          <h3>PowerStore에 관해 확인된 범위</h3>
+          <p>
+            Dell 문서는 PowerStore snapshot-differential이 replication에 사용된다고 설명합니다.
+            그러나 그 사실만으로 Cinder driver가 호출할 수 있는 public changed-block extent API가 존재한다고
+            증명되지는 않습니다. 따라서 “PowerStore도 private API만 있다”거나 “당장 CBT driver를 만들 수 있다”고 단정하지 않습니다.
+          </p>
+          <p><a href="https://infohub.delltechnologies.com/en-uk/l/dell-powerstore-replication-technologies/theory-of-operation-19/3/">Dell PowerStore replication theory of operation</a></p>
+        </article>
+        <article class="card">
+          <h3>PowerFlex와 data path</h3>
+          <p>
+            PowerFlex처럼 SDC가 필요한 환경에서는 관리 API와 실제 block data를 읽는 host/client 경로를 구분해야 합니다.
+            CBT driver가 backend diff를 가져오는 위치, backup host가 block device를 읽는 위치, SDC가 설치된 위치가
+            배포 구성에 따라 다를 수 있습니다.
+          </p>
+          <p class="mini-note">여기서는 특정 제품의 미확인 API를 가정하지 않고, Cinder driver contract와 supported data path를 먼저 확인하는 것이 안전합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="sources" class="section">
+      <div class="section-heading"><span class="section-number">16</span><h2>원문과 관련 링크</h2></div>
+      <p class="lead">
+        이 문서는 제공된 Gerrit diff와 Cinder 공식 문서를 읽고 정리한 static reference입니다.
+        운영 환경에서의 동작이나 최신 patchset 상태는 아래 원문에서 다시 확인해야 합니다.
+      </p>
+      <ol class="source-list">
+        <li>CBT design spec: <a href="https://review.opendev.org/c/openstack/cinder-specs/+/985089">Cinder Specs Gerrit 985089</a></li>
+        <li>CBT contract / REST API: <a href="https://review.opendev.org/c/openstack/cinder/+/990923">Cinder Gerrit 990923</a></li>
+        <li>CBT consumption: <a href="https://review.opendev.org/c/openstack/cinder/+/1000747">Cinder Gerrit 1000747</a></li>
+        <li>Paging follow-up: <a href="https://review.opendev.org/c/openstack/cinder/+/1001037">Cinder Gerrit 1001037</a></li>
+        <li>Zero restore prerequisite: <a href="https://review.opendev.org/c/openstack/cinder/+/999911">Cinder Gerrit 999911</a></li>
+        <li>RBD CBT: <a href="https://review.opendev.org/c/openstack/cinder/+/1002961">Cinder Gerrit 1002961</a></li>
+        <li>RBD snapshot export fix: <a href="https://review.opendev.org/c/openstack/cinder/+/1004171">Cinder Gerrit 1004171</a></li>
+        <li>Everpure CBT: <a href="https://review.opendev.org/c/openstack/cinder/+/990982">Cinder Gerrit 990982</a></li>
+        <li>Ceph diff API: <a href="https://raw.githubusercontent.com/ceph/ceph/main/src/pybind/rbd/rbd.pyx">librbd rbd.pyx</a></li>
+        <li>Swift backup driver: <a href="https://docs.openstack.org/cinder/latest/configuration/block-storage/backup/swift-backup-driver.html">OpenStack Cinder Swift backup driver docs</a></li>
+        <li>S3 backup driver: <a href="https://docs.openstack.org/cinder/latest/configuration/block-storage/backup/s3-backup-driver.html">OpenStack Cinder S3 backup driver docs</a></li>
+        <li>Driver feature matrix: <a href="https://docs.openstack.org/cinder/latest/reference/support-matrix.html">OpenStack Cinder support matrix</a></li>
+      </ol>
+      <div class="callout" style="margin-top:22px">
+        <strong>이 문서의 신뢰 범위</strong>
+        <p>
+          코드 설명은 제공된 patch text의 static review를 기준으로 합니다. production 성능 측정,
+          모든 Cinder 버전의 호환성, PowerStore public API 유무, 실제 support matrix의 향후 일정은
+          이 문서만으로 확정하지 않습니다.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p><a href="./index.html">Hong-p docs</a> · Cinder CBT implementation guide</p>
+      <p>문서 목적: Cinder CBT 구현 흐름을 쉽게 설명하고, 확인된 사실과 추정 범위를 분리합니다.</p>
+    </div>
+  </footer>
+</body>
+</html>
