@@ -1,0 +1,2227 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="KubeCon + CloudNativeCon + OpenInfra Summit + PyTorch Conference China 2026의 세션, 주제, 참석자 규모를 정리한 한국어 분석 리포트.">
+  <title>KubeCon China 2026 통합 행사 분석 리포트</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172235;
+      --muted: #62738b;
+      --paper: #f3f6fb;
+      --card: #fff;
+      --line: #d9e2ee;
+      --blue: #2477d4;
+      --blue-soft: #edf3ff;
+      --teal: #12a6a0;
+      --teal-soft: #eaf8f5;
+      --green: #118476;
+      --green-soft: #eaf8f5;
+      --orange: #c56a2b;
+      --orange-soft: #fff2ea;
+      --purple: #6d4bc3;
+      --purple-soft: #f2edff;
+      --shadow: 0 14px 34px rgba(28, 53, 91, .08);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+        "Noto Sans KR", "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.7;
+    }
+    a { color: #1759ad; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 900px;
+      margin: 18px 0 14px;
+      font-size: clamp(2.15rem, 6vw, 4.7rem);
+      line-height: 1.06;
+      letter-spacing: -.065em;
+    }
+    h2 {
+      margin-bottom: 0;
+      font-size: clamp(1.45rem, 3vw, 2.15rem);
+      line-height: 1.2;
+      letter-spacing: -.045em;
+    }
+    h3 { margin-bottom: 8px; font-size: 1.12rem; line-height: 1.35; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .hero {
+      color: #fff;
+      background:
+        radial-gradient(circle at 87% 10%, rgba(40, 103, 215, .48), transparent 32%),
+        radial-gradient(circle at 7% 94%, rgba(18, 166, 160, .3), transparent 27%),
+        linear-gradient(135deg, #0a142c, #142b58 58%, #1b4073);
+      padding: 46px 20px 58px;
+    }
+    .hero-inner, .content, .footer-inner { max-width: 1120px; margin: 0 auto; }
+    .hero-inner { position: relative; }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 28px;
+      color: #dce8ff;
+      font-size: .86rem;
+      font-weight: 750;
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .eyebrow {
+      display: inline-block;
+      padding: 5px 10px;
+      border: 1px solid rgba(255, 255, 255, .25);
+      border-radius: 999px;
+      color: #dce8ff;
+      background: rgba(255, 255, 255, .08);
+      font-size: .73rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+    }
+    .hero-title {
+      max-width: 920px;
+      margin: 0 0 16px;
+      color: #fff;
+      font-size: clamp(1.13rem, 2.2vw, 1.45rem);
+      font-weight: 750;
+      line-height: 1.45;
+    }
+    .hero-lead {
+      max-width: 830px;
+      margin-bottom: 24px;
+      color: #d0ddf3;
+      font-size: clamp(1rem, 2vw, 1.17rem);
+    }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-tags span {
+      padding: 6px 10px;
+      border: 1px solid rgba(255, 255, 255, .2);
+      border-radius: 999px;
+      color: #eaf1ff;
+      background: rgba(255, 255, 255, .09);
+      font-size: .8rem;
+    }
+    .hero-meta {
+      max-width: 900px;
+      margin-top: 26px;
+      padding-top: 17px;
+      border-top: 1px solid rgba(255, 255, 255, .17);
+      color: #c7d8f4;
+      font-size: .87rem;
+    }
+    .hero-meta p { margin: 4px 0; }
+    .hero-meta strong { color: #fff; }
+    .hero-meta a { color: #dce8ff; }
+    .topnav {
+      position: sticky;
+      z-index: 5;
+      top: 0;
+      border-bottom: 1px solid rgba(23, 34, 53, .11);
+      background: rgba(255, 255, 255, .95);
+      box-shadow: 0 5px 18px rgba(27, 47, 78, .06);
+      backdrop-filter: blur(12px);
+    }
+    .nav-inner {
+      display: flex;
+      gap: 4px;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 8px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-inner a {
+      flex: 0 0 auto;
+      padding: 6px 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: .77rem;
+      font-weight: 750;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-inner a:hover { color: var(--blue); background: var(--blue-soft); }
+    .content { padding: 44px 18px 90px; }
+    .section { scroll-margin-top: 68px; margin-top: 48px; }
+    .section:first-child { margin-top: 0; }
+    .section-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 11px;
+      margin-bottom: 18px;
+    }
+    .section-number {
+      color: var(--blue);
+      font-size: .82rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    .lead { max-width: 880px; color: #465873; font-size: 1.03rem; }
+    .summary-hero {
+      margin-bottom: 28px;
+      padding: 24px;
+      border: 1px solid #c7d8f7;
+      border-left: 6px solid var(--blue);
+      border-radius: 18px;
+      background: linear-gradient(115deg, #edf3ff, #fff);
+      box-shadow: var(--shadow);
+    }
+    .summary-hero .label {
+      margin-bottom: 5px;
+      color: var(--blue);
+      font-size: .75rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+    }
+    .summary-hero strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: clamp(1.25rem, 3vw, 1.72rem);
+      line-height: 1.35;
+    }
+    .summary-hero p { margin: 0; color: #465873; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .grid.two { grid-template-columns: repeat(2, 1fr); }
+    .card {
+      min-width: 0;
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .card p:last-child, .card ul:last-child, .card ol:last-child { margin-bottom: 0; }
+    .card .card-kicker {
+      margin-bottom: 6px;
+      color: var(--blue);
+      font-size: .73rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    .card p, .card li { color: #52647d; font-size: .93rem; }
+    .card strong { color: var(--ink); }
+    ul, ol { padding-left: 1.25rem; }
+    li + li { margin-top: 5px; }
+    .callout {
+      margin: 18px 0;
+      padding: 15px 17px;
+      border: 1px solid #cfe0f6;
+      border-left: 4px solid var(--blue);
+      border-radius: 12px;
+      background: var(--blue-soft);
+    }
+    .callout.orange { border-color: #f4d1c0; border-left-color: var(--orange); background: var(--orange-soft); }
+    .callout.green { border-color: #c9e7df; border-left-color: var(--green); background: var(--green-soft); }
+    .callout.purple { border-color: #ddd3fa; border-left-color: var(--purple); background: var(--purple-soft); }
+    .callout strong { display: block; margin-bottom: 4px; }
+    .callout p { margin-bottom: 0; color: #4c5e76; font-size: .92rem; }
+    .status {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 850;
+      line-height: 1.45;
+      vertical-align: 2px;
+      white-space: nowrap;
+    }
+    .status.confirmed { color: #0c7366; background: #d8f1eb; }
+    .status.estimate { color: #3157a3; background: #dfe9ff; }
+    .status.unpublished { color: #93501e; background: #ffeadc; }
+    .status.note { color: #6d4bc3; background: #f2edff; }
+    .data-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 15px;
+      margin: 10px 0 16px;
+      color: #697a91;
+      font-size: .81rem;
+    }
+    .data-legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .data-legend .confirmed-dot::before,
+    .data-legend .estimate-dot::before,
+    .data-legend .unpublished-dot::before {
+      content: "";
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 3px;
+    }
+    .data-legend .confirmed-dot::before { background: #d8f1eb; border: 1px solid #8ccfc1; }
+    .data-legend .estimate-dot::before { background: #dfe9ff; border: 1px solid #9cb8ec; }
+    .data-legend .unpublished-dot::before { background: #ffeadc; border: 1px solid #e6b188; }
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #e4eaf1;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      color: #3e5572;
+      background: #f6f9fd;
+      font-size: .79rem;
+      font-weight: 850;
+    }
+    td { color: #52647d; }
+    tr:last-child td { border-bottom: 0; }
+    td strong { color: var(--ink); }
+    .comparison { min-width: 680px; }
+    .comparison th:nth-child(1) { width: 28%; }
+    .comparison th:nth-child(2), .comparison th:nth-child(3) { width: 36%; }
+    .confirmed-cell { background: rgba(234, 248, 245, .34); }
+    .estimate-cell { background: rgba(237, 243, 255, .55); }
+    .unpublished-cell { background: rgba(255, 242, 234, .42); }
+    .table-note { margin: 10px 2px 0; color: #697a91; font-size: .82rem; }
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .stat {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .stat-value {
+      display: block;
+      color: var(--blue);
+      font-size: clamp(1.45rem, 4vw, 2.15rem);
+      font-weight: 900;
+      letter-spacing: -.05em;
+      line-height: 1.1;
+    }
+    .stat-label { display: block; margin-top: 5px; color: #60718a; font-size: .82rem; }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px 20px;
+      margin: 0;
+      padding-left: 1.35rem;
+    }
+    .toc-grid li { padding-left: 4px; color: var(--blue); }
+    .toc-grid a { color: #31598f; font-weight: 750; text-decoration: none; }
+    .toc-grid a:hover { text-decoration: underline; }
+    .split-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .track-bars {
+      margin-top: 17px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .track-bars h3 { margin-bottom: 14px; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(190px, 1.35fr) 2fr 34px;
+      gap: 10px;
+      align-items: center;
+      margin: 9px 0;
+    }
+    .bar-label { color: #52647d; font-size: .82rem; line-height: 1.3; }
+    .bar-track { height: 10px; overflow: hidden; border-radius: 999px; background: #edf1f6; }
+    .bar-fill {
+      display: block;
+      width: calc(var(--bar) * 10%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), #55a2f0);
+    }
+    .bar-value { color: var(--ink); font-size: .86rem; font-weight: 850; text-align: right; }
+    .track-table { min-width: 660px; }
+    .track-table .count { width: 85px; color: var(--ink); font-weight: 850; text-align: right; }
+    .other-format-table { min-width: 700px; }
+    .trend-table { min-width: 760px; }
+    .trend-table td:nth-child(2), .trend-table td:nth-child(3) { white-space: nowrap; }
+    .trend-table .change { font-weight: 900; white-space: nowrap; }
+    .trend-table .rise { color: #0b806e; background: rgba(234, 248, 245, .75); }
+    .trend-table .fall { color: #b25528; background: rgba(255, 242, 234, .72); }
+    .trend-table .flat { color: #52647d; }
+    .insight-list { margin: 18px 0 0; padding-left: 1.45rem; }
+    .insight-list li { padding-left: 5px; color: #52647d; }
+    .insight-list li::marker { color: var(--blue); font-weight: 900; }
+    .session-highlights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; margin: 0; padding: 0; list-style: none; }
+    .session-highlights li {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .session-highlights strong { display: block; margin-bottom: 5px; color: var(--ink); line-height: 1.45; }
+    .session-meta-line { color: #697a91; font-size: .82rem; }
+    .session-meta-line .format {
+      display: inline-block;
+      margin-right: 5px;
+      color: var(--blue);
+      font-weight: 850;
+    }
+    .country-table { min-width: 690px; }
+    .language-table, .difficulty-table { min-width: 470px; }
+    .rank-list { margin: 0; padding-left: 1.25rem; }
+    .rank-list li { color: #52647d; }
+    .affiliation-note { margin-top: 15px; color: #697a91; font-size: .84rem; }
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: action;
+    }
+    .action-grid li {
+      position: relative;
+      min-width: 0;
+      min-height: 170px;
+      padding: 42px 17px 17px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      counter-increment: action;
+    }
+    .action-grid li::before {
+      content: counter(action, decimal-leading-zero);
+      position: absolute;
+      top: 15px;
+      left: 17px;
+      color: var(--blue);
+      font-size: .82rem;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+    .action-grid strong { display: block; margin-bottom: 6px; font-size: .99rem; line-height: 1.35; }
+    .action-grid p { margin: 0; color: #52647d; font-size: .9rem; }
+    .appendix-intro { color: #697a91; font-size: .88rem; }
+    details {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    summary {
+      padding: 14px 17px;
+      cursor: pointer;
+      color: #31598f;
+      font-weight: 850;
+    }
+    summary::marker { color: var(--blue); }
+    .session-appendix { padding: 0 17px 18px; }
+    .source-box {
+      margin: 0 0 14px;
+      padding: 13px 15px;
+      border-radius: 11px;
+      color: #52647d;
+      background: #f5f8fd;
+      font-size: .86rem;
+    }
+    .source-box p { margin: 0 0 4px; }
+    .source-box p:last-child { margin-bottom: 0; }
+    .session-list { margin: 0; padding: 0; list-style: none; counter-reset: session; }
+    .session-item {
+      position: relative;
+      padding: 16px 0 16px 46px;
+      border-top: 1px solid #e7edf4;
+      counter-increment: session;
+    }
+    .session-item::before {
+      content: counter(session, decimal-leading-zero);
+      position: absolute;
+      top: 17px;
+      left: 0;
+      color: var(--blue);
+      font-size: .74rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+    }
+    .session-title {
+      display: grid;
+      grid-template-columns: 148px 1fr;
+      gap: 11px;
+      align-items: start;
+    }
+    .session-title time {
+      color: #60718a;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .78rem;
+      line-height: 1.5;
+    }
+    .session-title strong { color: var(--ink); font-size: .94rem; line-height: 1.45; }
+    .session-meta {
+      display: grid;
+      grid-template-columns: 48px minmax(110px, 1fr) 48px minmax(90px, 1fr);
+      gap: 3px 9px;
+      margin: 8px 0 0;
+      color: #697a91;
+      font-size: .79rem;
+    }
+    .session-meta dt { color: #3e5572; font-weight: 800; }
+    .session-meta dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+    .session-meta dt:nth-of-type(5) { grid-column: 1; }
+    .session-meta dd:nth-of-type(5) { grid-column: 2 / -1; }
+    .footer {
+      padding: 22px 18px 45px;
+      border-top: 1px solid var(--line);
+      color: #718198;
+      font-size: .82rem;
+    }
+    .footer-inner p { margin-bottom: 7px; }
+    .footer-inner a { color: #1759ad; }
+    .nowrap { white-space: nowrap; }
+    .muted { color: #697a91; }
+    td, .card, .hero-lead, .hero-title, .session-title strong { overflow-wrap: anywhere; }
+    a:focus-visible, summary:focus-visible { outline: 3px solid #12a6a0; outline-offset: 4px; }
+    @media (max-width: 900px) {
+      .grid, .grid.two, .session-highlights { grid-template-columns: 1fr; }
+      .toc-grid { grid-template-columns: repeat(2, 1fr); }
+      .action-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .hero { padding: 34px 16px 44px; }
+      .content { padding: 32px 14px 65px; }
+      .stat-strip, .action-grid, .toc-grid { grid-template-columns: 1fr; }
+      .summary-hero { padding: 19px; }
+      .bar-row { grid-template-columns: minmax(0, 1fr) 34px; gap: 7px 9px; }
+      .bar-track { grid-column: 1; grid-row: 2; }
+      .bar-value { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+      .session-title, .session-meta { grid-template-columns: 1fr; }
+      .session-meta dt:nth-of-type(5), .session-meta dd:nth-of-type(5) { grid-column: auto; }
+      .session-meta dt { margin-top: 4px; }
+      .session-meta dt:first-child { margin-top: 0; }
+      .session-meta dd { padding-left: 7px; }
+      .session-item { padding-left: 37px; }
+    }
+    @media (max-width: 400px) {
+      h1 { font-size: 2.15rem; }
+      .content { padding-left: 11px; padding-right: 11px; }
+      .card { padding: 16px; }
+      .session-appendix { padding-left: 12px; padding-right: 12px; }
+      .session-title strong { font-size: .9rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="./index.html">← 문서 목록으로 돌아가기</a>
+      <span class="eyebrow">KUBECON CHINA 2026 · EVENT ANALYSIS</span>
+      <h1>네 재단 행사가<br>한 자리에서 만났을 때</h1>
+      <p class="hero-title">KubeCon + CloudNativeCon + OpenInfra Summit + PyTorch Conference China 2026</p>
+      <p class="hero-lead">상하이에서 처음 한자리에 모인 클라우드 네이티브·오픈 인프라·PyTorch 행사를 세션 데이터와 2025년 홍콩 비교군으로 읽습니다.</p>
+      <div class="hero-tags">
+        <span>129개 스케줄 엔트리</span>
+        <span>139명 연사</span>
+        <span>정규 브레이크아웃 46개</span>
+        <span>11개 룸</span>
+        <span>참석자 수 미발표</span>
+      </div>
+      <div class="hero-meta">
+        <p><strong>일정</strong> · 2026-09-07(코로케이티드) ~ 09-09</p>
+        <p><strong>장소</strong> · Shanghai International Convention Center · 상하이 푸둥</p>
+        <p><strong>작성 기준일</strong> · 2026-09-10</p>
+        <p><strong>세션 출처</strong> · <a href="https://kubecon-cloudnativecon-openinfra-pytorch-2026.sessionize.com/api/schedule">공식 Sessionize 스케줄 API ↗</a> · 2026-09-10 수집</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="topnav" aria-label="빠른 목차">
+    <div class="nav-inner">
+      <a href="#summary">3분 요약</a>
+      <a href="#toc">전체 목차</a>
+      <a href="#structure">구조 변화</a>
+      <a href="#scale">규모 비교</a>
+      <a href="#tracks">트랙</a>
+      <a href="#topics">주제 증감</a>
+      <a href="#openstack">OpenStack</a>
+      <a href="#people">참석자·국적</a>
+      <a href="#korea">한국 관점</a>
+      <a href="#next">다음 할 일</a>
+      <a href="#appendix">전체 세션</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <section id="summary" class="section">
+      <div class="section-heading"><span class="section-number">START</span><h2>3분 요약</h2></div>
+      <div class="summary-hero">
+        <div class="label">ONE-LINE READ</div>
+        <strong>전체 세션 수는 비슷했지만, 행사의 중심은 AI와 짧은 키노트로 이동했다.</strong>
+        <p>2025년 홍콩의 117개 스케줄 엔트리와 2026년 상하이의 129개를 비교하면 전체 양은 비슷합니다. 그러나 키노트는 13개에서 24개로 늘고, 정규 브레이크아웃은 53개에서 46개로 줄었습니다. 세 재단이 각자 키노트 지분을 나누면서 5~10분짜리 짧은 슬롯이 많아졌고, 콘텐츠 세션의 79.5%가 AI / ML / LLM 전반을 다룹니다.</p>
+      </div>
+      <div class="data-legend" aria-label="수치 상태 범례">
+        <span class="confirmed-dot">확정·공개 실측 또는 공식 스케줄</span>
+        <span class="estimate-dot">스폰서 자료 예상치·소속 기반 추정</span>
+        <span class="unpublished-dot">공식 수치 미발표</span>
+      </div>
+      <div class="stat-strip">
+        <article class="stat"><span class="stat-value">129</span><span class="stat-label">2026 전체 스케줄 엔트리 <span class="status confirmed">확정</span></span></article>
+        <article class="stat"><span class="stat-value">117</span><span class="stat-label">2026 콘텐츠 세션 <span class="status confirmed">확정</span></span></article>
+        <article class="stat"><span class="stat-value">24</span><span class="stat-label">2026 키노트 <span class="status confirmed">확정</span></span></article>
+        <article class="stat"><span class="stat-value">139</span><span class="stat-label">2026 연사 <span class="status confirmed">확정</span></span></article>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="card-kicker">구조 변화</div>
+          <h3>세 재단의 첫 동시 개최</h3>
+          <p>CNCF의 KubeCon, OpenInfra Foundation의 OpenInfra Summit, PyTorch Foundation의 PyTorch Conference가 사상 처음 한 장소에서 합쳐졌습니다. 2026년에는 2025년까지 없던 OpenStack 계열 세션도 실제 프로그램에 들어왔습니다.</p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">콘텐츠 중심</div>
+          <h3>AI가 배경이 아니라 전제</h3>
+          <p>AI / ML / LLM 전반 언급은 50건(47.2%)에서 93건(79.5%)으로 늘었습니다. 에이전트·MCP는 5건(4.7%)에서 39건(33.3%)으로 뛰며 별도 운영 주제가 됐습니다.</p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">포지셔닝</div>
+          <h3>OpenStack은 AI를 떠받치는 인프라로</h3>
+          <p>OpenStack / OpenInfra 키워드 세션은 2025년 0건에서 2026년 17건으로 나타났습니다. 직접 관련 세션들은 OpenStack 자체 운영보다 AI 에이전트·AI 인프라와의 결합을 전면에 둡니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="toc" class="section">
+      <div class="section-heading"><span class="section-number">TOC</span><h2>목차</h2></div>
+      <nav aria-label="전체 목차">
+        <ol class="toc-grid">
+          <li><a href="#summary">3분 요약</a></li>
+          <li><a href="#structure">올해 행사의 구조 변화</a></li>
+          <li><a href="#scale">2025 홍콩 vs 2026 상하이 규모</a></li>
+          <li><a href="#tracks">2026 트랙별 세션 수</a></li>
+          <li><a href="#topics">주제 키워드 비교</a></li>
+          <li><a href="#openstack">OpenStack / OpenInfra 세션</a></li>
+          <li><a href="#people">참석자 규모와 국적</a></li>
+          <li><a href="#korea">한국 관점</a></li>
+          <li><a href="#next">다음에 할 일</a></li>
+          <li><a href="#appendix">129개 전체 세션 원본 목록</a></li>
+        </ol>
+      </nav>
+    </section>
+
+    <section id="structure" class="section">
+      <div class="section-heading"><span class="section-number">01</span><h2>올해 행사의 가장 큰 구조 변화</h2></div>
+      <p class="lead">2026년 상하이 행사는 기존 KubeCon 중심의 코로케이션을 넘어, 클라우드 네이티브·오픈 인프라·AI 프레임워크 재단이 한 프로그램 안에서 지분을 나눠 갖는 형태가 됐습니다.</p>
+      <div class="grid two">
+        <article class="card">
+          <div class="card-kicker">2025년까지</div>
+          <h3>KubeCon + Open Source Summit + AI_dev</h3>
+          <p>2025년 비교군은 홍콩에서 열린 KubeCon + CloudNativeCon + Open Source Summit + AI_dev China 조합입니다. OpenStack / OpenInfra 세션은 <strong>0개</strong>였습니다.</p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">2026년 상하이</div>
+          <h3>KubeCon + OpenInfra + PyTorch</h3>
+          <p>CNCF(KubeCon), OpenInfra Foundation(OpenInfra Summit), PyTorch Foundation(PyTorch Conference)이 사상 처음 한 자리에서 합쳐졌고, OpenStack 계열 세션이 실제로 들어왔습니다.</p>
+        </article>
+      </div>
+      <aside class="callout green">
+        <strong>읽는 법</strong>
+        <p>행사 이름이 길어진 만큼 단순히 세션 수를 더하는 문제가 아니라, 어떤 재단과 커뮤니티가 프로그램의 중심 의제를 만들었는지를 보는 것이 핵심입니다.</p>
+      </aside>
+    </section>
+
+    <section id="scale" class="section">
+      <div class="section-heading"><span class="section-number">02</span><h2>규모 비교: 2025 홍콩 vs 2026 상하이</h2></div>
+      <p class="lead">2025년은 홍콩 2025-06-10~11의 <a href="https://kccncchn2025.sched.com/">공개 스케줄</a>과 CNCF 공식 Transparency Report의 실측·공개 값, 2026년은 공식 Sessionize 스케줄과 스폰서 프로스펙터스의 예상치를 나눠서 봐야 합니다.</p>
+      <div class="callout orange">
+        <strong>2026 참석자 수는 아직 공식 발표되지 않았습니다.</strong>
+        <p>등록자와 참가 기업은 확정치가 아니라 스폰서 자료에 적힌 “1,000+”, “75+” 예상치만 있습니다. 아래 표에서 공식 스케줄로 확인된 값과 예상치·미발표 값을 색과 배지로 구분했습니다.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="comparison">
+          <thead>
+            <tr><th scope="col">항목</th><th scope="col">2025 (홍콩) <span class="status confirmed">공개 실측</span></th><th scope="col">2026 (상하이) <span class="status estimate">스케줄 확정</span></th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">등록자</th><td class="confirmed-cell">1,004명<br><small>실참석률 85%</small></td><td class="estimate-cell"><span class="status unpublished">미발표</span> <span class="status estimate">예상치</span><br><strong>1,000+</strong><br><small>스폰서 프로스펙터스</small></td></tr>
+            <tr><th scope="row">참가 기업</th><td class="confirmed-cell">383개사</td><td class="estimate-cell"><span class="status unpublished">미발표</span> <span class="status estimate">예상치</span><br><strong>75+</strong><br><small>스폰서·참여사</small></td></tr>
+            <tr><th scope="row">CFP 제출</th><td class="confirmed-cell">571건</td><td class="unpublished-cell"><span class="status unpublished">미발표</span></td></tr>
+            <tr><th scope="row">CFP 채택률</th><td class="confirmed-cell">9%</td><td class="unpublished-cell"><span class="status unpublished">미발표</span></td></tr>
+            <tr><th scope="row">전체 스케줄 엔트리</th><td class="confirmed-cell">117</td><td class="confirmed-cell">129</td></tr>
+            <tr><th scope="row">콘텐츠 세션<br><small>(등록·휴식 제외)</small></th><td class="confirmed-cell">106</td><td class="confirmed-cell">117</td></tr>
+            <tr><th scope="row">키노트</th><td class="confirmed-cell">13</td><td class="confirmed-cell">24</td></tr>
+            <tr><th scope="row">브레이크아웃<br><small>(정규 트랙)</small></th><td class="confirmed-cell">53</td><td class="confirmed-cell">46</td></tr>
+            <tr><th scope="row">메인테이너 트랙</th><td class="confirmed-cell">10</td><td class="confirmed-cell">8</td></tr>
+            <tr><th scope="row">라이트닝 토크</th><td class="confirmed-cell">15</td><td class="confirmed-cell">8<br><small>(+ 프로젝트 라이트닝 12)</small></td></tr>
+            <tr><th scope="row">연사</th><td class="confirmed-cell">114명</td><td class="confirmed-cell">139명</td></tr>
+            <tr><th scope="row">첫 참가자 비율</th><td class="confirmed-cell">48%</td><td class="unpublished-cell"><span class="status unpublished">미발표</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">해석: 전체 세션 수는 비슷하지만 키노트는 13 → 24로 거의 두 배가 됐고, 정규 브레이크아웃은 53 → 46으로 줄었습니다. 2026의 5~10분짜리 짧은 키노트 슬롯이 늘어난 구조입니다.</p>
+    </section>
+
+    <section id="tracks" class="section">
+      <div class="section-heading"><span class="section-number">03</span><h2>2026 트랙별 세션 수</h2></div>
+      <p class="lead">아래는 공식 카테고리 기준입니다. 정규 브레이크아웃은 46개이며, 막대는 정규 트랙 안에서 가장 큰 값인 10개를 기준으로 그린 순수 CSS 막대입니다.</p>
+      <div class="table-wrap">
+        <table class="track-table">
+          <thead><tr><th scope="col">정규 브레이크아웃 트랙</th><th scope="col" class="count">세션 수</th></tr></thead>
+          <tbody>
+            <tr><td>AI + ML + Agentic AI + Data Systems</td><td class="count">10</td></tr>
+            <tr><td>AI Infrastructure + Accelerators + Performance Engineering</td><td class="count">9</td></tr>
+            <tr><td>Cloud Infrastructure + Virtualization + Storage</td><td class="count">6</td></tr>
+            <tr><td>Emerging Technologies + Research + Advanced Topics</td><td class="count">4</td></tr>
+            <tr><td>Application Development + Developer Experience</td><td class="count">3</td></tr>
+            <tr><td>Operations + Observability + Reliability</td><td class="count">3</td></tr>
+            <tr><td>Networking + Edge + Distributed Systems</td><td class="count">3</td></tr>
+            <tr><td>Community + Open Source + Getting Started</td><td class="count">3</td></tr>
+            <tr><td>Platform Engineering + Cloud Native Architecture</td><td class="count">2</td></tr>
+            <tr><td>Security + Privacy + Trusted Computing</td><td class="count">2</td></tr>
+            <tr><td>Hardware Enablement + Diversification</td><td class="count">1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="track-bars" aria-label="정규 브레이크아웃 트랙별 세션 수 막대 차트">
+        <h3>정규 트랙 분포</h3>
+        <div class="bar-row"><span class="bar-label">AI + ML + Agentic AI + Data Systems</span><span class="bar-track"><span class="bar-fill" style="--bar:10"></span></span><span class="bar-value">10</span></div>
+        <div class="bar-row"><span class="bar-label">AI Infrastructure + Accelerators + Performance Engineering</span><span class="bar-track"><span class="bar-fill" style="--bar:9"></span></span><span class="bar-value">9</span></div>
+        <div class="bar-row"><span class="bar-label">Cloud Infrastructure + Virtualization + Storage</span><span class="bar-track"><span class="bar-fill" style="--bar:6"></span></span><span class="bar-value">6</span></div>
+        <div class="bar-row"><span class="bar-label">Emerging Technologies + Research + Advanced Topics</span><span class="bar-track"><span class="bar-fill" style="--bar:4"></span></span><span class="bar-value">4</span></div>
+        <div class="bar-row"><span class="bar-label">Application Development · Operations · Networking · Community</span><span class="bar-track"><span class="bar-fill" style="--bar:3"></span></span><span class="bar-value">각 3</span></div>
+        <div class="bar-row"><span class="bar-label">Platform Engineering · Security</span><span class="bar-track"><span class="bar-fill" style="--bar:2"></span></span><span class="bar-value">각 2</span></div>
+        <div class="bar-row"><span class="bar-label">Hardware Enablement + Diversification</span><span class="bar-track"><span class="bar-fill" style="--bar:1"></span></span><span class="bar-value">1</span></div>
+      </div>
+      <div class="table-wrap" style="margin-top:14px;">
+        <table class="other-format-table">
+          <thead><tr><th scope="col">기타 포맷</th><th scope="col" class="count">세션 수</th><th scope="col">구성 메모</th></tr></thead>
+          <tbody>
+            <tr><td>Keynote Sessions</td><td class="count">24</td><td>키노트</td></tr>
+            <tr><td>Project Opportunities</td><td class="count">15</td><td>프로젝트 라이트닝 + 파빌리온 + 메인테이너 밋업</td></tr>
+            <tr><td>Maintainer Track</td><td class="count">8</td><td>메인테이너 트랙</td></tr>
+            <tr><td>Lightning Talks</td><td class="count">8</td><td>라이트닝 토크</td></tr>
+            <tr><td>Experiences</td><td class="count">5</td><td>커뮤니티·교류 포맷</td></tr>
+            <tr><td>Sponsor Demos</td><td class="count">3</td><td>스폰서 데모</td></tr>
+            <tr><td>Sponsor-hosted Co-located</td><td class="count">3</td><td>스폰서 주최 코로케이티드</td></tr>
+            <tr><td>Solutions Showcase</td><td class="count">2</td><td>솔루션 쇼케이스</td></tr>
+            <tr><td>Tutorials</td><td class="count">2</td><td>튜토리얼</td></tr>
+            <tr><td>CNCF-hosted Co-located</td><td class="count">1</td><td>OSPOlogy + OSPO Summit China</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <aside class="callout purple">
+        <strong>AI 트랙이 단일 최대 블록</strong>
+        <p>정규 트랙 46개 중 AI 전용 트랙 두 개가 19개(41%)를 차지합니다. 행사의 무게중심이 인프라 일반론보다 AI 워크로드를 떠받치는 플랫폼과 가속기로 옮겨갔다는 신호입니다.</p>
+      </aside>
+    </section>
+
+    <section id="topics" class="section">
+      <div class="section-heading"><span class="section-number">04</span><h2>주제 키워드 비교: 2025 vs 2026</h2></div>
+      <p class="lead">제목+설명 텍스트에 키워드가 등장한 콘텐츠 세션 비율입니다. 한 세션이 여러 주제에 중복 집계되므로, 행별 수치를 합해 전체 세션 수로 보지 않습니다.</p>
+      <div class="data-legend"><span class="confirmed-dot">2025·2026 콘텐츠 세션 기반 집계</span><span style="color:#0b806e;">증가 · 상승색</span><span style="color:#b25528;">감소 · 하락색</span></div>
+      <div class="table-wrap">
+        <table class="trend-table">
+          <thead><tr><th scope="col">주제</th><th scope="col">2025</th><th scope="col">2026</th><th scope="col">증감</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">AI / ML / LLM 전반</th><td>50건 (47.2%)</td><td>93건 (79.5%)</td><td class="change rise">+32.3%p</td></tr>
+            <tr><th scope="row">에이전트/에이전틱 AI, MCP</th><td>5건 (4.7%)</td><td>39건 (33.3%)</td><td class="change rise">+28.6%p</td></tr>
+            <tr><th scope="row">하드웨어 다양성 / RISC-V / ARM / 이기종 가속기</th><td>11건 (10.4%)</td><td>32건 (27.4%)</td><td class="change rise">+17.0%p</td></tr>
+            <tr><th scope="row">GPU / 가속기 / 추론 성능</th><td>27건 (25.5%)</td><td>48건 (41.0%)</td><td class="change rise">+15.6%p</td></tr>
+            <tr><th scope="row">OpenStack / OpenInfra</th><td>0건 (0.0%)</td><td>17건 (14.5%)</td><td class="change rise">+14.5%p</td></tr>
+            <tr><th scope="row">가상화 / 샌드박스 (Kata, KubeVirt, VM)</th><td>4건 (3.8%)</td><td>18건 (15.4%)</td><td class="change rise">+11.6%p</td></tr>
+            <tr><th scope="row">서버리스</th><td>1건 (0.9%)</td><td>4건 (3.4%)</td><td class="change rise">+2.5%p</td></tr>
+            <tr><th scope="row">스토리지</th><td>9건 (8.5%)</td><td>10건 (8.5%)</td><td class="change rise">+0.1%p</td></tr>
+            <tr><th scope="row">쿠버네티스 / 클라우드 네이티브</th><td>56건 (52.8%)</td><td>60건 (51.3%)</td><td class="change fall">-1.5%p</td></tr>
+            <tr><th scope="row">보안 / 컨피덴셜 컴퓨팅</th><td>23건 (21.7%)</td><td>22건 (18.8%)</td><td class="change fall">-2.9%p</td></tr>
+            <tr><th scope="row">플랫폼 엔지니어링 / DevEx</th><td>7건 (6.6%)</td><td>4건 (3.4%)</td><td class="change fall">-3.2%p</td></tr>
+            <tr><th scope="row">옵저버빌리티</th><td>17건 (16.0%)</td><td>15건 (12.8%)</td><td class="change fall">-3.2%p</td></tr>
+            <tr><th scope="row">WebAssembly</th><td>5건 (4.7%)</td><td>0건 (0.0%)</td><td class="change fall">-4.7%p</td></tr>
+            <tr><th scope="row">네트워킹 / 엣지</th><td>35건 (33.0%)</td><td>32건 (27.4%)</td><td class="change fall">-5.7%p</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ol class="insight-list">
+        <li><strong>AI가 전제가 됐습니다.</strong> 콘텐츠 세션 10개 중 8개가 AI를 다룹니다. 2025년에는 절반이 안 됐습니다.</li>
+        <li><strong>워크로드 올리기에서 에이전트 운영하기로 이동했습니다.</strong> agentic/agent/MCP 언급이 5건 → 39건으로 늘었고, 샌드박싱·옵저버빌리티·런타임·멀티테넌트 보안이 별도 세션으로 등장했습니다.</li>
+        <li><strong>추론이 학습을 밀어냈습니다.</strong> vLLM, SGLang, KV 캐시, PD 분리(prefill/decode disaggregation), TTFT 진단, llm-d 등 추론 서빙 스택 세션이 대거 등장했습니다.</li>
+        <li><strong>하드웨어 다양성이 중국 행사의 고유 축이 됐습니다.</strong> Ascend, FlagOS, Cambricon, RISC-V, HiFloat8, device-agnostic PyTorch, “Write Once Run Anywhere” 등이 보이며 NVIDIA 독점 가정을 깨는 세션이 27%입니다.</li>
+        <li><strong>이전 주력 주제는 뒤로 밀렸습니다.</strong> 플랫폼 엔지니어링, WebAssembly, 옵저버빌리티가 약해졌고 WASM은 올해 0건입니다.</li>
+      </ol>
+    </section>
+
+    <section id="openstack" class="section">
+      <div class="section-heading"><span class="section-number">05</span><h2>OpenStack / OpenInfra 세션</h2></div>
+      <p class="lead">2025년 0개였던 OpenStack 계열이 2026년 프로그램 안에 들어왔습니다. 키워드 기준으로는 17건(14.5%)이며, 브리프에서 직접 관련으로 확인한 항목은 아래와 같습니다.</p>
+      <div class="callout green">
+        <strong>“OpenStack 자체 운영”보다 “AI를 떠받치는 오픈 인프라”</strong>
+        <p>OpenInfra가 CNCF 산하로 들어온 뒤 첫 중국 행사에서 OpenStack은 AI 에이전트·AI 인프라와 결합된 형태로 포지셔닝됐습니다.</p>
+      </div>
+      <ul class="session-highlights">
+        <li><strong>Declarative Underlays: Scaling Purpose-Built Infrastructure(Clusters) for OpenStack with Cluster API</strong><span class="session-meta-line"><span class="format">09-08 11:00 · Grand Ballroom II</span> 발표자가 이 저장소 소유자</span></li>
+        <li><strong>Spec-Driven Evolution: How AI Agents are Rewriting the OpenStack/K8s Playbook</strong><span class="session-meta-line"><span class="format">09-08 14:30</span></span></li>
+        <li><strong>Zuul and OpenClaw, Safe Agentic coding via Human Collaboration Tools</strong><span class="session-meta-line"><span class="format">09-08 16:15</span></span></li>
+        <li><strong>Escaping the Vendor Trap: A Journey for Migrating Legacy Infrastructure to OpenStack and K8s</strong><span class="session-meta-line"><span class="format">09-09 11:00</span></span></li>
+        <li><strong>Secure AI Agent Sandboxing with OpenStack Zun and Kata Container</strong><span class="session-meta-line"><span class="format">09-09 11:45</span></span></li>
+        <li><strong>From Disk Images to Container Images: Deploying bootc to Bare Metal with Kubernetes and Ironic</strong><span class="session-meta-line"><span class="format">09-09 13:45</span></span></li>
+        <li><strong>Redesigning OpenStack i18n for the AI Era: Weblate &amp; Zero-GPU AI</strong><span class="session-meta-line"><span class="format">09-09 14:30</span></span></li>
+        <li><strong>키노트: What AI Agents Need from Open Infrastructure / Building an Agent Runtime with Open Infrastructure / What Powers Frontier Intelligence</strong><span class="session-meta-line"><span class="format">Keynote Sessions</span> 3개</span></li>
+      </ul>
+    </section>
+
+    <section id="people" class="section">
+      <div class="section-heading"><span class="section-number">06</span><h2>참석자 규모와 국적</h2></div>
+      <p class="lead">공식 2026 참가자 수는 아직 없습니다. 따라서 2025년 실측, 2026년 스폰서 예상치, 2026년 연사 소속 기반 추정을 서로 섞지 않고 따로 제시합니다.</p>
+      <div class="callout orange">
+        <strong><span class="status unpublished">미발표</span> 2026 공식 참석자 수</strong>
+        <p>스폰서 프로스펙터스의 참석자 “1,000+”는 예상치일 뿐 확정치가 아닙니다. CNCF Transparency Report가 보통 행사 4~8주 뒤 공개되므로, 2026년판이 나오면 이 값을 실측치로 교체해야 합니다.</p>
+      </div>
+      <div class="grid two">
+        <article class="card">
+          <div class="card-kicker">근거 01 · 2025 홍콩</div>
+          <h3>실측·공개 값 <span class="status confirmed">확정</span></h3>
+          <p><strong>등록 1,004명</strong>, 실참석률 85%, 참가 기업 383개사입니다.</p>
+          <p class="muted">국가 상위 5개:</p>
+          <ol class="rank-list">
+            <li>중국(홍콩 포함) 736명</li>
+            <li>미국 46명</li>
+            <li>인도 26명</li>
+            <li>싱가포르 20명</li>
+            <li>대한민국 17명</li>
+          </ol>
+        </article>
+        <article class="card">
+          <div class="card-kicker">근거 02 · 2026 스폰서 자료</div>
+          <h3>프로스펙터스 예상치 <span class="status estimate">추정</span> <span class="status unpublished">미발표</span></h3>
+          <p>참석자 <strong>1,000+</strong>, 참여 기업 <strong>75+</strong>, 연사 <strong>100+</strong>, 세션 <strong>75+</strong>입니다. 모두 공식 실측치가 아닙니다.</p>
+        </article>
+      </div>
+      <h3 style="margin-top:22px;">2025년 홍콩 지역 분포</h3>
+      <div class="table-wrap">
+        <table class="country-table">
+          <thead><tr><th scope="col">지역</th><th scope="col">비율</th><th scope="col">지역</th><th scope="col">비율</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">아시아</th><td>84%</td><th scope="row">유럽</th><td>3%</td></tr>
+            <tr><th scope="row">북미</th><td>5%</td><th scope="row">남미</th><td>&lt;1%</td></tr>
+            <tr><th scope="row">아프리카</th><td>&lt;1%</td><th scope="row">오세아니아</th><td>1%</td></tr>
+            <tr><th scope="row">무응답</th><td>6%</td><th scope="row">—</th><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 style="margin-top:22px;">2026년 연사 소속 기반 국적 추정</h3>
+      <div class="callout purple">
+        <strong><span class="status estimate">추정치</span> 참석자 국적 분포가 아닙니다.</strong>
+        <p>139명 연사의 소속 회사를 바탕으로 직접 산출한 분류입니다. 실제 참석자의 국적·거주지 분포로 해석하면 안 됩니다.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="country-table">
+          <thead><tr><th scope="col">분류</th><th scope="col">연사 수</th><th scope="col">비율·세부</th><th scope="col">상태</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">중국계</th><td>78명</td><td>56%</td><td><span class="status estimate">소속 기반 추정</span></td></tr>
+            <tr><th scope="row">미국계</th><td>51명</td><td>37%</td><td><span class="status estimate">소속 기반 추정</span></td></tr>
+            <tr><th scope="row">한국</th><td>3명</td><td>Samsung SDS 2, NHN Cloud 1</td><td><span class="status estimate">소속 기반 추정</span></td></tr>
+            <tr><th scope="row">일본</th><td>2명</td><td>DOCOMO Euro-Labs</td><td><span class="status estimate">소속 기반 추정</span></td></tr>
+            <tr><th scope="row">베트남</th><td>2명</td><td>Viettel</td><td><span class="status estimate">소속 기반 추정</span></td></tr>
+            <tr><th scope="row">무소속·불명</th><td>3명</td><td>소속 정보 없음 또는 불명</td><td><span class="status estimate">소속 기반 추정</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="affiliation-note">연사 소속 상위: Huawei 18(표기 변형 합산), DaoCloud 10, Alibaba/Alibaba Cloud 10, NVIDIA 8, Meta 8, Ant Group 8, Red Hat 5, Linux Foundation 4, Intel 4, Dynamia.ai 4, BAAI 3, China Merchants Bank 3. 그 외 Google, IBM, Microsoft, Amazon, VMware, ZTE, China Mobile, SenseTime, MiniMax, Trip.com, Xiaohongshu, Cambricon, Samsung SDS, NHN Cloud, Viettel, DOCOMO 등이 있습니다.</p>
+      <div class="grid two" style="margin-top:18px;">
+        <article class="card">
+          <div class="card-kicker">세션 언어 · 공식 스케줄</div>
+          <h3>전체 129개 엔트리</h3>
+          <div class="table-wrap">
+            <table class="language-table"><tbody>
+              <tr><th scope="row">중국어</th><td>48</td></tr>
+              <tr><th scope="row">영어</th><td>42</td></tr>
+              <tr><th scope="row">미지정</th><td>39</td></tr>
+            </tbody></table>
+          </div>
+          <p style="margin-top:10px;">정규 브레이크아웃 46개만 보면 중국어 24 / 영어 21로 거의 반반입니다.</p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">난이도 · 표기된 세션 기준</div>
+          <h3>입문 세션이 사실상 없음</h3>
+          <div class="table-wrap">
+            <table class="difficulty-table"><tbody>
+              <tr><th scope="row">Intermediate</th><td>24</td></tr>
+              <tr><th scope="row">Any</th><td>23</td></tr>
+              <tr><th scope="row">Advanced</th><td>7</td></tr>
+              <tr><th scope="row">Beginner</th><td>1</td></tr>
+            </tbody></table>
+          </div>
+        </article>
+      </div>
+      <p class="table-note">2025년까지 중국어 우세 구조에서 영어 세션 비중이 올라온 것은 PyTorch·OpenInfra 글로벌 연사가 들어온 효과로 해석됩니다.</p>
+    </section>
+
+    <section id="korea" class="section">
+      <div class="section-heading"><span class="section-number">07</span><h2>한국 관점에서 눈에 띄는 점</h2></div>
+      <div class="grid two">
+        <article class="card">
+          <div class="card-kicker">참여 밀도</div>
+          <h3>발표자는 3명뿐</h3>
+          <p>한국 소속 연사는 <strong>3명</strong>(Samsung SDS 2, NHN Cloud 1)입니다. 2025년 한국 참석자 17명(전체 5위)에 비하면 발표 참여는 얇습니다.</p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">저장소와 연결</div>
+          <h3>이미 이어지는 발표 축</h3>
+          <p>이 저장소 소유자가 Grand Ballroom II(메인 룸)에서 Declarative Underlays를 발표했습니다. KubeEdge 엣지 리소스 컨트롤 라이트닝 토크, In-Place PVC Re-Binding, Lightweight Confidential Containers 관련 자료도 저장소에 있습니다.</p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">진입 기회</div>
+          <h3>이기종 가속기와 프로덕션 사례</h3>
+          <p>중국 벤더(Huawei, DaoCloud, Alibaba, Ant)가 프로그램의 중심입니다. 한국 기업이 들어갈 여지는 이기종 가속기 운영 경험과 금융·통신 프로덕션 사례 쪽에 있습니다.</p>
+        </article>
+        <article class="card">
+          <div class="card-kicker">실제 신호</div>
+          <h3>금융권 에이전트 운영</h3>
+          <p>China Merchants Bank가 금융권 에이전트 운영 사례로 세션을 잡았습니다. “AI를 실제 인프라에 올린 경험”을 공개하는 방향이 한국 관점에서도 유효합니다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="next" class="section">
+      <div class="section-heading"><span class="section-number">08</span><h2>다음에 하면 좋을 것</h2></div>
+      <p class="lead">이번 프로그램에서 읽힌 채택 패턴과 저장소의 기존 발표 축을 다음 CFP·프로젝트·공유 자료로 연결합니다.</p>
+      <ol class="action-grid">
+        <li><strong>내년 CFP 대비</strong><p>채택 세션의 공통 패턴은 “프로덕션 규모 숫자 + 오픈소스 프로젝트 이름 + AI 워크로드”입니다. 예: 100k-GPU 잡, 8백만 태스크/일, 수십억 문서 스캔. 규모 숫자 없는 제안은 9% 채택률을 뚫기 어렵습니다.</p></li>
+        <li><strong>에이전트 인프라 공백 노리기</strong><p>에이전트 샌드박싱(Kata/Zun), 에이전트 옵저버빌리티, 에이전트용 KV 캐시 계층은 올해 처음 등장한 영역이라 아직 표준이 없습니다. 지금 시작하면 내년 메인테이너 트랙 진입을 노릴 수 있습니다.</p></li>
+        <li><strong>OpenStack + Cluster API 계속 밀기</strong><p>올해 OpenInfra 세션이 0 → 17건으로 열렸고 경쟁자가 적습니다. Declarative Underlays 후속으로 실제 운영 데이터를 붙인 속편이 유리합니다.</p></li>
+        <li><strong>국내 공유 자료화</strong><p>저장소에 이미 있는 한국어 해설 페이지(Declarative Underlays, KubeEdge, PVC Rebinding, Confidential Containers, Cinder CBT) 패턴 그대로 이번 행사 요약 페이지를 공유합니다.</p></li>
+        <li><strong>확정 수치 갱신 예약</strong><p>CNCF Transparency Report는 보통 행사 4~8주 뒤 공개됩니다. 2025년판은 2025-07 공개됐으므로, 2026년판이 나오면 참석자·국적·CFP 수치를 실측치로 교체합니다.</p></li>
+        <li><strong>놓친 세션 추적</strong><p>녹화가 CNCF WeChat과 YouTube 플레이리스트로 올라오면 AI Infra 트랙 9개, AI+ML 트랙 10개를 우선 시청 목록으로 잡습니다.</p></li>
+      </ol>
+    </section>
+
+    <section id="appendix" class="section">
+      <div class="section-heading"><span class="section-number">09</span><h2>부록: 전체 세션 원본 목록</h2></div>
+      <p class="appendix-intro">sessions_2026.md에서 옮긴 129개 스케줄 엔트리입니다. 휴식·등록·스폰서 포맷을 포함하며, 각 항목의 날짜·제목·트랙·언어·난이도·장소·발표자를 보존했습니다.</p>
+      <details>
+        <summary>129개 엔트리 펼쳐 보기</summary>
+        <div class="session-appendix">
+          <div class="source-box">
+            <p><strong>출처</strong> · <a href="https://kubecon-cloudnativecon-openinfra-pytorch-2026.sessionize.com/api/schedule">공식 Sessionize 스케줄 API ↗</a></p>
+            <p><strong>장소</strong> · Shanghai International Convention Center, 상하이 푸둥 · <strong>일정</strong> · 2026-09-07(코로케이티드) ~ 09-09</p>
+          </div>
+          <ol class="session-list">
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-07T08:00">2026-09-07 08:00</time><strong>Registration + Badge Pick-Up</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Registration + Badge Pick-up</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>1F Foyer</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-07T08:00">2026-09-07 08:00</time><strong>Cloakroom</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Registration + Badge Pick-up</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F Foyer</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-07T13:00">2026-09-07 13:00</time><strong>Open Computing: Building Open Software for Diverse Hardware Hosted by FlagOS</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Sponsor-hosted Co-located Events</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-07T13:30">2026-09-07 13:30</time><strong>OSPOlogy + OSPO Summit China 2026 | [Pre-Registration Required]</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>CNCF-Hosted Co-located Events</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | Jiu Zhou Hall</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-07T13:30">2026-09-07 13:30</time><strong>AI Native Open Session Hosted by ETSI ISG NFV</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Sponsor-hosted Co-located Events</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>Off-Site Location</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-07T14:00">2026-09-07 14:00</time><strong>Hardware-Aware AI: Building PyTorch Workloads Across Accelerators Hosted by Huawei</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Sponsor-hosted Co-located Events</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-07T17:30">2026-09-07 17:30</time><strong>PyTorch Conference Community Night, Sponsored by Huawei</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Experiences</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>Off-Site Location</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T07:30">2026-09-08 07:30</time><strong>Registration + Badge Pick-Up</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Registration + Badge Pick-up</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>1F Foyer</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T07:30">2026-09-08 07:30</time><strong>Cloakroom</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Registration + Badge Pick-up</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F Foyer</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:00">2026-09-08 09:00</time><strong>From Open Source Adoption to Open Source Innovation: China’s Next Chapter</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Professor Lu Shouqun (China OSS)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:02">2026-09-08 09:02</time><strong>Open Source for the AI Era</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Horace Li (The Linux Foundation); Jonathan Bryce (The Linux Foundation)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:07">2026-09-08 09:07</time><strong>Beyond Multimodal: Building Full‑Modal AGI via Open‑Weight</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Ryan Lee (MiniMax)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:12">2026-09-08 09:12</time><strong>Operating Frontier Intelligence at Scale</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Chris Aniszczyk (The Linux Foundation); Xiao Zhang (Dynamia.ai)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:24">2026-09-08 09:24</time><strong>Tidal Auto-scaling for Training and Inference Based on Kubernetes + KEDA</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Jun Zheng (China Merchants Bank); Tan Pei Xiang (China Merchants Bank)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:32">2026-09-08 09:32</time><strong>Building Frontier Intelligence in the Open</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Mark Collier (PyTorch Foundation)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:42">2026-09-08 09:42</time><strong>Ascend &amp; PyTorch: Pioneer New AI Open Ecosystem</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Liang Zhang (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:47">2026-09-08 09:47</time><strong>Towards Device-agnostic PyTorch: Building Unified Infrastructure for a Multi-Backend Ecosystem.</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Wei Li (Cambricon)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:54">2026-09-08 09:54</time><strong>Inside vLLM: Production Best Practices, Model Integration and Road Map</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Kaichao You (Inferact)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T09:59">2026-09-08 09:59</time><strong>PD Disaggregation vLLM Deployment on Alternative AI Accelerators Using llm-d</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Mengxuan Li (Dynamia.ai); 纪飞 王 (Dynamia)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:06">2026-09-08 10:06</time><strong>From Containers to Agents: The Next Cloud Native</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Di Xu (Xiaohongshu)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:13">2026-09-08 10:13</time><strong>What AI Agents Need from Open Infrastructure</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Yaya Xia (Ant Group)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:20">2026-09-08 10:20</time><strong>Building an Agent Runtime with Open Infrastructure</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Xu Wang (Ant Group); Yaya Xia (Ant Group)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:25">2026-09-08 10:25</time><strong>Closing Remarks</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:30">2026-09-08 10:30</time><strong>Coffee Break ☕</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Breaks</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:30">2026-09-08 10:30</time><strong>Gold Sponsor In-Booth Demos</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Sponsor Demos</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:30">2026-09-08 10:30</time><strong>Project Pavilion | Tuesday AM Project Tables</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:30">2026-09-08 10:30</time><strong>Solutions Showcase</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Solutions Showcase</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T10:30">2026-09-08 10:30</time><strong>Women&#39;s Community Gathering</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Experiences</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:00">2026-09-08 11:00</time><strong>8 Million Tasks Daily: Driving Efficiency in Multi-Tenant Data Platforms at Horizon Robotics</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Platform Engineering + Cloud Native Architecture</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>JIanxiang Sun (Horizon Robotics); Shuangkun Tian (Alibaba Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:00">2026-09-08 11:00</time><strong>Accelerating Sequential Recommender Models in the PyTorch Ecosystem</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Community + Open Source + Getting Started</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Jiayu Sun (NVIDIA); Zan Huang (NVIDIA)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:00">2026-09-08 11:00</time><strong>Declarative Underlays: Scaling Purpose-Built Infrastructure(Clusters) for OpenStack with Cluster API</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Cloud Infrastructure + Virtualization + Storage</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Advanced</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>HanSol Park (Samsung SDS); Kangsub Song (Samsung SDS)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:00">2026-09-08 11:00</time><strong>📚 Building Portable Large Models on Heterogeneous AI Accelerators with FlagOS</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>📚 Tutorials</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Hongjun Zhang (BAAI); Mengsi Lyu (BAAI); Yufeng Lyu (BAAI)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:00">2026-09-08 11:00</time><strong>Project Lightning Talk: Opening Remarks</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Miley Fu (Olares )</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:07">2026-09-08 11:07</time><strong>Project Lightning Talk: Architecture Without Gatekeepers: Decoupling for Neutrality</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Sergey Pronin (Solanica)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:14">2026-09-08 11:14</time><strong>Project Lightning Talk: From Static Slices to Elastic GPUs: Dynamic MIG with HAMI</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>纪飞 王 (Dynamia)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:21">2026-09-08 11:21</time><strong>Project Lightning Talk: KubeEdge Everywhere: Latest Project Update with industrial cases</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Hongbing Zhang</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:28">2026-09-08 11:28</time><strong>Project Lightning Talk: Multi-cluster Orchestration System: Karmada Updates and Use Cases</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Hongcai Ren; Yiheng Ci</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:35">2026-09-08 11:35</time><strong>Project Lightning Talk: Atlantis: Terraform Pull Request Automation for Cloud Native Teams</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Rui Chen (Justworks)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:42">2026-09-08 11:42</time><strong>Project Lightning Talk: Run Sandbox Securely and Cost-Effectively with OpenKruise Agents</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Zhang Zhen (Alibaba Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:45">2026-09-08 11:45</time><strong>Scaling Digital Employees at China Merchants Bank in Production: A Controlled AI Agents Approach</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Platform Engineering + Cloud Native Architecture</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Advanced</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Jiahang Xu (China Merchants Bank)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:45">2026-09-08 11:45</time><strong>Dragonfly&#39;s CNCF Graduation Journey and Large-Scale AI Model Distribution in Practice</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Community + Open Source + Getting Started</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Fengjun Lyu (Ant Group); Wenbo Qi (Ant Group)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:45">2026-09-08 11:45</time><strong>Exploring HiFloat8: A Tapered Format Complementing the FP8 Ecosystem for Robust Model Training</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Yun Zhao (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:49">2026-09-08 11:49</time><strong>Project Lightning Talk: Let&#39;s Talk About Perses, the Open Specification for Prometheus and More</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Leon Nunes</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:53">2026-09-08 11:53</time><strong>Project Lightning Talk:  Let’s Talk About Headlamp, the Extensible Open-Source Kubernetes UI</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Emily Chen (Akuity )</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T11:58">2026-09-08 11:58</time><strong>Project Lightning Talk: Closing Remarks</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Miley Fu (Olares )</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T12:15">2026-09-08 12:15</time><strong>Lunch (Not Provided) 🍜</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Breaks</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>Off-Site Location</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T13:45">2026-09-08 13:45</time><strong>Architecting Secure Agentic Workflows on Kubernetes: A Financial Sector Case Study</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Morgan Foster (Red Hat); Vincent Caldeira (Red Hat)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T13:45">2026-09-08 13:45</time><strong>Zero-Trust Traffic Governance For Kubernetes AI Agent Sandboxes</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Networking + Edge + Distributed Systems</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Bingshen Wang (Alibaba Cloud); Bo Kang Li (Alibaba Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T13:45">2026-09-08 13:45</time><strong>From Chatbots to Agentic AI: Running NVIDIA Dynamo the Kubernetes Way</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Bo Chu (Alibaba Cloud); Xianglong Lu (NVIDIA)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T13:45">2026-09-08 13:45</time><strong>📚 Advanced NCCL Tutorial: Beyond Collectives</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>📚 Tutorials</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Advanced</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Hanyue He (NVIDIA); Jeff Hammond (NVIDIA); Ke Wen (NVIDIA)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T13:45">2026-09-08 13:45</time><strong>Beyond Model Sharding: Atomic Scheduling and Disaggregated LLM Serving with LeaderWorkerSet</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Maintainer Track</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Chen Zicong (Huawei Technologies Co., Ltd.); Kay Yan (DaoCloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T13:45">2026-09-08 13:45</time><strong>Peer Group Mentoring</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Experiences</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5D + E</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T14:30">2026-09-08 14:30</time><strong>Spec-Driven Evolution: How AI Agents are Rewriting the OpenStack/K8s Playbook</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Networking + Edge + Distributed Systems</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Bertrand Souville (DOCOMO Euro-Labs); Muhammad Hamza (DOCOMO Euro-Labs)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T14:30">2026-09-08 14:30</time><strong>Behind the Scenes of Building a Gateway API Dataplane With Envoy Proxy</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Networking + Edge + Distributed Systems</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Advanced</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Huabing (Robin) Zhao (tetrate.io); Norwin Schnyder (Airlock)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T14:30">2026-09-08 14:30</time><strong>How Intsig Serves Billions of Document Scans: GPU Virtualization at Scale with HAMi</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Walter Duan (intsig information co. ltd); Xiao Zhang (dynamia.ai)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T14:30">2026-09-08 14:30</time><strong>Dragonfly V2.5.0 - Intro, Updates, Data Distribution in AI Infrastructure</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Maintainer Track</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Chenyu Zhang (VMware by Broadcom); Wenbo Qi (Ant Group)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T15:00">2026-09-08 15:00</time><strong>Coffee Break ☕</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Breaks</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T15:00">2026-09-08 15:00</time><strong>Project Pavilion | Tuesday PM Project Tables</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T15:00">2026-09-08 15:00</time><strong>Women&#39;s Community Gathering (Additional Session)</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Experiences</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T15:30">2026-09-08 15:30</time><strong>Minutes, Not Weeks: Long-Term Memory for AI Applications with PowerMem</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Application Development + Developer Experience</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Yihang Li (OceanBase, Ant Group)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T15:30">2026-09-08 15:30</time><strong>Building AI4S Systems for Scientific Research on Kubernetes</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Emerging Technologies + Research + Advanced Topics</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Jiamu Liu (China Mobile Research Institute); Yanjun Chen (China Mobile Research Institute)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T15:30">2026-09-08 15:30</time><strong>KernelAgent: Hardware-Guided GPU Kernel Optimization via Multi-Agent Orchestration</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Advanced</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Jack Khuu (Meta); Kaiming Cheng (Meta); Laura Wang (Meta)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T15:30">2026-09-08 15:30</time><strong>10 Years of Cilium: Connecting, Securing, and Simplifying the Cloud Native Stack</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Maintainer Track</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Liyi Huang (Isovalent (Cisco)); Tingjin Ye (ANTA Sports Products Limited); Yashi Su (Alibaba Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:15">2026-09-08 16:15</time><strong>Self-Healing Rollouts: Automating Production Fixes with Agentic AI</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Application Development + Developer Experience</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Daniel Oh (Red Hat); Kevin Dubois (IBM)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:15">2026-09-08 16:15</time><strong>Cybertwin-based Cloud Native Network (CCNN): Network Architecture Innovation and Practice</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Emerging Technologies + Research + Advanced Topics</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Advanced</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Dandan Liang (Pengcheng Laboratory); Weizhou Lan (DaoCloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:15">2026-09-08 16:15</time><strong>Zuul and OpenClaw, Safe Agentic coding via Human Collaboration Tools</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Application Development + Developer Experience</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Monty Taylor (WanderTracks)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:15">2026-09-08 16:15</time><strong>⚡ Can Stateful AI Agents Scale to Zero?</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>⚡Lightning Talks</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Peng Li (Alibaba Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:15">2026-09-08 16:15</time><strong>Evolving Argo Workflows for AI: New Features, Tuning, and Multi-Tenant Isolation</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Maintainer Track</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Shuangkun Tian (Alibaba Cloud); Yashi Su (Alibaba Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:22">2026-09-08 16:22</time><strong>⚡Edge Resource Control in KubeEdge:Safely Holding and Releasing Pod Updates for Critical Edge Device</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>⚡Lightning Talks</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Feng Gao (Sony China)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:29">2026-09-08 16:29</time><strong>⚡ Eliminating Adaptation Latency: Day-0 Inference for New Models on Multi-Backends with vLLM</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>⚡Lightning Talks</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Xiaoshuang Wang (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:36">2026-09-08 16:36</time><strong>⚡Empower open edge computing on RISC-V</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>⚡Lightning Talks</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Tiejun Chen (RISC-V International )</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:43">2026-09-08 16:43</time><strong>⚡ Fast Restarts, Not Just Fast Starts: Accelerating Pod Recovery</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>⚡Lightning Talks</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Baofa Fan (DaoCloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:50">2026-09-08 16:50</time><strong>⚡ Speedy But Sturdy PyTorch Optimizers</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>⚡Lightning Talks</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Jane Xu (Meta Platforms Inc)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T16:57">2026-09-08 16:57</time><strong>⚡Building a Multi-Cluster Progressive Delivery Platform with Karmada &amp; Argo</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>⚡Lightning Talks</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Zhuang Zhang (Huawei Technologies Co. Ltd)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T17:00">2026-09-08 17:00</time><strong>Agile Readiness: Leveraging CI Relay and Full-Scale Test Reuse</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Hardware Enablement + Diversification</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Jiawei Li (Huawei); Jingwei Huang (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T17:00">2026-09-08 17:00</time><strong>Gravity of Ecosystems: Pollinating the Modern AI Orchestrator</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Emerging Technologies + Research + Advanced Topics</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Bo Fu (Google); Wenjia Zhang (Google)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T17:00">2026-09-08 17:00</time><strong>Redefining LLM Training through Atomic Components and Serverless TaaS</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Tan Pei Xiang (China Merchants Bank)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T17:00">2026-09-08 17:00</time><strong>Hibernate and Evolving: Taming OpenClaw with OpenKruise Agents</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Maintainer Track</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Zhang Zhen (Alibaba Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T17:04">2026-09-08 17:04</time><strong>⚡ Before vLLM starts: Preflight Checks for LWS for LLM Inference on K8S</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>⚡Lightning Talks</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Peter Pan (DaoCloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-08T17:30">2026-09-08 17:30</time><strong>Welcome Reception 🎉</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Experiences</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T08:00">2026-09-09 08:00</time><strong>Registration + Badge Pick-Up</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Registration + Badge Pick-up</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>1F Foyer</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T08:00">2026-09-09 08:00</time><strong>Cloakroom</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Registration + Badge Pick-up</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F Foyer</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T09:00">2026-09-09 09:00</time><strong>Welcome Back + Opening Remarks</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Horace Li (The Linux Foundation); Jonathan Bryce (The Linux Foundation)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T09:05">2026-09-09 09:05</time><strong>What Powers Frontier Intelligence</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Thierry Carrez (OpenInfra Foundation)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T09:17">2026-09-09 09:17</time><strong>Road from Kata Containers to Confidential Containers + GPUs: From First Commit to CNCF Incubation</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Zvonko Kaiser (NVIDIA)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T09:24">2026-09-09 09:24</time><strong>HyperParallel: A SuperPoD-Aware Distributed Acceleration Library</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Shendi Wang (Huawei); Teng Su (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T09:31">2026-09-09 09:31</time><strong>Build a Unified Heterogeneous AI Computing Ecosystem for PyTorch</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Zesheng Zong (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T09:38">2026-09-09 09:38</time><strong>Serving Qwen at Scale: Multi-Cluster AI Infrastructure on Karmada</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Jionghang Cai (Alibaba)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T09:45">2026-09-09 09:45</time><strong>Meet the Community Behind the Open Source AI Stack</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Fupan Li (Ant Group); Hiu Yeung, Sunny Chan (TCC Consulting Limited); Jane Lyu (The Linux Foundation); Zesheng Zong (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T09:55">2026-09-09 09:55</time><strong>Building Frontier AI Infra: SGLang and Miles</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Ke Bao (RadixArk)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T10:00">2026-09-09 10:00</time><strong>A Cloud Native Stack from Bare Metal to Tokens for Large-Scale AI Inference</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Trong Vinh Nguyen (Viettel)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T10:25">2026-09-09 10:25</time><strong>Closing Remarks</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Keynote Sessions</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T10:30">2026-09-09 10:30</time><strong>Coffee Break ☕</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Breaks</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T10:30">2026-09-09 10:30</time><strong>Project Pavilion | Wednesday AM Project Tables</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T10:30">2026-09-09 10:30</time><strong>Solutions Showcase</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Solutions Showcase</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:00">2026-09-09 11:00</time><strong>Serving AI at Massive Scale: The Cloud-Native Inference Plane Behind Huawei Celia</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Kevin Wang (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:00">2026-09-09 11:00</time><strong>Pathless First: Redefining runc Container Security Against ProcFS-Based Attacks</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Security + Privacy + Trusted Computing</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Fubang Li (Acmcoder.com From CIIC)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:00">2026-09-09 11:00</time><strong>Escaping the Vendor Trap: A Journey for Migrating Legacy Infrastructure to OpenStack and K8s</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Cloud Infrastructure + Virtualization + Storage</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Quoc Dat Le (Viettel); Trong Vinh Nguyen (Viettel)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:00">2026-09-09 11:00</time><strong>In-Place PVC Re-Binding: Zero-Downtime Disk Migration Using Only the Kubernetes API</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Cloud Infrastructure + Virtualization + Storage</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Maxim Nazarenko (Amazon); Nibir Bora (Clean Compute)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:00">2026-09-09 11:00</time><strong>Accelerating RL with AgentCube: Cloud-Native Multi-Agent Collaboration</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Sponsor Demos</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Zhencheng Lee (Huawei Technologies Co., Ltd)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:25">2026-09-09 11:25</time><strong>KV Cache: Accelerating AI inference on Intel CPU</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Sponsor Demos</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Bin Yang (Intel)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:45">2026-09-09 11:45</time><strong>Training Through Failures: How Meta Keeps 100k-GPU Jobs Alive with Open-Source Fault Tolerance</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Amir Afzali (Meta); Tristan Rice (Meta)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:45">2026-09-09 11:45</time><strong>All-or-Nothing No More: Taming Kubernetes Impersonation with Granular Controls</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Security + Privacy + Trusted Computing</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Jian Qiu (Independent)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:45">2026-09-09 11:45</time><strong>Secure AI Agent Sandboxing with OpenStack Zun and Kata Container</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Wenjie Bao (ZTE)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T11:45">2026-09-09 11:45</time><strong>One Size Fits None: Lightweight Workload-Specialized Confidential Containers</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Cloud Infrastructure + Virtualization + Storage</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Kailun Qin (Intel Corporation)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T12:15">2026-09-09 12:15</time><strong>Lunch (Not Provided) 🍜</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Breaks</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>Off-Site Location</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T13:00">2026-09-09 13:00</time><strong>Maintainer Meet-Up</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5D + E</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T13:15">2026-09-09 13:15</time><strong>Project Pavilion | Wednesday PM Project Tables</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Project Opportunities</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T13:45">2026-09-09 13:45</time><strong>Turning Fragmented GPU Clusters Into One Elastic Compute Pool</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>ChongKang Tan (Ant Group)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T13:45">2026-09-09 13:45</time><strong>Beyond Static Pods: Dynamic GPU Sharing and Low-Latency Model Switching for LLM Inference on K8s</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Jun Duan (IBM); 夕宁 王 (Alibaba)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T13:45">2026-09-09 13:45</time><strong>To Cache or Not to Cache? A Tiered KVCache Storage System for Agent Scenarios</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Advanced</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Jingbin Zhang (Huawei); Wang Cong (Huawei); yun bai (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T13:45">2026-09-09 13:45</time><strong>From Disk Images to Container Images: Deploying bootc to Bare Metal with Kubernetes and Ironic</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Cloud Infrastructure + Virtualization + Storage</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Steve Baker (Red Hat)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T13:45">2026-09-09 13:45</time><strong>Helion&#39;s New CuTe DSL and Pallas Backends and How we Built Them via Agents</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Dunfan Lu (Meta); Jason Ansel (Meta)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T14:30">2026-09-09 14:30</time><strong>veRL: Extreme Optimization Practices for Ultra-Large-Scale MoE Models</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Carson Wu (Huawei Technologies Co., Ltd.)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T14:30">2026-09-09 14:30</time><strong>End-to-End Observability for LLM Inference: From Token to GPU</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Operations + Observability + Reliability</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Jared Tan (DaoCloud); Murphy Chen (DaoCloud); Nicole Li (DaoCloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T14:30">2026-09-09 14:30</time><strong>Redesigning OpenStack i18n for the AI Era: Weblate &amp; Zero-GPU AI</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Community + Open Source + Getting Started</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Beginner</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>DaGyeong Kim (Independent); Seongsoo Cho (NHN Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T14:30">2026-09-09 14:30</time><strong>From Cloud to AI: How Kata Containers 4.0 Reinvents the Sandbox for the Agent Era</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Cloud Infrastructure + Virtualization + Storage</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Fupan Li (Ant Group); Xuewei Niu (AntGroup)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T14:30">2026-09-09 14:30</time><strong>Multi-cluster Orchestration System: Karmada Updates and Use Cases</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Maintainer Track</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Hongcai Ren; Zongqing Li (Trip.com)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T15:00">2026-09-09 15:00</time><strong>Coffee Break ☕</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Breaks</dd>
+    <dt>언어</dt><dd>-</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom I</dd>
+    <dt>발표자</dt><dd>-</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T15:30">2026-09-09 15:30</time><strong>vLLM KV Cache Management: From Cache Reuse to Agent Scenario Optimization</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Mengqing Cao (Huawei); 玺源 王 (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T15:30">2026-09-09 15:30</time><strong>Non-Invasive AI Agent Observability With OBI</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Operations + Observability + Reliability</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Endre Sara (Causely); Haibin Zhang (Alibaba Cloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T15:30">2026-09-09 15:30</time><strong>The State of the PyTorch Ecosystem in 2026: Global Trends and China’s Rising Role</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Wei Wang (East China Normal University)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T15:30">2026-09-09 15:30</time><strong>Write Once, Run Anywhere: PyTorch’s Generalization Journey</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Eikan Wang (Intel); Yu Guangye (Intel)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T15:30">2026-09-09 15:30</time><strong>Solving Industrial Challenges with KubeEdge: A Post-Graduation Report</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Maintainer Track</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Huan Wei (Harmonycloud); Yin Ding; Yue Bao (Huawei)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T16:15">2026-09-09 16:15</time><strong>vLLM-Helion: SOTA LLM Performance by advanced autotuning and fine-grained dispatching</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI Infrastructure + Accelerators + Performance Engineering</dd>
+    <dt>언어</dt><dd>English</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall I</dd>
+    <dt>발표자</dt><dd>Sean Chen (Red Hat)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T16:15">2026-09-09 16:15</time><strong>Why Your TTFT Lies: Diagnosing PD-Disaggregated LLM Inference with Minimal Cross-Layer Metrics</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Operations + Observability + Reliability</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>1F | Mandarin Hall II</dd>
+    <dt>발표자</dt><dd>Kebe Liu (DaoCloud); Nicole Li (DaoCloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T16:15">2026-09-09 16:15</time><strong>What We Learned Securing AI Agents at Scale on Multi-Tenant Kubernetes Clusters</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>AI + ML + Agentic AI + Data Systems</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Any</dd>
+    <dt>장소</dt><dd>7F | Grand Ballroom II + III</dd>
+    <dt>발표자</dt><dd>Pengfei Ni (Microsoft)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T16:15">2026-09-09 16:15</time><strong>Kubernetes DRA Architecture: Scheduling, Status, and Topology at Scale</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Emerging Technologies + Research + Advanced Topics</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>Intermediate</dd>
+    <dt>장소</dt><dd>7F | Pearl Hall</dd>
+    <dt>발표자</dt><dd>Kang Zhang (NVIDIA); Paco Xu (DaoCloud)</dd>
+  </dl>
+</li>
+<li class="session-item">
+  <div class="session-title"><time datetime="2026-09-09T16:15">2026-09-09 16:15</time><strong>Volcano: A Unified Scheduling Platform for Cloud Native AI</strong></div>
+  <dl class="session-meta">
+    <dt>트랙</dt><dd>Maintainer Track</dd>
+    <dt>언어</dt><dd>Chinese</dd>
+    <dt>난이도</dt><dd>-</dd>
+    <dt>장소</dt><dd>5F | 5B + C</dd>
+    <dt>발표자</dt><dd>Chen Zicong (Huawei Technologies Co., Ltd.); DongYang Wang (SenseTime)</dd>
+  </dl>
+</li>
+          </ol>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p><a href="./index.html">Hong-p docs</a> · KubeCon China 2026 통합 행사 분석 리포트</p>
+      <p>작성 기준일 2026-09-10 · 2026 세션·연사 데이터는 공식 Sessionize 스케줄 API, 2025 비교군은 공개 스케줄과 CNCF Transparency Report를 바탕으로 정리했습니다.</p>
+      <p>주의: 2026 참가자 수는 공식 미발표이며, 스폰서 프로스펙터스 값은 예상치입니다. 연사 국적은 소속 회사 기반 추정입니다.</p>
+    </div>
+  </footer>
+</body>
+</html>

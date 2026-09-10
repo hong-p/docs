@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="description" content="Kubernetes 스토리지 기초부터 Azure 디스크의 In-Place PVC Re-Binding 절차까지, 39장 슬라이드와 함께 읽는 한국어 기술 문서."><title>In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션</title><style>
+:root{color-scheme:light dark;--bg:#f5f5f0;--surface:#fff;--text:#202d35;--muted:#5a6b71;--line:#d7dfda;--accent:#066d60;--soft:#e6f1ea;--code:#15242a;--codetext:#e3edf0;--shadow:0 18px 50px #20372e10}
+@media(prefers-color-scheme:dark){:root{--bg:#111a1d;--surface:#192529;--text:#e0eae6;--muted:#a9b9b9;--line:#34454a;--accent:#80dac0;--soft:#203a34;--code:#0c1519;--shadow:none}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;line-height:1.85;word-break:keep-all;overflow-wrap:anywhere}a{color:var(--accent)}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.skip{position:fixed;top:-80px;left:16px;z-index:9;background:var(--surface);padding:10px}.skip:focus{top:10px}.layout{display:grid;grid-template-columns:240px minmax(0,1000px);gap:52px;max-width:1390px;margin:auto;padding:42px 36px}.sidebar{position:sticky;top:32px;align-self:start;max-height:calc(100vh - 64px);overflow-y:auto}.brand{font-size:12px;letter-spacing:.15em;font-weight:800;color:var(--accent)}.sidebar p{font-size:13px;color:var(--muted)}nav{display:grid;gap:4px;margin-top:25px}nav a{text-decoration:none;color:var(--muted);font-size:14px;padding:8px 12px;border-left:2px solid transparent;line-height:1.5}nav a[aria-current=true]{color:var(--accent);border-color:var(--accent);background:var(--soft);font-weight:700}main{min-width:0}.hero{border-top:5px solid var(--accent);padding:18px 0 22px}.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--accent);font-weight:800}h1{font-size:clamp(30px,3.8vw,46px);letter-spacing:-.045em;line-height:1.12;margin:12px 0}h1 span{display:block;color:var(--accent)}.english{font-size:14px;color:var(--muted);max-width:760px;line-height:1.5}.lede{font-size:17px;font-weight:600;line-height:1.45}.meta{display:grid;grid-template-columns:90px minmax(0,1fr);gap:9px 16px;font-size:14px;border-top:1px solid var(--line);padding-top:23px}.meta dt{color:var(--muted)}.meta dd{margin:0}.note{padding:20px 24px;background:var(--soft);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;margin:26px 0}.note p{margin:0}section{padding:40px 0;border-top:1px solid var(--line)}h2{font-size:clamp(26px,3vw,34px);letter-spacing:-.035em;line-height:1.4;margin:8px 0 28px}h3{font-size:21px;line-height:1.5;margin:34px 0 12px}p{margin:15px 0}li{margin:8px 0}ul,ol{padding-left:24px}strong{font-weight:750}blockquote{margin:24px 0;padding:4px 22px;border-left:3px solid var(--accent);background:var(--soft)}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.86em;background:var(--soft);padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}.codebox{min-width:0;margin:20px 0;background:var(--code);color:var(--codetext);border-radius:10px;overflow:hidden}.code-label{font:700 11px system-ui;letter-spacing:.1em;text-transform:uppercase;padding:11px 18px;border-bottom:1px solid #ffffff20;color:#acc9c7}pre{margin:0;padding:18px;overflow-x:auto;max-width:100%;line-height:1.7;tab-size:2}pre code{background:none;padding:0;color:inherit;white-space:pre;overflow-wrap:normal;font-size:13px}.tok-comment{color:#9bb4ae}.tok-key{color:#80d9eb}.tok-string{color:#eace8d}.tok-command{color:#b6a5ff}.tok-variable{color:#ffb38a}.tok-value{color:#90dfaf}.table-scroll{overflow-x:auto;max-width:100%;margin:24px 0;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;font-size:14px;min-width:480px}th,td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:var(--soft);white-space:nowrap}tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:color-mix(in srgb,var(--soft) 30%,transparent)}.slide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:30px 0 8px}figure{margin:0;min-width:0}.slide-button{display:block;width:100%;padding:0;border:1px solid var(--line);border-radius:9px;background:var(--surface);overflow:hidden;box-shadow:var(--shadow);transition:transform .18s}.slide-button:hover{transform:translateY(-3px)}img{display:block;max-width:100%;width:100%;height:auto}figcaption{font-size:12px;line-height:1.6;color:var(--muted);margin:9px 2px}figcaption span{font-variant-numeric:tabular-nums;font-weight:800;color:var(--accent);margin-right:6px}.hero .slide-grid{grid-template-columns:1fr;max-width:620px}footer{font-size:13px;color:var(--muted);padding:30px 0;border-top:1px solid var(--line)}
+@media(max-width:1050px){.layout{grid-template-columns:185px minmax(0,1fr);gap:28px;padding:28px 24px}}
+@media(max-width:760px){html{scroll-padding-top:16px}.layout{display:block;padding:22px 18px}.sidebar{position:static;max-height:none;overflow:visible;margin-bottom:26px}.sidebar p{display:none}nav{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}nav a{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:5px 8px}nav a[aria-current=true]{border-color:var(--accent)}.hero{padding-top:18px}.lede{font-size:17px}.meta{grid-template-columns:58px minmax(0,1fr);gap:9px 12px}.slide-grid{grid-template-columns:1fr}.note{padding:17px}section{padding:32px 0}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.slide-button{transition:none}}
+@media print{.sidebar,.skip{display:none}.layout{display:block;padding:0}body{background:white;color:black}.slide-grid{grid-template-columns:repeat(2,minmax(0,1fr))}pre{white-space:pre-wrap}pre code{white-space:pre-wrap}.table-scroll{overflow:visible}table{min-width:0}figure{break-inside:avoid}}
+
+[hidden]{display:none!important}
+.slide-viewer{min-width:0;max-width:100%;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);scroll-margin-top:24px}
+.slide-stage{display:grid;min-width:0}.viewer-slide{grid-area:1/1;min-width:0}.viewer-slide img{width:100%;height:auto;object-fit:contain;background:var(--bg)}.viewer-slide figcaption{min-height:3.6em;margin:0;padding:12px 4px;font-size:14px}
+.slide-controls{display:flex;align-items:center;justify-content:center;gap:12px;padding-top:12px;border-top:1px solid var(--line)}.slide-controls button{min-height:44px;padding:7px 13px;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--accent);font-weight:700}.slide-controls button:disabled{cursor:default;opacity:.4}.slide-position{min-width:66px;text-align:center;font-variant-numeric:tabular-nums;font-weight:800}
+.slide-thumbnails{display:flex;gap:10px;overflow-x:auto;max-width:100%;min-width:0;margin-top:16px;padding:6px 5px 12px;overscroll-behavior-x:contain;scrollbar-color:var(--accent) var(--soft)}.slide-thumbnail{position:relative;flex:0 0 104px;min-width:0;padding:3px;border:2px solid var(--line);border-radius:7px;background:var(--bg);color:var(--muted)}.slide-thumbnail img{width:100%;height:auto}.slide-thumbnail span{display:block;font-size:12px;font-weight:800;line-height:1.8}.slide-thumbnail[aria-current="true"]{border-color:var(--accent);background:var(--soft);color:var(--accent);box-shadow:0 0 0 1px var(--accent)}.viewer-help{font-size:12px;color:var(--muted);margin:12px 0 0}
+@media(max-width:760px){.slide-viewer{padding:8px}.slide-controls{gap:8px}.slide-controls button{padding:7px 10px}.slide-thumbnail{flex-basis:86px}.viewer-slide figcaption{min-height:0;font-size:12px}}
+@media print{.slide-controls,.slide-thumbnails,.viewer-help{display:none!important}.slide-stage{display:block}.viewer-slide[hidden]{display:block!important}.slide-viewer{border:0;padding:0}.viewer-slide{margin-bottom:20px}}
+.gallery-details,.slide-map{margin:22px 0;border:1px solid var(--line);border-radius:10px;background:var(--surface)}.gallery-details summary,.slide-map summary{cursor:pointer;padding:13px 16px;color:var(--accent);font-weight:750}.gallery-details[open],.slide-map[open]{padding-bottom:12px}.gallery-details .meta{margin:0 18px;padding-top:14px}.gallery-details .note{margin:18px 18px 0}.slide-map .table-scroll{margin:0 10px 10px}.slide-map>p{margin-left:16px;margin-right:16px}</style></head>
+<body><a class="skip" href="#main">본문으로 건너뛰기</a><div class="layout"><aside class="sidebar"><div class="brand">STORAGE / FIELD NOTES</div><p>Kubernetes API로 바꾸는<br>디스크 연결의 방식</p><nav aria-label="문서 목차"><a href="#gallery">전체 슬라이드 뷰어</a><a href="#background">먼저 알아둘 배경 지식</a><a href="#context">배경과 목표</a><a href="#hard">왜 직접 바꿀 수 없을까?</a><a href="#internals">재바인딩을 가능하게 하는 내부 동작</a><a href="#algorithm">알고리즘: 다섯 단계로 연결 바꾸기</a><a href="#results">결과와 중단 범위</a><a href="#alternatives">다른 전략과 비교</a><a href="#failures">실패 사례와 타이밍</a><a href="#principles">운영에서 얻은 세 가지 원칙</a></nav></aside><main id="main"><header class="hero"><div class="eyebrow">KUBECON CHINA 2026 · TECHNICAL GUIDE</div><h1>디스크는 그대로,<br><span>PVC 연결을 새롭게.</span></h1><p class="english">In-Place PVC Re-Binding: Zero-Downtime Disk Migration Using Only the Kubernetes API</p><p class="lede">실제 데이터를 옮기지 않고 Kubernetes의 스토리지 연결을 in-tree에서 CSI로 전환한 사례를, 기초 개념부터 살펴봅니다.</p></header><section id="gallery" aria-labelledby="heading-gallery"><div class="section-heading"><span class="eyebrow">00 / GUIDE</span><h2 id="heading-gallery">전체 슬라이드 뷰어</h2></div><p>총 <strong>39장</strong>을 이 자리에서 넘겨보며 각 섹션의 흐름을 따라갑니다.</p><div id="slide-viewer" class="slide-viewer" tabindex="0" role="region" aria-roledescription="슬라이드 뷰어" aria-label="PVC 재바인딩 발표 슬라이드 39장" aria-describedby="viewer-help">
+<div class="slide-stage"><figure id="viewer-slide-1" class="viewer-slide" role="group" aria-label="1 / 39 · 슬라이드 01: 표지"><img src="./slides/slide-01.png" alt="슬라이드 01: 표지" width="1100" height="619" loading="eager" decoding="async"><figcaption><span>01 / 39</span> 표지</figcaption></figure>
+<figure id="viewer-slide-2" class="viewer-slide" role="group" aria-label="2 / 39 · 슬라이드 02: Commure 회사 소개와 미션" hidden><img src="./slides/slide-02.png" alt="슬라이드 02: Commure 회사 소개와 미션" width="1100" height="619" loading="eager" decoding="async"><figcaption><span>02 / 39</span> Commure 회사 소개와 미션</figcaption></figure>
+<figure id="viewer-slide-3" class="viewer-slide" role="group" aria-label="3 / 39 · 슬라이드 03: 목표와 인프라 규모 (1/4)" hidden><img src="./slides/slide-03.png" alt="슬라이드 03: 목표와 인프라 규모 (1/4)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>03 / 39</span> 목표와 인프라 규모 (1/4)</figcaption></figure>
+<figure id="viewer-slide-4" class="viewer-slide" role="group" aria-label="4 / 39 · 슬라이드 04: 목표와 인프라 규모 (2/4)" hidden><img src="./slides/slide-04.png" alt="슬라이드 04: 목표와 인프라 규모 (2/4)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>04 / 39</span> 목표와 인프라 규모 (2/4)</figcaption></figure>
+<figure id="viewer-slide-5" class="viewer-slide" role="group" aria-label="5 / 39 · 슬라이드 05: 목표와 인프라 규모 (3/4)" hidden><img src="./slides/slide-05.png" alt="슬라이드 05: 목표와 인프라 규모 (3/4)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>05 / 39</span> 목표와 인프라 규모 (3/4)</figcaption></figure>
+<figure id="viewer-slide-6" class="viewer-slide" role="group" aria-label="6 / 39 · 슬라이드 06: 목표와 인프라 규모 (4/4)" hidden><img src="./slides/slide-06.png" alt="슬라이드 06: 목표와 인프라 규모 (4/4)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>06 / 39</span> 목표와 인프라 규모 (4/4)</figcaption></figure>
+<figure id="viewer-slide-7" class="viewer-slide" role="group" aria-label="7 / 39 · 슬라이드 07: 왜 어려운가?" hidden><img src="./slides/slide-07.png" alt="슬라이드 07: 왜 어려운가?" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>07 / 39</span> 왜 어려운가?</figcaption></figure>
+<figure id="viewer-slide-8" class="viewer-slide" role="group" aria-label="8 / 39 · 슬라이드 08: 스토리지 리소스와 스코프 (1/3)" hidden><img src="./slides/slide-08.png" alt="슬라이드 08: 스토리지 리소스와 스코프 (1/3)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>08 / 39</span> 스토리지 리소스와 스코프 (1/3)</figcaption></figure>
+<figure id="viewer-slide-9" class="viewer-slide" role="group" aria-label="9 / 39 · 슬라이드 09: 스토리지 리소스와 스코프 (2/3)" hidden><img src="./slides/slide-09.png" alt="슬라이드 09: 스토리지 리소스와 스코프 (2/3)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>09 / 39</span> 스토리지 리소스와 스코프 (2/3)</figcaption></figure>
+<figure id="viewer-slide-10" class="viewer-slide" role="group" aria-label="10 / 39 · 슬라이드 10: 스토리지 리소스와 스코프 (3/3)" hidden><img src="./slides/slide-10.png" alt="슬라이드 10: 스토리지 리소스와 스코프 (3/3)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>10 / 39</span> 스토리지 리소스와 스코프 (3/3)</figcaption></figure>
+<figure id="viewer-slide-11" class="viewer-slide" role="group" aria-label="11 / 39 · 슬라이드 11: 동적 볼륨 프로비저닝 (1/6)" hidden><img src="./slides/slide-11.png" alt="슬라이드 11: 동적 볼륨 프로비저닝 (1/6)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>11 / 39</span> 동적 볼륨 프로비저닝 (1/6)</figcaption></figure>
+<figure id="viewer-slide-12" class="viewer-slide" role="group" aria-label="12 / 39 · 슬라이드 12: 동적 볼륨 프로비저닝 (2/6)" hidden><img src="./slides/slide-12.png" alt="슬라이드 12: 동적 볼륨 프로비저닝 (2/6)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>12 / 39</span> 동적 볼륨 프로비저닝 (2/6)</figcaption></figure>
+<figure id="viewer-slide-13" class="viewer-slide" role="group" aria-label="13 / 39 · 슬라이드 13: 동적 볼륨 프로비저닝 (3/6)" hidden><img src="./slides/slide-13.png" alt="슬라이드 13: 동적 볼륨 프로비저닝 (3/6)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>13 / 39</span> 동적 볼륨 프로비저닝 (3/6)</figcaption></figure>
+<figure id="viewer-slide-14" class="viewer-slide" role="group" aria-label="14 / 39 · 슬라이드 14: 동적 볼륨 프로비저닝 (4/6)" hidden><img src="./slides/slide-14.png" alt="슬라이드 14: 동적 볼륨 프로비저닝 (4/6)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>14 / 39</span> 동적 볼륨 프로비저닝 (4/6)</figcaption></figure>
+<figure id="viewer-slide-15" class="viewer-slide" role="group" aria-label="15 / 39 · 슬라이드 15: 동적 볼륨 프로비저닝 (5/6)" hidden><img src="./slides/slide-15.png" alt="슬라이드 15: 동적 볼륨 프로비저닝 (5/6)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>15 / 39</span> 동적 볼륨 프로비저닝 (5/6)</figcaption></figure>
+<figure id="viewer-slide-16" class="viewer-slide" role="group" aria-label="16 / 39 · 슬라이드 16: 동적 볼륨 프로비저닝 (6/6)" hidden><img src="./slides/slide-16.png" alt="슬라이드 16: 동적 볼륨 프로비저닝 (6/6)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>16 / 39</span> 동적 볼륨 프로비저닝 (6/6)</figcaption></figure>
+<figure id="viewer-slide-17" class="viewer-slide" role="group" aria-label="17 / 39 · 슬라이드 17: Kubernetes 영속성 원칙" hidden><img src="./slides/slide-17.png" alt="슬라이드 17: Kubernetes 영속성 원칙" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>17 / 39</span> Kubernetes 영속성 원칙</figcaption></figure>
+<figure id="viewer-slide-18" class="viewer-slide" role="group" aria-label="18 / 39 · 슬라이드 18: Kubernetes 내부 동작" hidden><img src="./slides/slide-18.png" alt="슬라이드 18: Kubernetes 내부 동작" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>18 / 39</span> Kubernetes 내부 동작</figcaption></figure>
+<figure id="viewer-slide-19" class="viewer-slide" role="group" aria-label="19 / 39 · 슬라이드 19: StorageClass: legacy와 CSI YAML 비교" hidden><img src="./slides/slide-19.png" alt="슬라이드 19: StorageClass: legacy와 CSI YAML 비교" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>19 / 39</span> StorageClass: legacy와 CSI YAML 비교</figcaption></figure>
+<figure id="viewer-slide-20" class="viewer-slide" role="group" aria-label="20 / 39 · 슬라이드 20: claimRef: 특정 PVC에 확정 바인딩" hidden><img src="./slides/slide-20.png" alt="슬라이드 20: claimRef: 특정 PVC에 확정 바인딩" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>20 / 39</span> claimRef: 특정 PVC에 확정 바인딩</figcaption></figure>
+<figure id="viewer-slide-21" class="viewer-slide" role="group" aria-label="21 / 39 · 슬라이드 21: claimRef: 미래 PVC를 위한 예약" hidden><img src="./slides/slide-21.png" alt="슬라이드 21: claimRef: 미래 PVC를 위한 예약" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>21 / 39</span> claimRef: 미래 PVC를 위한 예약</figcaption></figure>
+<figure id="viewer-slide-22" class="viewer-slide" role="group" aria-label="22 / 39 · 슬라이드 22: pvc-protection finalizer" hidden><img src="./slides/slide-22.png" alt="슬라이드 22: pvc-protection finalizer" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>22 / 39</span> pvc-protection finalizer</figcaption></figure>
+<figure id="viewer-slide-23" class="viewer-slide" role="group" aria-label="23 / 39 · 슬라이드 23: 알고리즘 소개" hidden><img src="./slides/slide-23.png" alt="슬라이드 23: 알고리즘 소개" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>23 / 39</span> 알고리즘 소개</figcaption></figure>
+<figure id="viewer-slide-24" class="viewer-slide" role="group" aria-label="24 / 39 · 슬라이드 24: 알고리즘 1~3단계 (1/3)" hidden><img src="./slides/slide-24.png" alt="슬라이드 24: 알고리즘 1~3단계 (1/3)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>24 / 39</span> 알고리즘 1~3단계 (1/3)</figcaption></figure>
+<figure id="viewer-slide-25" class="viewer-slide" role="group" aria-label="25 / 39 · 슬라이드 25: 알고리즘 1~3단계 (2/3)" hidden><img src="./slides/slide-25.png" alt="슬라이드 25: 알고리즘 1~3단계 (2/3)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>25 / 39</span> 알고리즘 1~3단계 (2/3)</figcaption></figure>
+<figure id="viewer-slide-26" class="viewer-slide" role="group" aria-label="26 / 39 · 슬라이드 26: 알고리즘 1~3단계 (3/3)" hidden><img src="./slides/slide-26.png" alt="슬라이드 26: 알고리즘 1~3단계 (3/3)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>26 / 39</span> 알고리즘 1~3단계 (3/3)</figcaption></figure>
+<figure id="viewer-slide-27" class="viewer-slide" role="group" aria-label="27 / 39 · 슬라이드 27: 재바인딩 흐름 그림 — 1단계만 표시: Pod–PVC–PV(in-tree)–Managed Disk 연결과 레거시 PV의 reclaim policy를 Retain으로 변경" hidden><img src="./slides/slide-27.png" alt="슬라이드 27: 재바인딩 흐름 그림 — 1단계만 표시: Pod–PVC–PV(in-tree)–Managed Disk 연결과 레거시 PV의 reclaim policy를 Retain으로 변경" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>27 / 39</span> 재바인딩 흐름 그림 — 1단계만 표시: Pod–PVC–PV(in-tree)–Managed Disk 연결과 레거시 PV의 reclaim policy를 Retain으로 변경</figcaption></figure>
+<figure id="viewer-slide-28" class="viewer-slide" role="group" aria-label="28 / 39 · 슬라이드 28: 새 CSI honeypot PV의 YAML — claimRef에서 uid와 resourceVersion 생략" hidden><img src="./slides/slide-28.png" alt="슬라이드 28: 새 CSI honeypot PV의 YAML — claimRef에서 uid와 resourceVersion 생략" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>28 / 39</span> 새 CSI honeypot PV의 YAML — claimRef에서 uid와 resourceVersion 생략</figcaption></figure>
+<figure id="viewer-slide-29" class="viewer-slide" role="group" aria-label="29 / 39 · 슬라이드 29: 재바인딩 흐름 그림 — 1~2단계 표시: Retain 설정과 원본 managed disk를 가리키는 honeypot CSI PV 생성" hidden><img src="./slides/slide-29.png" alt="슬라이드 29: 재바인딩 흐름 그림 — 1~2단계 표시: Retain 설정과 원본 managed disk를 가리키는 honeypot CSI PV 생성" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>29 / 39</span> 재바인딩 흐름 그림 — 1~2단계 표시: Retain 설정과 원본 managed disk를 가리키는 honeypot CSI PV 생성</figcaption></figure>
+<figure id="viewer-slide-30" class="viewer-slide" role="group" aria-label="30 / 39 · 슬라이드 30: 재바인딩 트리거 명령 — kubectl delete pvc와 kubectl delete pod" hidden><img src="./slides/slide-30.png" alt="슬라이드 30: 재바인딩 트리거 명령 — kubectl delete pvc와 kubectl delete pod" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>30 / 39</span> 재바인딩 트리거 명령 — kubectl delete pvc와 kubectl delete pod</figcaption></figure>
+<figure id="viewer-slide-31" class="viewer-slide" role="group" aria-label="31 / 39 · 슬라이드 31: 재바인딩의 4단계 핵심 그림 — 1~4단계 전체 표시: Retain 설정 → honeypot PV 생성 → 레거시 PVC와 Pod 삭제 → StatefulSet이 새 Pod와 PVC를 생성하고 PVC가 honeypot PV에 바인딩" hidden><img src="./slides/slide-31.png" alt="슬라이드 31: 재바인딩의 4단계 핵심 그림 — 1~4단계 전체 표시: Retain 설정 → honeypot PV 생성 → 레거시 PVC와 Pod 삭제 → StatefulSet이 새 Pod와 PVC를 생성하고 PVC가 honeypot PV에 바인딩" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>31 / 39</span> 재바인딩의 4단계 핵심 그림 — 1~4단계 전체 표시: Retain 설정 → honeypot PV 생성 → 레거시 PVC와 Pod 삭제 → StatefulSet이 새 Pod와 PVC를 생성하고 PVC가 honeypot PV에 바인딩</figcaption></figure>
+<figure id="viewer-slide-32" class="viewer-slide" role="group" aria-label="32 / 39 · 슬라이드 32: 결과: 2개월과 S자 진행률" hidden><img src="./slides/slide-32.png" alt="슬라이드 32: 결과: 2개월과 S자 진행률" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>32 / 39</span> 결과: 2개월과 S자 진행률</figcaption></figure>
+<figure id="viewer-slide-33" class="viewer-slide" role="group" aria-label="33 / 39 · 슬라이드 33: 대안 비교" hidden><img src="./slides/slide-33.png" alt="슬라이드 33: 대안 비교" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>33 / 39</span> 대안 비교</figcaption></figure>
+<figure id="viewer-slide-34" class="viewer-slide" role="group" aria-label="34 / 39 · 슬라이드 34: 실패 사례 (1)" hidden><img src="./slides/slide-34.png" alt="슬라이드 34: 실패 사례 (1)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>34 / 39</span> 실패 사례 (1)</figcaption></figure>
+<figure id="viewer-slide-35" class="viewer-slide" role="group" aria-label="35 / 39 · 슬라이드 35: 실패 사례 (2)" hidden><img src="./slides/slide-35.png" alt="슬라이드 35: 실패 사례 (2)" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>35 / 39</span> 실패 사례 (2)</figcaption></figure>
+<figure id="viewer-slide-36" class="viewer-slide" role="group" aria-label="36 / 39 · 슬라이드 36: 원칙: 깊은 시스템 지식" hidden><img src="./slides/slide-36.png" alt="슬라이드 36: 원칙: 깊은 시스템 지식" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>36 / 39</span> 원칙: 깊은 시스템 지식</figcaption></figure>
+<figure id="viewer-slide-37" class="viewer-slide" role="group" aria-label="37 / 39 · 슬라이드 37: 원칙: 실험과 운영 성숙도" hidden><img src="./slides/slide-37.png" alt="슬라이드 37: 원칙: 실험과 운영 성숙도" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>37 / 39</span> 원칙: 실험과 운영 성숙도</figcaption></figure>
+<figure id="viewer-slide-38" class="viewer-slide" role="group" aria-label="38 / 39 · 슬라이드 38: 원칙: 규모와 자동화" hidden><img src="./slides/slide-38.png" alt="슬라이드 38: 원칙: 규모와 자동화" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>38 / 39</span> 원칙: 규모와 자동화</figcaption></figure>
+<figure id="viewer-slide-39" class="viewer-slide" role="group" aria-label="39 / 39 · 슬라이드 39: 마무리와 연락처" hidden><img src="./slides/slide-39.png" alt="슬라이드 39: 마무리와 연락처" width="1100" height="619" loading="lazy" decoding="async"><figcaption><span>39 / 39</span> 마무리와 연락처</figcaption></figure></div>
+<div class="slide-controls" hidden><button type="button" id="slide-prev" aria-label="이전 슬라이드" disabled>← 이전</button><span id="slide-position" class="slide-position" role="status" aria-live="polite" aria-atomic="true">1 / 39</span><button type="button" id="slide-next" aria-label="다음 슬라이드">다음 →</button></div>
+<div class="slide-thumbnails" role="group" aria-label="슬라이드 썸네일로 바로 이동" hidden><button type="button" class="slide-thumbnail" data-thumbnail="1" aria-controls="viewer-slide-1" aria-label="슬라이드 01: 표지로 이동" aria-current="true"><img src="./slides/slide-01.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>01</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="2" aria-controls="viewer-slide-2" aria-label="슬라이드 02: Commure 회사 소개와 미션로 이동" aria-current="false"><img src="./slides/slide-02.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>02</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="3" aria-controls="viewer-slide-3" aria-label="슬라이드 03: 목표와 인프라 규모 (1/4)로 이동" aria-current="false"><img src="./slides/slide-03.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>03</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="4" aria-controls="viewer-slide-4" aria-label="슬라이드 04: 목표와 인프라 규모 (2/4)로 이동" aria-current="false"><img src="./slides/slide-04.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>04</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="5" aria-controls="viewer-slide-5" aria-label="슬라이드 05: 목표와 인프라 규모 (3/4)로 이동" aria-current="false"><img src="./slides/slide-05.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>05</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="6" aria-controls="viewer-slide-6" aria-label="슬라이드 06: 목표와 인프라 규모 (4/4)로 이동" aria-current="false"><img src="./slides/slide-06.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>06</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="7" aria-controls="viewer-slide-7" aria-label="슬라이드 07: 왜 어려운가?로 이동" aria-current="false"><img src="./slides/slide-07.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>07</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="8" aria-controls="viewer-slide-8" aria-label="슬라이드 08: 스토리지 리소스와 스코프 (1/3)로 이동" aria-current="false"><img src="./slides/slide-08.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>08</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="9" aria-controls="viewer-slide-9" aria-label="슬라이드 09: 스토리지 리소스와 스코프 (2/3)로 이동" aria-current="false"><img src="./slides/slide-09.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>09</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="10" aria-controls="viewer-slide-10" aria-label="슬라이드 10: 스토리지 리소스와 스코프 (3/3)로 이동" aria-current="false"><img src="./slides/slide-10.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>10</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="11" aria-controls="viewer-slide-11" aria-label="슬라이드 11: 동적 볼륨 프로비저닝 (1/6)로 이동" aria-current="false"><img src="./slides/slide-11.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>11</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="12" aria-controls="viewer-slide-12" aria-label="슬라이드 12: 동적 볼륨 프로비저닝 (2/6)로 이동" aria-current="false"><img src="./slides/slide-12.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>12</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="13" aria-controls="viewer-slide-13" aria-label="슬라이드 13: 동적 볼륨 프로비저닝 (3/6)로 이동" aria-current="false"><img src="./slides/slide-13.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>13</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="14" aria-controls="viewer-slide-14" aria-label="슬라이드 14: 동적 볼륨 프로비저닝 (4/6)로 이동" aria-current="false"><img src="./slides/slide-14.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>14</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="15" aria-controls="viewer-slide-15" aria-label="슬라이드 15: 동적 볼륨 프로비저닝 (5/6)로 이동" aria-current="false"><img src="./slides/slide-15.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>15</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="16" aria-controls="viewer-slide-16" aria-label="슬라이드 16: 동적 볼륨 프로비저닝 (6/6)로 이동" aria-current="false"><img src="./slides/slide-16.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>16</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="17" aria-controls="viewer-slide-17" aria-label="슬라이드 17: Kubernetes 영속성 원칙로 이동" aria-current="false"><img src="./slides/slide-17.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>17</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="18" aria-controls="viewer-slide-18" aria-label="슬라이드 18: Kubernetes 내부 동작로 이동" aria-current="false"><img src="./slides/slide-18.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>18</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="19" aria-controls="viewer-slide-19" aria-label="슬라이드 19: StorageClass: legacy와 CSI YAML 비교로 이동" aria-current="false"><img src="./slides/slide-19.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>19</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="20" aria-controls="viewer-slide-20" aria-label="슬라이드 20: claimRef: 특정 PVC에 확정 바인딩로 이동" aria-current="false"><img src="./slides/slide-20.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>20</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="21" aria-controls="viewer-slide-21" aria-label="슬라이드 21: claimRef: 미래 PVC를 위한 예약로 이동" aria-current="false"><img src="./slides/slide-21.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>21</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="22" aria-controls="viewer-slide-22" aria-label="슬라이드 22: pvc-protection finalizer로 이동" aria-current="false"><img src="./slides/slide-22.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>22</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="23" aria-controls="viewer-slide-23" aria-label="슬라이드 23: 알고리즘 소개로 이동" aria-current="false"><img src="./slides/slide-23.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>23</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="24" aria-controls="viewer-slide-24" aria-label="슬라이드 24: 알고리즘 1~3단계 (1/3)로 이동" aria-current="false"><img src="./slides/slide-24.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>24</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="25" aria-controls="viewer-slide-25" aria-label="슬라이드 25: 알고리즘 1~3단계 (2/3)로 이동" aria-current="false"><img src="./slides/slide-25.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>25</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="26" aria-controls="viewer-slide-26" aria-label="슬라이드 26: 알고리즘 1~3단계 (3/3)로 이동" aria-current="false"><img src="./slides/slide-26.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>26</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="27" aria-controls="viewer-slide-27" aria-label="슬라이드 27로 이동: 재바인딩 흐름 그림 — 1단계만 표시: Pod–PVC–PV(in-tree)–Managed Disk 연결과 레거시 PV의 reclaim policy를 Retain으로 변경" aria-current="false"><img src="./slides/slide-27.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>27</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="28" aria-controls="viewer-slide-28" aria-label="슬라이드 28로 이동: 새 CSI honeypot PV의 YAML — claimRef에서 uid와 resourceVersion 생략" aria-current="false"><img src="./slides/slide-28.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>28</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="29" aria-controls="viewer-slide-29" aria-label="슬라이드 29로 이동: 재바인딩 흐름 그림 — 1~2단계 표시: Retain 설정과 원본 managed disk를 가리키는 honeypot CSI PV 생성" aria-current="false"><img src="./slides/slide-29.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>29</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="30" aria-controls="viewer-slide-30" aria-label="슬라이드 30로 이동: 재바인딩 트리거 명령 — kubectl delete pvc와 kubectl delete pod" aria-current="false"><img src="./slides/slide-30.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>30</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="31" aria-controls="viewer-slide-31" aria-label="슬라이드 31로 이동: 재바인딩의 4단계 핵심 그림 — 1~4단계 전체 표시: Retain 설정 → honeypot PV 생성 → 레거시 PVC와 Pod 삭제 → StatefulSet이 새 Pod와 PVC를 생성하고 PVC가 honeypot PV에 바인딩" aria-current="false"><img src="./slides/slide-31.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>31</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="32" aria-controls="viewer-slide-32" aria-label="슬라이드 32: 결과: 2개월과 S자 진행률로 이동" aria-current="false"><img src="./slides/slide-32.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>32</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="33" aria-controls="viewer-slide-33" aria-label="슬라이드 33: 대안 비교로 이동" aria-current="false"><img src="./slides/slide-33.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>33</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="34" aria-controls="viewer-slide-34" aria-label="슬라이드 34: 실패 사례 (1)로 이동" aria-current="false"><img src="./slides/slide-34.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>34</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="35" aria-controls="viewer-slide-35" aria-label="슬라이드 35: 실패 사례 (2)로 이동" aria-current="false"><img src="./slides/slide-35.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>35</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="36" aria-controls="viewer-slide-36" aria-label="슬라이드 36: 원칙: 깊은 시스템 지식로 이동" aria-current="false"><img src="./slides/slide-36.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>36</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="37" aria-controls="viewer-slide-37" aria-label="슬라이드 37: 원칙: 실험과 운영 성숙도로 이동" aria-current="false"><img src="./slides/slide-37.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>37</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="38" aria-controls="viewer-slide-38" aria-label="슬라이드 38: 원칙: 규모와 자동화로 이동" aria-current="false"><img src="./slides/slide-38.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>38</span></button>
+<button type="button" class="slide-thumbnail" data-thumbnail="39" aria-controls="viewer-slide-39" aria-label="슬라이드 39: 마무리와 연락처로 이동" aria-current="false"><img src="./slides/slide-39.png" alt="" width="1100" height="619" loading="lazy" decoding="async"><span>39</span></button></div>
+<p id="viewer-help" class="viewer-help">이전·다음 버튼이나 썸네일로 이동하세요. 뷰어에 초점을 둔 상태에서는 ← → 키로도 넘길 수 있습니다. 본문의 이미지를 누르면 이 뷰어에서 해당 슬라이드로 이동합니다.</p><noscript><p>자바스크립트가 꺼져 있어 첫 슬라이드만 표시됩니다. 나머지는 본문의 이미지로 볼 수 있습니다.</p></noscript></div><details class="gallery-details"><summary>발표 정보와 읽기 안내</summary><dl class="meta"><dt>발표자</dt><dd>Nibir Bora · Commure, Engineering Manager, Core Infrastructure<br>Maxim Nazarenko · Amazon, Senior Software Engineer</dd><dt>행사</dt><dd>KubeCon + CloudNativeCon + OpenInfra Summit + PyTorch Conference China 2026</dd><dt>일시</dt><dd>2026년 9월 9일 11:00 · 30분</dd><dt>장소</dt><dd>7F Pearl Hall</dd><dt>자료</dt><dd>발표 요약 기반 한국어 해설 · 원본 순서의 슬라이드 39장</dd></dl><div class="note"><p><strong>읽기의 출발점</strong><br>디스크는 데이터를 담는 실물이고, PV와 PVC는 Kubernetes가 디스크를 연결하기 위한 객체입니다. 이 사례는 객체를 교체하면서 디스크를 보존합니다. Pod 재시작에 따른 중단은 있으며, 서비스 전체의 무중단 여부는 워크로드 구성에 달려 있습니다.</p></div></details><details class="slide-map"><summary>슬라이드 39장 내용 대응표</summary><p><code>slides/slide-01.png</code> ~ <code>slides/slide-39.png</code> (총 39장, PDF 원본 순서 그대로 렌더링)</p><p>섹션별 대응:</p><div class="table-scroll" tabindex="0" role="region" aria-label="가로로 스크롤할 수 있는 표"><table>
+<thead>
+<tr>
+<th>슬라이드</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td>표지</td>
+</tr>
+<tr>
+<td>02</td>
+<td>Commure 회사 소개와 미션</td>
+</tr>
+<tr>
+<td>03-06</td>
+<td>목표와 인프라 규모 (점진적 빌드업)</td>
+</tr>
+<tr>
+<td>07</td>
+<td>&quot;What makes it hard?&quot; 전환 슬라이드</td>
+</tr>
+<tr>
+<td>08-10</td>
+<td>Kubernetes 스토리지 리소스 아이소메트릭 다이어그램 (PVC=네임스페이스 스코프, PV/StorageClass=클러스터 스코프)</td>
+</tr>
+<tr>
+<td>11-16</td>
+<td>동적 볼륨 프로비저닝 흐름</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Kubernetes 영속성 원칙 인용구</td>
+</tr>
+<tr>
+<td>18</td>
+<td>&quot;Kubernetes Under the Hood&quot; 전환 슬라이드</td>
+</tr>
+<tr>
+<td>19</td>
+<td>StorageClass는 수동적이다 (legacy vs new YAML 비교)</td>
+</tr>
+<tr>
+<td>20-21</td>
+<td>claimRef가 바인딩을 결정한다 (Firm binding vs PV available)</td>
+</tr>
+<tr>
+<td>22</td>
+<td>pvc-protection finalizer</td>
+</tr>
+<tr>
+<td>23</td>
+<td>&quot;Putting it Together - The Algorithm&quot; 전환 슬라이드</td>
+</tr>
+<tr>
+<td>24-26</td>
+<td>알고리즘 1~3단계</td>
+</tr>
+<tr>
+<td>27</td>
+<td>4단계 아이소메트릭 다이어그램 (핵심 그림)</td>
+</tr>
+<tr>
+<td>28-31</td>
+<td>알고리즘 4~5단계와 다이어그램 반복</td>
+</tr>
+<tr>
+<td>32</td>
+<td>결과: 2개월, S자 진행률 곡선</td>
+</tr>
+<tr>
+<td>33</td>
+<td>대안 비교표</td>
+</tr>
+<tr>
+<td>34-35</td>
+<td>실패 사례</td>
+</tr>
+<tr>
+<td>36-38</td>
+<td>원칙 3가지</td>
+</tr>
+<tr>
+<td>39</td>
+<td>마무리와 연락처</td>
+</tr>
+</tbody>
+</table></div></details></section><section id="background" aria-labelledby="heading-background"><div class="section-heading"><span class="eyebrow">01 / GUIDE</span><h2 id="heading-background">먼저 알아둘 배경 지식</h2></div><p>이 발표를 이해하려면 아래 개념이 필요하다. Kubernetes 스토리지를 처음 보는 사람 기준으로 정리한다.</p>
+<ul>
+<li><strong>Pod:</strong> 컨테이너가 실제로 실행되는 단위다. 언제든 죽고 다시 만들어질 수 있는 일회용 존재로 취급한다.</li>
+<li><strong>StatefulSet:</strong> 데이터베이스처럼 상태를 가진 앱을 굴리는 컨트롤러다. Pod마다 고정된 이름(예: <code>db-0</code>, <code>db-1</code>)과 전용 디스크를 붙여준다.</li>
+<li><strong>PersistentVolume (PV):</strong> 실제 디스크를 Kubernetes가 인식하는 객체로 표현한 것이다. 클러스터 전체에서 보이며, 어떤 드라이버로 어느 디스크를 쓰는지 적혀 있다.</li>
+<li><strong>PersistentVolumeClaim (PVC):</strong> &quot;이만한 디스크가 필요하다&quot;는 신청서다. 네임스페이스 안에 있으며, Pod는 PV를 직접 보지 않고 PVC를 통해 디스크를 쓴다.</li>
+<li><strong>StorageClass:</strong> 디스크를 어떤 방식으로 만들지 정한 템플릿이다. 어떤 드라이버(provisioner)를 쓸지, 디스크 등급은 무엇인지를 담는다.</li>
+<li><strong>바인딩(binding):</strong> PVC 한 장과 PV 한 개가 짝이 되는 것이다. 짝이 지어지면 그 PVC를 쓰는 Pod가 해당 디스크를 마운트한다.</li>
+<li><strong>in-tree 드라이버:</strong> 예전에는 클라우드별 스토리지 코드가 Kubernetes 본체 안에 들어 있었다. 이것이 in-tree다. 유지보수가 어려워 2020년에 폐기 예정으로 지정됐다.</li>
+<li><strong>CSI (Container Storage Interface):</strong> 스토리지 드라이버를 Kubernetes 본체 밖에서 별도로 개발·배포하는 표준 방식이다. in-tree의 대체재다.</li>
+<li><strong>reclaim policy:</strong> PVC가 사라졌을 때 PV와 실제 디스크를 어떻게 할지 정한다. <code>Delete</code>면 디스크까지 지우고, <code>Retain</code>이면 디스크를 남긴다.</li>
+<li><strong>finalizer:</strong> 객체를 지우려 할 때 &quot;아직 정리할 게 남았다&quot;며 삭제를 붙잡아 두는 표식이다. 조건이 해소돼야 실제로 지워진다.</li>
+<li><strong>immutable 필드:</strong> 한 번 만들면 수정할 수 없는 항목이다. StorageClass의 provisioner, PV의 볼륨 소스가 여기에 해당해서 이 마이그레이션이 어려워진다.</li>
+</ul>
+<h3>이 발표의 핵심 아이디어를 한 문장으로</h3>
+<p>디스크는 그대로 두고, 그 디스크를 가리키는 Kubernetes 객체만 in-tree용에서 CSI용으로 갈아끼운다. Pod 재시작 시간 외에는 중단이 없다.</p>
+<h3>왜 &quot;honeypot PV&quot;라고 부르는가</h3>
+<p>새로 만든 CSI PV는 아직 존재하지 않는 PVC의 이름과 네임스페이스만 적어둔다. 나중에 StatefulSet이 같은 이름의 PVC를 만들면, 그 PVC가 이 PV를 발견하고 스스로 달라붙는다. 미리 놓아둔 덫에 걸리는 모양이라 honeypot이라고 부른다.</p>
+<h3>먼저, 창고에 비유해 봅시다</h3>
+<p>실제 Azure 디스크는 <strong>물건이 들어 있는 창고</strong>, PV는 창고의 주소와 출입 방식을 적은 <strong>시설 등록증</strong>, PVC는 사용자가 낸 <strong>창고 사용 신청서</strong>입니다. Pod는 그 창고를 쓰는 작업자이고, StatefulSet은 같은 이름의 작업자와 신청서가 다시 준비되도록 관리하는 담당자입니다. StorageClass는 새 창고를 마련할 때 쓰는 주문 양식입니다.</p>
+<p><strong>네임스페이스(namespace)</strong>는 한 클러스터 안에서 자원을 구분하는 작업 구역입니다. <strong>클러스터(cluster)</strong>는 Kubernetes가 함께 관리하는 서버 묶음이고, <strong>노드(node)</strong>는 그 안의 개별 서버입니다. PVC는 구역별 신청서이고, PV와 StorageClass는 클러스터 전체의 시설 목록과 주문 양식에 해당합니다. <strong>컨트롤러(controller)</strong>는 실제 상태를 관찰하고 원하는 상태에 맞도록 객체를 생성·정리하는 자동 관리자입니다.</p>
+<p><strong>마운트(mount)</strong>는 디스크의 파일 시스템을 컨테이너가 파일 경로로 사용하도록 연결하는 일입니다. <strong>attach</strong>는 디스크를 노드에 연결하는 단계입니다. 둘은 연결 과정의 서로 다른 단계입니다.</p>
+<h3>이름이 같아도 같은 객체는 아닙니다</h3>
+<p><code>metadata.name</code>은 사람이 읽는 이름이고, <strong>UID</strong>는 객체가 생성될 때 부여되는 고유 식별자입니다. 같은 이름으로 PVC를 다시 만들어도 UID는 바뀝니다. <code>resourceVersion</code>은 객체 변경 버전을 나타내는 값입니다. 이 차이가 뒤에서 설명할 재바인딩의 핵심입니다.</p>
+</section><section id="context" aria-labelledby="heading-context"><div class="section-heading"><span class="eyebrow">02 / GUIDE</span><h2 id="heading-context">배경과 목표</h2></div><p>Commure는 헬스케어 RCM/앰비언트 플랫폼이다. 연 250억 달러 이상이 시스템을 통과하고, 연 1억 건 이상의 환자 상호작용을 처리하며, 50만 명 이상의 임상의가 사용한다.</p>
+<p>인프라 규모:</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="가로로 스크롤할 수 있는 표"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>규모</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>클러스터</td>
+<td>100+</td>
+</tr>
+<tr>
+<td>노드</td>
+<td>5,000+</td>
+</tr>
+<tr>
+<td>Pod</td>
+<td>35,000+</td>
+</tr>
+<tr>
+<td>일일 스케줄링</td>
+<td>200,000+</td>
+</tr>
+<tr>
+<td>마이크로서비스</td>
+<td>1,200</td>
+</tr>
+<tr>
+<td>리전</td>
+<td>3 리전 멀티리전 액티브</td>
+</tr>
+<tr>
+<td>CPU 코어</td>
+<td>약 100,000</td>
+</tr>
+<tr>
+<td>메모리</td>
+<td>350TiB+</td>
+</tr>
+</tbody>
+</table></div>
+<p>목표:</p>
+<ul>
+<li>Kubernetes가 2020년에 in-tree 스토리지 플러그인을 deprecate 했다.</li>
+<li>Azure managed disk 약 500개를 in-tree 드라이버에서 CSI 드라이버로 이관해야 한다.</li>
+<li>글로벌 비즈니스라 24/7 무중단이 요구된다.</li>
+<li>대상 워크로드는 ClickHouse, CockroachDB, ElasticSearch, Kafka, Prometheus 등 상태 저장 시스템이다.</li>
+</ul>
+<h3>왜 이 규모에서 어려울까요?</h3>
+<p>RCM은 진료비 청구·수납 등 수익 주기를 관리하는 업무이고, 앰비언트 플랫폼은 진료 현장의 상호작용을 지원하는 플랫폼을 뜻합니다. 표의 수치는 발표가 소개한 Commure의 운영 규모입니다. 멀티리전 액티브는 여러 지역에서 서비스를 동시에 운영한다는 뜻이며, TiB는 메모리·저장 용량 단위입니다.</p>
+<p>여기서 <strong>상태 저장 시스템</strong>은 Pod가 바뀌어도 데이터가 남아 있어야 하는 서비스입니다. ClickHouse와 CockroachDB 같은 데이터베이스, ElasticSearch 검색 시스템, Kafka 메시지 시스템, Prometheus 모니터링 시스템이 대상입니다. 목표는 약 500개 디스크의 데이터를 복사하는 대신, 기존 디스크를 사용하는 드라이버와 Kubernetes의 연결 정보를 전환하는 것입니다.</p>
+<div class="slide-grid"><figure><button class="slide-button" type="button" data-slide="2" aria-label="슬라이드 02 뷰어로 이동: Commure 회사 소개와 미션"><img src="./slides/slide-02.png" alt="슬라이드 02: Commure 회사 소개와 미션" loading="lazy" decoding="async"></button><figcaption><span>02 / 39</span> Commure 회사 소개와 미션</figcaption></figure><figure><button class="slide-button" type="button" data-slide="3" aria-label="슬라이드 03 뷰어로 이동: 목표와 인프라 규모 (1/4)"><img src="./slides/slide-03.png" alt="슬라이드 03: 목표와 인프라 규모 (1/4)" loading="lazy" decoding="async"></button><figcaption><span>03 / 39</span> 목표와 인프라 규모 (1/4)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="4" aria-label="슬라이드 04 뷰어로 이동: 목표와 인프라 규모 (2/4)"><img src="./slides/slide-04.png" alt="슬라이드 04: 목표와 인프라 규모 (2/4)" loading="lazy" decoding="async"></button><figcaption><span>04 / 39</span> 목표와 인프라 규모 (2/4)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="5" aria-label="슬라이드 05 뷰어로 이동: 목표와 인프라 규모 (3/4)"><img src="./slides/slide-05.png" alt="슬라이드 05: 목표와 인프라 규모 (3/4)" loading="lazy" decoding="async"></button><figcaption><span>05 / 39</span> 목표와 인프라 규모 (3/4)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="6" aria-label="슬라이드 06 뷰어로 이동: 목표와 인프라 규모 (4/4)"><img src="./slides/slide-06.png" alt="슬라이드 06: 목표와 인프라 규모 (4/4)" loading="lazy" decoding="async"></button><figcaption><span>06 / 39</span> 목표와 인프라 규모 (4/4)</figcaption></figure></div></section><section id="hard" aria-labelledby="heading-hard"><div class="section-heading"><span class="eyebrow">03 / GUIDE</span><h2 id="heading-hard">왜 직접 바꿀 수 없을까?</h2></div><h3>바꾸고 싶은 것은 주소가 아니라 연결 방식입니다</h3>
+<p><strong>프로비저닝(provisioning)</strong>은 요청에 맞는 디스크와 PV를 준비하는 과정이고, <strong>provisioner</strong>는 그 일을 담당하는 드라이버입니다. StatefulSet의 <code>volumeClaimTemplates</code>는 Pod별 PVC를 만들기 위한 신청서 원본입니다. <code>storageClassName</code>은 사용할 주문 양식의 이름입니다.</p>
+<p>PV의 <strong>claimRef</strong>는 “이 창고는 어느 신청서에 배정되었는가”를 적은 예약표입니다. 이름과 네임스페이스뿐 아니라 UID까지 기록하면, 같은 이름의 신청서를 다시 내더라도 이전 신청서와 구별합니다. 원문의 <code>spec.persistentVolumeSource.azureDisk.diskURI</code>는 볼륨 소스 구조를 설명한 표현이며, 실제 PV YAML에서는 <code>spec.azureDisk.diskURI</code>처럼 적습니다.</p>
+<p><strong>immutable(불변)</strong>은 생성 후 해당 항목을 수정할 수 없다는 뜻입니다. 발급된 등록증에서 시설 종류를 덧칠해 바꿀 수 없는 것과 비슷합니다. StorageClass의 provisioner나 PV의 볼륨 소스를 직접 고치지 못하므로, 새 객체를 준비해 연결을 넘겨야 합니다.
+Kubernetes 스토리지 리소스는 스코프가 나뉜다. PVC는 네임스페이스 스코프, PV와 StorageClass는 클러스터 스코프다.</p>
+<p>동적 볼륨 프로비저닝의 흐름:</p>
+<ol>
+<li>StatefulSet의 <code>volumeClaimTemplates</code>가 <code>storageClassName: legacy-storage-class</code>를 참조한다.</li>
+<li>해당 StorageClass의 <code>provisioner</code>가 <code>kubernetes.io/azure-disk</code>(in-tree)다.</li>
+<li>프로비저닝된 PV는 <code>spec.persistentVolumeSource.azureDisk.diskURI</code>로 실제 Azure 디스크를 가리킨다.</li>
+<li>PV의 <code>claimRef</code>가 PVC의 name, namespace, <strong>uid</strong>까지 포함해 강하게 바인딩된다.</li>
+</ol>
+<p>핵심 제약은 대부분의 필드가 immutable이라는 점이다. StorageClass의 provisioner를 바꿀 수 없고, 기존 PV의 볼륨 소스를 in-tree에서 CSI로 바꿀 수도 없다.</p>
+<blockquote>
+<p><strong>Kubernetes의 영속성 원칙:</strong> 스토리지는 durable하고 안정적인 리소스이며, Pod는 일시적이고 교체 가능한 존재다.</p>
+</blockquote>
+<div class="slide-grid"><figure><button class="slide-button" type="button" data-slide="7" aria-label="슬라이드 07 뷰어로 이동: 왜 어려운가?"><img src="./slides/slide-07.png" alt="슬라이드 07: 왜 어려운가?" loading="lazy" decoding="async"></button><figcaption><span>07 / 39</span> 왜 어려운가?</figcaption></figure><figure><button class="slide-button" type="button" data-slide="8" aria-label="슬라이드 08 뷰어로 이동: 스토리지 리소스와 스코프 (1/3)"><img src="./slides/slide-08.png" alt="슬라이드 08: 스토리지 리소스와 스코프 (1/3)" loading="lazy" decoding="async"></button><figcaption><span>08 / 39</span> 스토리지 리소스와 스코프 (1/3)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="9" aria-label="슬라이드 09 뷰어로 이동: 스토리지 리소스와 스코프 (2/3)"><img src="./slides/slide-09.png" alt="슬라이드 09: 스토리지 리소스와 스코프 (2/3)" loading="lazy" decoding="async"></button><figcaption><span>09 / 39</span> 스토리지 리소스와 스코프 (2/3)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="10" aria-label="슬라이드 10 뷰어로 이동: 스토리지 리소스와 스코프 (3/3)"><img src="./slides/slide-10.png" alt="슬라이드 10: 스토리지 리소스와 스코프 (3/3)" loading="lazy" decoding="async"></button><figcaption><span>10 / 39</span> 스토리지 리소스와 스코프 (3/3)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="11" aria-label="슬라이드 11 뷰어로 이동: 동적 볼륨 프로비저닝 (1/6)"><img src="./slides/slide-11.png" alt="슬라이드 11: 동적 볼륨 프로비저닝 (1/6)" loading="lazy" decoding="async"></button><figcaption><span>11 / 39</span> 동적 볼륨 프로비저닝 (1/6)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="12" aria-label="슬라이드 12 뷰어로 이동: 동적 볼륨 프로비저닝 (2/6)"><img src="./slides/slide-12.png" alt="슬라이드 12: 동적 볼륨 프로비저닝 (2/6)" loading="lazy" decoding="async"></button><figcaption><span>12 / 39</span> 동적 볼륨 프로비저닝 (2/6)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="13" aria-label="슬라이드 13 뷰어로 이동: 동적 볼륨 프로비저닝 (3/6)"><img src="./slides/slide-13.png" alt="슬라이드 13: 동적 볼륨 프로비저닝 (3/6)" loading="lazy" decoding="async"></button><figcaption><span>13 / 39</span> 동적 볼륨 프로비저닝 (3/6)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="14" aria-label="슬라이드 14 뷰어로 이동: 동적 볼륨 프로비저닝 (4/6)"><img src="./slides/slide-14.png" alt="슬라이드 14: 동적 볼륨 프로비저닝 (4/6)" loading="lazy" decoding="async"></button><figcaption><span>14 / 39</span> 동적 볼륨 프로비저닝 (4/6)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="15" aria-label="슬라이드 15 뷰어로 이동: 동적 볼륨 프로비저닝 (5/6)"><img src="./slides/slide-15.png" alt="슬라이드 15: 동적 볼륨 프로비저닝 (5/6)" loading="lazy" decoding="async"></button><figcaption><span>15 / 39</span> 동적 볼륨 프로비저닝 (5/6)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="16" aria-label="슬라이드 16 뷰어로 이동: 동적 볼륨 프로비저닝 (6/6)"><img src="./slides/slide-16.png" alt="슬라이드 16: 동적 볼륨 프로비저닝 (6/6)" loading="lazy" decoding="async"></button><figcaption><span>16 / 39</span> 동적 볼륨 프로비저닝 (6/6)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="17" aria-label="슬라이드 17 뷰어로 이동: Kubernetes 영속성 원칙"><img src="./slides/slide-17.png" alt="슬라이드 17: Kubernetes 영속성 원칙" loading="lazy" decoding="async"></button><figcaption><span>17 / 39</span> Kubernetes 영속성 원칙</figcaption></figure></div></section><section id="internals" aria-labelledby="heading-internals"><div class="section-heading"><span class="eyebrow">04 / GUIDE</span><h2 id="heading-internals">재바인딩을 가능하게 하는 내부 동작</h2></div><h3>3.1 StorageClass 객체는 수동적(passive)이다</h3>
+<p>StorageClass는 프로비저닝 시점에만 참조된다. 이미 바인딩된 PV/PVC는 StorageClass를 다시 읽지 않는다. 따라서 <strong>같은 이름으로 지우고 다시 만들 수 있다.</strong></p>
+<div class="codebox"><div class="code-label">yaml</div><pre><code><span class="tok-comment"># Legacy</span>
+<span class="tok-key">kind</span>: StorageClass
+<span class="tok-key">metadata</span>:
+  <span class="tok-key">name</span>: legacy-storage-class
+<span class="tok-key">provisioner</span>: kubernetes.io/azure-disk
+<span class="tok-key">parameters</span>:
+  <span class="tok-key">storageaccounttype</span>: Premium_LRS
+  <span class="tok-key">kind</span>: <span class="tok-value">Managed</span>
+<span class="tok-key">reclaimPolicy</span>: <span class="tok-value">Delete</span>
+<span class="tok-key">volumeBindingMode</span>: <span class="tok-value">WaitForFirstConsumer</span>
+</code></pre></div>
+<div class="codebox"><div class="code-label">yaml</div><pre><code><span class="tok-comment"># New</span>
+<span class="tok-key">kind</span>: StorageClass
+<span class="tok-key">metadata</span>:
+  <span class="tok-key">name</span>: legacy-storage-class
+<span class="tok-key">provisioner</span>: disk.csi.azure.com
+<span class="tok-key">parameters</span>:
+  <span class="tok-key">skuName</span>: Premium_LRS
+<span class="tok-key">reclaimPolicy</span>: <span class="tok-value">Delete</span>
+<span class="tok-key">volumeBindingMode</span>: <span class="tok-value">WaitForFirstConsumer</span>
+</code></pre></div>
+<h3>3.2 PV의 claimRef가 바인딩 동작을 결정한다</h3>
+<p><code>claimRef</code>에 <code>uid</code>와 <code>resourceVersion</code>이 있으면 특정 PVC 인스턴스에 확정 바인딩된다(Firm binding). 반대로 name과 namespace만 남기고 <code>uid</code>와 <code>resourceVersion</code>을 <strong>생략하면</strong> 그 PV는 &quot;해당 이름의 PVC가 나타나면 바인딩되겠다&quot;는 예약 상태(PV available)가 된다.</p>
+<div class="codebox"><div class="code-label">yaml</div><pre><code><span class="tok-comment"># Firm binding</span>
+<span class="tok-key">kind</span>: PersistentVolume
+<span class="tok-key">spec</span>:
+  <span class="tok-key">claimRef</span>:
+    <span class="tok-key">kind</span>: PersistentVolumeClaim
+    <span class="tok-key">name</span>: data-pvc
+    <span class="tok-key">namespace</span>: production
+    <span class="tok-key">uid</span>: 8cbb0f8e...
+    <span class="tok-key">resourceVersion</span>: <span class="tok-string">&quot;123456&quot;</span>
+  <span class="tok-key">azureDisk</span>:
+    <span class="tok-key">diskURI</span>: /subscriptions/.../disks/data-disk
+</code></pre></div>
+<div class="codebox"><div class="code-label">yaml</div><pre><code><span class="tok-comment"># PV available (예약된 상태)</span>
+<span class="tok-key">kind</span>: PersistentVolume
+<span class="tok-key">spec</span>:
+  <span class="tok-key">claimRef</span>:
+    <span class="tok-key">kind</span>: PersistentVolumeClaim
+    <span class="tok-key">name</span>: data-pvc
+    <span class="tok-key">namespace</span>: production
+    <span class="tok-comment"># uid: OMITTED</span>
+    <span class="tok-comment"># resourceVersion: OMITTED</span>
+  <span class="tok-key">csi</span>:
+    <span class="tok-key">driver</span>: disk.csi.azure.com
+    <span class="tok-key">volumeHandle</span>: /subscriptions/.../disks/data-disk
+</code></pre></div>
+<p>이것이 이 발표가 말하는 &quot;honeypot PV&quot;다. 같은 물리 디스크를 CSI 드라이버로 가리키면서, 미래에 생성될 동일 이름의 PVC를 기다린다.</p>
+<h3>3.3 pvc-protection finalizer</h3>
+<p>PVC를 삭제해도 이를 사용하는 Pod가 살아 있으면 <code>kubernetes.io/pvc-protection</code> finalizer 때문에 <code>deletionTimestamp</code>만 찍히고 <code>status.phase: Bound</code> 상태로 남는다. 즉 <strong>PVC 삭제와 Pod 삭제가 함께 일어나야</strong> 실제로 정리된다.</p>
+<div class="codebox"><div class="code-label">yaml</div><pre><code><span class="tok-key">kind</span>: PersistentVolumeClaim
+<span class="tok-key">metadata</span>:
+  <span class="tok-key">name</span>: data-db-0
+  <span class="tok-key">namespace</span>: production
+  <span class="tok-key">deletionTimestamp</span>: <span class="tok-string">&quot;2026-09-05T18:42:00Z&quot;</span>
+  <span class="tok-key">finalizers</span>:
+    - kubernetes.io/pvc-protection
+<span class="tok-key">status</span>:
+  <span class="tok-key">phase</span>: <span class="tok-value">Bound</span>
+</code></pre></div>
+<h3>세 동작을 비유로 연결하기</h3>
+<p>StorageClass는 <strong>최초 주문 때 읽는 양식</strong>입니다. 양식을 같은 이름의 새 버전으로 교체해도 이미 연결된 디스크가 자동으로 새 디스크로 바뀌지는 않습니다. 다만 교체 이후 새로 프로비저닝하는 요청은 새 설정을 사용합니다. <code>WaitForFirstConsumer</code>는 디스크를 사용할 Pod의 배치 조건을 고려할 때까지 바인딩·프로비저닝을 기다리는 방식입니다.</p>
+<p>claimRef에서 UID를 빼는 것은 <strong>특정 신청서 번호 대신 이름과 구역만 적은 예약석</strong>을 마련하는 것과 같습니다. 이때 <code>resourceVersion</code>도 생략합니다. UID가 특정 PVC 인스턴스를 구별하는 핵심이며, 이름만 맞으면 모든 조건을 무시하고 연결된다는 뜻은 아닙니다. 용량·접근 모드·StorageClass 등도 맞아야 합니다.</p>
+<p><strong>honeypot PV</strong>는 발표에서 붙인 별칭입니다. 보안용 유인 서버가 아니라, 앞으로 다시 생성될 PVC를 기다리는 CSI PV입니다. 같은 창고에 대해 새 출입 방식으로 등록증을 준비해 두는 셈입니다. <code>volumeHandle</code>에는 새 디스크 주소가 아니라 <strong>원본 Azure managed disk의 식별자</strong>가 들어갑니다.</p>
+<p><strong>finalizer</strong>는 퇴실 전에 반납을 확인하는 체크표와 같습니다. <code>kubernetes.io/pvc-protection</code>은 사용 중인 PVC가 즉시 사라지지 않도록 붙잡습니다. <code>deletionTimestamp</code>는 삭제 요청 시각이지 삭제 완료 시각이 아닙니다. 삭제를 요청한 PVC가 아직 <code>Bound</code>로 표시될 수 있으며, 이 절차에서는 해당 PVC를 쓰는 Pod도 종료되어야 정리가 진행됩니다. finalizer를 강제로 지우는 방식으로 설명한 절차가 아닙니다.</p>
+<div class="slide-grid"><figure><button class="slide-button" type="button" data-slide="18" aria-label="슬라이드 18 뷰어로 이동: Kubernetes 내부 동작"><img src="./slides/slide-18.png" alt="슬라이드 18: Kubernetes 내부 동작" loading="lazy" decoding="async"></button><figcaption><span>18 / 39</span> Kubernetes 내부 동작</figcaption></figure><figure><button class="slide-button" type="button" data-slide="19" aria-label="슬라이드 19 뷰어로 이동: StorageClass: legacy와 CSI YAML 비교"><img src="./slides/slide-19.png" alt="슬라이드 19: StorageClass: legacy와 CSI YAML 비교" loading="lazy" decoding="async"></button><figcaption><span>19 / 39</span> StorageClass: legacy와 CSI YAML 비교</figcaption></figure><figure><button class="slide-button" type="button" data-slide="20" aria-label="슬라이드 20 뷰어로 이동: claimRef: 특정 PVC에 확정 바인딩"><img src="./slides/slide-20.png" alt="슬라이드 20: claimRef: 특정 PVC에 확정 바인딩" loading="lazy" decoding="async"></button><figcaption><span>20 / 39</span> claimRef: 특정 PVC에 확정 바인딩</figcaption></figure><figure><button class="slide-button" type="button" data-slide="21" aria-label="슬라이드 21 뷰어로 이동: claimRef: 미래 PVC를 위한 예약"><img src="./slides/slide-21.png" alt="슬라이드 21: claimRef: 미래 PVC를 위한 예약" loading="lazy" decoding="async"></button><figcaption><span>21 / 39</span> claimRef: 미래 PVC를 위한 예약</figcaption></figure><figure><button class="slide-button" type="button" data-slide="22" aria-label="슬라이드 22 뷰어로 이동: pvc-protection finalizer"><img src="./slides/slide-22.png" alt="슬라이드 22: pvc-protection finalizer" loading="lazy" decoding="async"></button><figcaption><span>22 / 39</span> pvc-protection finalizer</figcaption></figure></div></section><section id="algorithm" aria-labelledby="heading-algorithm"><div class="section-heading"><span class="eyebrow">05 / GUIDE</span><h2 id="heading-algorithm">알고리즘: 다섯 단계로 연결 바꾸기</h2></div><h3>실행 예제를 읽기 전에</h3>
+<p>아래 절차는 발표의 동작 원리를 풀어 쓴 것입니다. YAML은 핵심 필드 중심의 발췌입니다. 실제 적용할 StorageClass에는 <code>apiVersion: storage.k8s.io/v1</code>이 필요하고, PV에는 <code>apiVersion: v1</code>, 고유한 <code>metadata.name</code>, 용량·접근 모드·StorageClass와 디스크 속성 등 환경에 맞는 완전한 명세가 필요합니다. <code>/subscriptions/...</code>는 실제 Azure 디스크 식별자로 바꿔야 합니다.</p>
+<p><strong>reclaim policy(회수 정책)</strong>는 신청서가 없어졌을 때 창고를 어떻게 처리할지 정하는 규칙입니다. <code>Delete</code>는 창고와 내용까지 철거하는 쪽이고, <code>Retain</code>은 사용 관계가 끝나도 창고를 남기는 쪽입니다. 따라서 이전 PV를 <code>Retain</code>으로 바꾸는 것은 데이터를 지키는 핵심 단계입니다. StorageClass의 <code>reclaimPolicy</code>를 바꾸는 것과 이미 존재하는 PV의 정책을 바꾸는 것은 별개입니다.</p>
+<p><code>PV_NAME</code>, <code>PVC_NAME</code>, <code>POD_NAME</code>은 전환 대상의 이름을 담는 셸 변수입니다. PVC와 Pod 명령은 대상 네임스페이스에서 실행해야 합니다. 다음 예제는 본문의 예시와 같이 <code>production</code>을 사용합니다.</p>
+<h3>Step 1. 레거시 StorageClass 삭제</h3>
+<div class="codebox"><div class="code-label">bash</div><pre><code><span class="tok-command">kubectl</span> <span class="tok-command">delete</span> sc legacy-storage-class
+</code></pre></div>
+<h3>Step 2. 같은 이름으로 CSI StorageClass 생성</h3>
+<div class="codebox"><div class="code-label">bash</div><pre><code><span class="tok-command">kubectl</span> <span class="tok-command">apply</span> -f - &lt;&lt;<span class="tok-string">&#x27;EOF&#x27;</span>
+<span class="tok-key">apiVersion</span>: storage.k8s.io/v1
+<span class="tok-key">kind</span>: StorageClass
+<span class="tok-key">metadata</span>:
+  <span class="tok-key">name</span>: legacy-storage-class
+<span class="tok-key">provisioner</span>: disk.csi.azure.com
+<span class="tok-key">parameters</span>:
+  <span class="tok-key">skuName</span>: Premium_LRS
+<span class="tok-key">reclaimPolicy</span>: <span class="tok-value">Delete</span>
+<span class="tok-key">volumeBindingMode</span>: <span class="tok-value">WaitForFirstConsumer</span>
+EOF
+</code></pre></div>
+<h3>Step 3. 레거시 PV의 reclaim policy를 Retain으로 변경</h3>
+<p>PVC를 지웠을 때 실제 Azure 디스크가 삭제되지 않도록 보호한다. 이 단계를 빠뜨리면 데이터가 사라진다.</p>
+<div class="codebox"><div class="code-label">bash</div><pre><code><span class="tok-command">kubectl</span> <span class="tok-command">patch</span> pv <span class="tok-variable">$PV_NAME</span> -p <span class="tok-string">&#x27;{&quot;spec&quot;:{&quot;persistentVolumeReclaimPolicy&quot;:&quot;Retain&quot;}}&#x27;</span>
+</code></pre></div>
+<h3>Step 4. 새 CSI PV(&quot;honeypot&quot;) 생성</h3>
+<p>원본 managed disk를 그대로 가리키고, <code>claimRef</code>에서 <code>uid</code>와 <code>resourceVersion</code>을 생략한다.</p>
+<div class="codebox"><div class="code-label">yaml</div><pre><code><span class="tok-key">kind</span>: PersistentVolume
+<span class="tok-key">spec</span>:
+  <span class="tok-key">claimRef</span>:
+    <span class="tok-key">kind</span>: PersistentVolumeClaim
+    <span class="tok-key">name</span>: data-app-0
+    <span class="tok-key">namespace</span>: production
+    <span class="tok-comment"># uid: OMITTED</span>
+    <span class="tok-comment"># resourceVersion: OMITTED</span>
+  <span class="tok-key">csi</span>:
+    <span class="tok-key">driver</span>: disk.csi.azure.com
+    <span class="tok-key">volumeHandle</span>: /subscriptions/.../disks/data-disk
+</code></pre></div>
+<h3>Step 5. 재바인딩 트리거</h3>
+<p>레거시 PVC와 StatefulSet Pod를 함께 삭제한다. pvc-protection finalizer 때문에 둘 다 지워야 진행된다.</p>
+<div class="codebox"><div class="code-label">bash</div><pre><code><span class="tok-command">kubectl</span> <span class="tok-command">delete</span> pvc <span class="tok-string">&quot;$PVC_NAME&quot;</span> -n production --wait=false
+<span class="tok-command">kubectl</span> <span class="tok-command">delete</span> pod <span class="tok-string">&quot;$POD_NAME&quot;</span> -n production
+</code></pre></div>
+<p><strong>명령 보완:</strong> 원문은 <code>kubectl delete pvc $PVC_NAME</code> 다음에 Pod 삭제를 제시합니다. 기본 삭제 명령은 삭제 완료를 기다릴 수 있으므로, 첫 명령에 <code>--wait=false</code>를 넣어 다음 Pod 삭제 명령으로 진행하게 했습니다. 이는 finalizer를 없애는 옵션이 아니라 클라이언트가 기다리지 않게 하는 옵션입니다.</p>
+<p>이후 StatefulSet 컨트롤러가 새 Pod와 새 PVC를 만들고, 새 PVC는 대기 중이던 honeypot PV를 찾아 바인딩된다. 디스크는 그대로이므로 데이터가 보존되고, 중단은 Pod 재시작 시간뿐이다.</p>
+<h3>그림으로 본 흐름</h3>
+<ol>
+<li>레거시 PV의 reclaim policy를 retain으로 설정한다.</li>
+<li>원본 managed disk를 가리키는 CSI honeypot PV를 만든다. claimRef의 uid와 resourceVersion은 생략한다.</li>
+<li>레거시 PVC와 StatefulSet Pod를 삭제해 재바인딩을 트리거한다.</li>
+<li>StatefulSet 컨트롤러가 새 Pod와 PVC를 만들고, PVC가 honeypot PV를 찾아 바인딩된다.</li>
+</ol>
+<div class="slide-grid"><figure><button class="slide-button" type="button" data-slide="23" aria-label="슬라이드 23 뷰어로 이동: 알고리즘 소개"><img src="./slides/slide-23.png" alt="슬라이드 23: 알고리즘 소개" loading="lazy" decoding="async"></button><figcaption><span>23 / 39</span> 알고리즘 소개</figcaption></figure><figure><button class="slide-button" type="button" data-slide="24" aria-label="슬라이드 24 뷰어로 이동: 알고리즘 1~3단계 (1/3)"><img src="./slides/slide-24.png" alt="슬라이드 24: 알고리즘 1~3단계 (1/3)" loading="lazy" decoding="async"></button><figcaption><span>24 / 39</span> 알고리즘 1~3단계 (1/3)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="25" aria-label="슬라이드 25 뷰어로 이동: 알고리즘 1~3단계 (2/3)"><img src="./slides/slide-25.png" alt="슬라이드 25: 알고리즘 1~3단계 (2/3)" loading="lazy" decoding="async"></button><figcaption><span>25 / 39</span> 알고리즘 1~3단계 (2/3)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="26" aria-label="슬라이드 26 뷰어로 이동: 알고리즘 1~3단계 (3/3)"><img src="./slides/slide-26.png" alt="슬라이드 26: 알고리즘 1~3단계 (3/3)" loading="lazy" decoding="async"></button><figcaption><span>26 / 39</span> 알고리즘 1~3단계 (3/3)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="27" aria-label="슬라이드 27 뷰어로 이동: 재바인딩 흐름 그림 — 1단계만 표시: Pod–PVC–PV(in-tree)–Managed Disk 연결과 레거시 PV의 reclaim policy를 Retain으로 변경"><img src="./slides/slide-27.png" alt="슬라이드 27: 재바인딩 흐름 그림 — 1단계만 표시: Pod–PVC–PV(in-tree)–Managed Disk 연결과 레거시 PV의 reclaim policy를 Retain으로 변경" loading="lazy" decoding="async"></button><figcaption><span>27 / 39</span> 재바인딩 흐름 그림 — 1단계만 표시: Pod–PVC–PV(in-tree)–Managed Disk 연결과 레거시 PV의 reclaim policy를 Retain으로 변경</figcaption></figure><figure><button class="slide-button" type="button" data-slide="28" aria-label="슬라이드 28 뷰어로 이동: 새 CSI honeypot PV의 YAML — claimRef에서 uid와 resourceVersion 생략"><img src="./slides/slide-28.png" alt="슬라이드 28: 새 CSI honeypot PV의 YAML — claimRef에서 uid와 resourceVersion 생략" loading="lazy" decoding="async"></button><figcaption><span>28 / 39</span> 새 CSI honeypot PV의 YAML — claimRef에서 uid와 resourceVersion 생략</figcaption></figure><figure><button class="slide-button" type="button" data-slide="29" aria-label="슬라이드 29 뷰어로 이동: 재바인딩 흐름 그림 — 1~2단계 표시: Retain 설정과 원본 managed disk를 가리키는 honeypot CSI PV 생성"><img src="./slides/slide-29.png" alt="슬라이드 29: 재바인딩 흐름 그림 — 1~2단계 표시: Retain 설정과 원본 managed disk를 가리키는 honeypot CSI PV 생성" loading="lazy" decoding="async"></button><figcaption><span>29 / 39</span> 재바인딩 흐름 그림 — 1~2단계 표시: Retain 설정과 원본 managed disk를 가리키는 honeypot CSI PV 생성</figcaption></figure><figure><button class="slide-button" type="button" data-slide="30" aria-label="슬라이드 30 뷰어로 이동: 재바인딩 트리거 명령 — kubectl delete pvc와 kubectl delete pod"><img src="./slides/slide-30.png" alt="슬라이드 30: 재바인딩 트리거 명령 — kubectl delete pvc와 kubectl delete pod" loading="lazy" decoding="async"></button><figcaption><span>30 / 39</span> 재바인딩 트리거 명령 — kubectl delete pvc와 kubectl delete pod</figcaption></figure><figure><button class="slide-button" type="button" data-slide="31" aria-label="슬라이드 31 뷰어로 이동: 재바인딩의 4단계 핵심 그림 — 1~4단계 전체 표시: Retain 설정 → honeypot PV 생성 → 레거시 PVC와 Pod 삭제 → StatefulSet이 새 Pod와 PVC를 생성하고 PVC가 honeypot PV에 바인딩"><img src="./slides/slide-31.png" alt="슬라이드 31: 재바인딩의 4단계 핵심 그림 — 1~4단계 전체 표시: Retain 설정 → honeypot PV 생성 → 레거시 PVC와 Pod 삭제 → StatefulSet이 새 Pod와 PVC를 생성하고 PVC가 honeypot PV에 바인딩" loading="lazy" decoding="async"></button><figcaption><span>31 / 39</span> 재바인딩의 4단계 핵심 그림 — 1~4단계 전체 표시: Retain 설정 → honeypot PV 생성 → 레거시 PVC와 Pod 삭제 → StatefulSet이 새 Pod와 PVC를 생성하고 PVC가 honeypot PV에 바인딩</figcaption></figure></div></section><section id="results" aria-labelledby="heading-results"><div class="section-heading"><span class="eyebrow">06 / GUIDE</span><h2 id="heading-results">결과와 중단 범위</h2></div><p>전체 마이그레이션에 <strong>2개월</strong>이 걸렸다. 진행률 곡선은 S자 형태였다. 초기 4~5주는 0%에 머물며 검증과 자동화 준비에 쓰였고, 이후 급격히 상승해 약 38%에 도달했다. 중반에는 40%대에서 완만하게 진행되다가, 마지막 구간에서 다시 가파르게 올라 100%를 달성했다.</p>
+<h3>진행률을 어떻게 읽어야 할까요?</h3>
+<p>2개월은 전체 디스크를 순차적으로 전환한 프로젝트 기간입니다. 개별 서비스가 2개월 동안 멈췄다는 뜻이 아닙니다. 초기 4~5주의 준비, 약 38%까지의 상승, 40%대의 완만한 구간, 마지막 100% 달성은 발표의 진행률 설명을 그대로 따른 것입니다.</p>
+<p>발표 제목은 “Zero-Downtime”이지만 절차에는 Pod 재시작이 포함됩니다. <strong>개별 Pod에는 재시작·재연결에 따른 중단이 있습니다.</strong> 서비스 전체의 무중단 여부는 복제본, 장애 대응, 트래픽 처리 방식에 달려 있습니다. 이 방법의 직접적인 이점은 디스크 데이터를 복사하지 않고 보존하며 연결 객체를 교체한다는 점입니다.</p>
+<div class="slide-grid"><figure><button class="slide-button" type="button" data-slide="32" aria-label="슬라이드 32 뷰어로 이동: 결과: 2개월과 S자 진행률"><img src="./slides/slide-32.png" alt="슬라이드 32: 결과: 2개월과 S자 진행률" loading="lazy" decoding="async"></button><figcaption><span>32 / 39</span> 결과: 2개월과 S자 진행률</figcaption></figure></div></section><section id="alternatives" aria-labelledby="heading-alternatives"><div class="section-heading"><span class="eyebrow">07 / GUIDE</span><h2 id="heading-alternatives">다른 전략과 비교</h2></div><p>표는 <strong>이번 발표의 운영 조건에 따른 평가</strong>입니다. High는 높음, Low는 낮음, Medium은 중간, Minimal은 최소 수준, Extreme은 극도로 높음이라는 뜻입니다. 보편적인 보장이나 모든 환경의 우열로 읽기보다는 핵심 서비스에 적용할 때의 비교로 보세요.</p>
+<p>Microsoft Static Volume은 정적으로 볼륨을 준비하는 접근, Orphan and Adopt는 기존 자원의 관리 관계를 끊고 다시 인계하는 접근, Backup and Restore는 데이터를 백업한 뒤 복원하는 접근입니다. Forking the Control Plane은 Kubernetes의 핵심 제어 소프트웨어를 직접 수정해 운영하는 방식입니다. In-Place PVC Re-Binding은 디스크를 유지한 채 PVC와 PV의 연결을 다시 만드는 방식입니다.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="가로로 스크롤할 수 있는 표"><table>
+<thead>
+<tr>
+<th>전략</th>
+<th>다운타임 영향</th>
+<th>데이터 리스크</th>
+<th>운영 복잡도</th>
+<th>핵심 서비스 적합성</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Microsoft Static Volume</td>
+<td>High (전체 재배포)</td>
+<td>Low</td>
+<td>Medium</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Orphan and Adopt</td>
+<td>High (장기 중단 위험)</td>
+<td>Low</td>
+<td>High</td>
+<td>Very Low</td>
+</tr>
+<tr>
+<td>Backup and Restore</td>
+<td>High (백업+복원 시간)</td>
+<td>Medium (일관성 문제)</td>
+<td>Medium</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Forking the Control Plane</td>
+<td>Low (완벽할 경우)</td>
+<td>Very High (코어 K8s 수정)</td>
+<td>Extreme (K8s 포크 필요)</td>
+<td>Very Low</td>
+</tr>
+<tr>
+<td><strong>In-Place PVC Re-Binding</strong></td>
+<td><strong>Minimal (Pod 재시작)</strong></td>
+<td><strong>Low (디스크에 데이터 보존)</strong></td>
+<td><strong>High (깊은 전문성 필요)</strong></td>
+<td><strong>High</strong></td>
+</tr>
+</tbody>
+</table></div>
+<div class="slide-grid"><figure><button class="slide-button" type="button" data-slide="33" aria-label="슬라이드 33 뷰어로 이동: 대안 비교"><img src="./slides/slide-33.png" alt="슬라이드 33: 대안 비교" loading="lazy" decoding="async"></button><figcaption><span>33 / 39</span> 대안 비교</figcaption></figure></div></section><section id="failures" aria-labelledby="heading-failures"><div class="section-heading"><span class="eyebrow">08 / GUIDE</span><h2 id="heading-failures">실패 사례와 타이밍</h2></div><ul>
+<li><strong>PV Multi-Attach 실패:</strong> 이전 attach가 정리되기 전에 새 Pod가 볼륨을 붙이려 할 때 발생한다.</li>
+<li><strong>Pod 재생성과 PVC 사이의 레이스 컨디션:</strong> StatefulSet 컨트롤러가 PVC보다 먼저 또는 늦게 움직이면서 생기는 타이밍 문제다.</li>
+</ul>
+<h3>두 실패는 모두 “언제 완료됐는가”의 문제입니다</h3>
+<p><strong>Multi-Attach</strong>는 디스크가 이전 노드에 연결된 상태에서 새 노드에도 연결하려고 할 때 나타날 수 있습니다. 삭제 명령이 접수됐다고 이전 연결의 해제가 끝난 것은 아닙니다. Pod 종료와 볼륨 연결 해제 상태를 구분해서 관찰해야 합니다.</p>
+<p><strong>레이스 컨디션(race condition)</strong>은 여러 자동 처리 과정의 실행 순서에 따라 결과가 달라지는 현상입니다. 접수 창구가 이전 신청서를 정리하는 동안 담당자가 새 신청서를 만들려는 상황과 비슷합니다. StatefulSet의 Pod/PVC 재생성과 기존 PVC 삭제 완료 시점이 맞지 않으면 전환이 지연되거나 예상과 다른 흐름이 생길 수 있습니다. 자동화는 명령을 연달아 보내는 것뿐 아니라 각 단계의 실제 완료 상태를 확인해야 합니다.</p>
+<div class="slide-grid"><figure><button class="slide-button" type="button" data-slide="34" aria-label="슬라이드 34 뷰어로 이동: 실패 사례 (1)"><img src="./slides/slide-34.png" alt="슬라이드 34: 실패 사례 (1)" loading="lazy" decoding="async"></button><figcaption><span>34 / 39</span> 실패 사례 (1)</figcaption></figure><figure><button class="slide-button" type="button" data-slide="35" aria-label="슬라이드 35 뷰어로 이동: 실패 사례 (2)"><img src="./slides/slide-35.png" alt="슬라이드 35: 실패 사례 (2)" loading="lazy" decoding="async"></button><figcaption><span>35 / 39</span> 실패 사례 (2)</figcaption></figure></div></section><section id="principles" aria-labelledby="heading-principles"><div class="section-heading"><span class="eyebrow">09 / GUIDE</span><h2 id="heading-principles">운영에서 얻은 세 가지 원칙</h2></div><ul>
+<li>깊은 시스템 지식이 무식한 힘보다 낫다 (Deep systems knowledge trumps brute force).</li>
+<li>실험이 운영 성숙도를 만든다 (Experimentation builds operational excellence).</li>
+<li>규모에서의 신뢰성은 자동화가 핵심이다 (Automation is the key to reliability at scale).
+세 원칙은 하나의 운영 방식으로 이어집니다. 먼저 컨트롤러와 바인딩 규칙을 이해하고, 작은 범위에서 실패와 재시도를 실험한 다음, 확인된 절차를 자동화해 큰 규모로 넓힙니다. 디스크를 그대로 둔다고 운영이 단순해지는 것은 아닙니다. 데이터 보존 정책과 객체 수명, 비동기 컨트롤러의 타이밍을 함께 다루는 것이 이 사례의 핵심입니다.</li>
+</ul>
+<div class="slide-grid"><figure><button class="slide-button" type="button" data-slide="36" aria-label="슬라이드 36 뷰어로 이동: 원칙: 깊은 시스템 지식"><img src="./slides/slide-36.png" alt="슬라이드 36: 원칙: 깊은 시스템 지식" loading="lazy" decoding="async"></button><figcaption><span>36 / 39</span> 원칙: 깊은 시스템 지식</figcaption></figure><figure><button class="slide-button" type="button" data-slide="37" aria-label="슬라이드 37 뷰어로 이동: 원칙: 실험과 운영 성숙도"><img src="./slides/slide-37.png" alt="슬라이드 37: 원칙: 실험과 운영 성숙도" loading="lazy" decoding="async"></button><figcaption><span>37 / 39</span> 원칙: 실험과 운영 성숙도</figcaption></figure><figure><button class="slide-button" type="button" data-slide="38" aria-label="슬라이드 38 뷰어로 이동: 원칙: 규모와 자동화"><img src="./slides/slide-38.png" alt="슬라이드 38: 원칙: 규모와 자동화" loading="lazy" decoding="async"></button><figcaption><span>38 / 39</span> 원칙: 규모와 자동화</figcaption></figure><figure><button class="slide-button" type="button" data-slide="39" aria-label="슬라이드 39 뷰어로 이동: 마무리와 연락처"><img src="./slides/slide-39.png" alt="슬라이드 39: 마무리와 연락처" loading="lazy" decoding="async"></button><figcaption><span>39 / 39</span> 마무리와 연락처</figcaption></figure></div></section><footer>출처: 같은 폴더의 <a href="./summary.md">summary.md</a>와 발표 슬라이드 39장. 발표 내용을 바탕으로 초보자용 설명을 덧붙였으며, 실행 예제의 보완 사항은 본문에 표시했습니다. 이미지·스타일·스크립트는 외부 네트워크 리소스를 사용하지 않습니다.</footer></main></div><script>
+const viewer=document.getElementById('slide-viewer');
+const viewerSlides=[...viewer.querySelectorAll('.viewer-slide')];
+const thumbnails=[...viewer.querySelectorAll('[data-thumbnail]')];
+const strip=viewer.querySelector('.slide-thumbnails');
+const previous=document.getElementById('slide-prev');
+const next=document.getElementById('slide-next');
+const position=document.getElementById('slide-position');
+let current=0;
+function showSlide(index, revealThumbnail=true){
+  current=Math.max(0,Math.min(index,viewerSlides.length-1));
+  viewerSlides.forEach((slide,i)=>{
+    const image=slide.querySelector('img');
+    // Eager loading also fetches adjacent images while their figures are hidden.
+    image.loading=Math.abs(i-current)<=1?'eager':'lazy';
+    slide.hidden=i!==current;
+  });
+  thumbnails.forEach((thumbnail,i)=>thumbnail.setAttribute('aria-current',String(i===current)));
+  position.textContent=`${current+1} / ${viewerSlides.length}`;
+  if((current===0&&document.activeElement===previous)||(current===viewerSlides.length-1&&document.activeElement===next))viewer.focus({preventScroll:true});
+  previous.disabled=current===0;
+  next.disabled=current===viewerSlides.length-1;
+  if(revealThumbnail){
+    const selected=thumbnails[current].getBoundingClientRect();
+    const bounds=strip.getBoundingClientRect();
+    // Scroll only the thumbnail strip, preserving the document's reading position.
+    if(selected.left<bounds.left)strip.scrollLeft-=bounds.left-selected.left+5;
+    else if(selected.right>bounds.right)strip.scrollLeft+=selected.right-bounds.right+5;
+  }
+}
+previous.addEventListener('click',()=>showSlide(current-1));
+next.addEventListener('click',()=>showSlide(current+1));
+thumbnails.forEach((thumbnail,i)=>thumbnail.addEventListener('click',()=>showSlide(i)));
+viewer.addEventListener('keydown',event=>{
+  if(event.altKey||event.ctrlKey||event.metaKey||event.shiftKey)return;
+  if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
+    event.preventDefault();
+    showSlide(current+(event.key==='ArrowRight'?1:-1));
+    if(event.target.closest('.slide-thumbnail'))thumbnails[current].focus({preventScroll:true});
+  }
+});
+document.querySelectorAll('.slide-button[data-slide]').forEach(button=>button.addEventListener('click',()=>{
+  showSlide(Number(button.dataset.slide)-1);
+  viewer.focus({preventScroll:true});
+  viewer.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
+}));
+viewer.querySelector('.slide-controls').hidden=false;
+strip.hidden=false;
+showSlide(0,false);
+const sections=[...document.querySelectorAll('main section')];
+const links=[...document.querySelectorAll('nav a')];
+let scheduled=false;
+function updateNav(){let active=sections[0];for(const section of sections){if(section.getBoundingClientRect().top<=window.innerHeight*.3)active=section;}for(const link of links){if(link.hash===`#${active.id}`)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');}scheduled=false;}
+addEventListener('scroll',()=>{if(!scheduled){scheduled=true;requestAnimationFrame(updateNav);}},{passive:true});addEventListener('resize',updateNav);updateNav();
+</script></body></html>
