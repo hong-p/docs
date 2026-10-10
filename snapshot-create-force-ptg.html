@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PTG speaking draft on whether Manila should honor or remove the snapshot create force parameter.">
+  <link rel="icon" href="./_static/favicon.ico">
+  <title>Snapshot create force · PTG Speaking Draft</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c2730; background: #f3f6f8; }
+    body { margin: 0; }
+    main { max-width: 760px; margin: 0 auto; padding: 48px 24px 72px; }
+    nav { display: flex; flex-wrap: wrap; gap: 12px 24px; font-size: .95rem; }
+    a { color: #176896; text-underline-offset: 3px; }
+    .eyebrow { color: #2a7ab0; font-size: .8rem; font-weight: 700; letter-spacing: .12em; margin: 36px 0 12px; }
+    h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 12px; }
+    .subtitle, footer { color: #52626d; line-height: 1.6; }
+    article { background: #fff; border: 1px solid #dbe4e9; border-radius: 12px; margin-top: 28px; padding: 24px 32px; font-size: 1.15rem; line-height: 1.85; }
+    article p { margin: 0 0 1.3em; }
+    article p:last-child { margin-bottom: 0; }
+    footer { margin-top: 24px; font-size: .85rem; }
+    @media (max-width: 560px) { main { padding: 28px 16px 48px; } article { padding: 22px; } }
+    @media print { :root { background: white; } main { max-width: none; padding: 0; } nav { display: none; } .eyebrow { margin-top: 0; } article { border: 0; padding: 0; font-size: 12pt; line-height: 1.6; } article p { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Document links">
+      <a href="./index.html">All documents</a>
+      <a href="./specs/2027.1/share-delete-cascade.html">Share cascade deletion spec</a>
+    </nav>
+    <p class="eyebrow">MANILA / PTG</p>
+    <h1>Snapshot create force</h1>
+    <p class="subtitle">PTG speaking draft · hong-p · Time slot: 14:30–14:55</p>
+    <article aria-label="Speaking draft">
+      <p>Hi everyone. While working on the share cascade deletion spec, I found an issue with the force parameter in the snapshot create API.</p>
+
+      <p>The API reference documents this parameter, but the controller ignores it. So if the source share is in the error state, for example, setting force=true still returns HTTP 400, saying that the share must be available. I reported this as bug 2169703.</p>
+
+      <p>There is also an older report, bug 1811336. In May 2019, Tom Barron commented that this had been discussed at the PTG and suggested removing the option because no clear use case had been identified. That bug expired, but the parameter is still documented today.</p>
+
+      <p>I’d like to discuss whether we should support this option or deprecate and remove it.</p>
+
+      <p>Does anyone have a real use case for creating a snapshot from a share that is not available? For example, would this help with recovery if the share is in an error state in Manila but is still usable on the backend?</p>
+
+      <p>If we keep it, we need to define which share states should allow forced snapshot creation. This also affects the cascade deletion spec: even with force=true, snapshot creation should be blocked while the source share is being deleted.</p>
+
+      <p>If there is no clear use case, we could follow the earlier recommendation and remove the option through the appropriate deprecation process.</p>
+
+      <p>What do people think? Should we fix the API to honor force=true, with clear state restrictions, or move toward removing it?</p>
+    </article>
+    <footer>
+      References:
+      <a href="https://bugs.launchpad.net/manila/+bug/2169703">Bug 2169703</a> ·
+      <a href="https://bugs.launchpad.net/manila/+bug/1811336/comments/3">Tom Barron’s May 2, 2019 comment on bug 1811336</a> ·
+      <a href="https://docs.openstack.org/api-ref/shared-file-system/#create-share-snapshot">Snapshot create API reference</a>.
+      Draft prepared on October 10, 2026.
+    </footer>
+  </main>
+</body>
+</html>
