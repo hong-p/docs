@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Per-volume QoS at create time and online update &#8212; Cinder Specs 0.0.1.dev686 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=29da98fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bilingual.css?v=09332d3e" />
+    <script src="../../_static/documentation_options.js?v=988e2de3"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="No specs have yet been approved." href="remove-me.html" />
+    <link rel="prev" title="Block Storage Service Specifications (cinder)" href="../../index.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DD299CMF7V">
+</script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
+gtag('config', 'G-DD299CMF7V');
+</script>
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/cinder-specs/src/doc/source/specs/2027.1/per-volume-qos.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Global Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="https://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="https://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="https://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Per-volume QoS at create time and online update</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="../../index.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Block Storage Service Specifications (cinder)"></i></a>
+    
+    
+    <a href="remove-me.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: No specs have yet been approved."></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="per-volume-qos-at-create-time-and-online-update">
+<h1>Per-volume QoS at create time and online update<a class="headerlink" href="#per-volume-qos-at-create-time-and-online-update" title="Link to this heading">¶</a></h1>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 생성 시점과 온라인 변경을 지원하는 볼륨별 QoS</span></p>
+</div>
+<div class="bilingual-glossary docutils container">
+<p class="bilingual-glossary-title"><strong>어려운 용어·숙어</strong></p>
+<ul class="simple">
+<li><p>QoS spec: QoS 사양 - 볼륨 타입에 연결해 IOPS·대역폭 상한 같은 성능 제한을 정의하는 key/value 묶음</p></li>
+<li><p>consumer (back-end / front-end): 적용 주체 - QoS를 스토리지가 적용하는지(back-end), 하이퍼바이저가 적용하는지(front-end)</p></li>
+<li><p>retype: 타입 변경 - 볼륨의 볼륨 타입을 바꾸는 작업으로, 백엔드에 따라 마이그레이션이 동반될 수 있음</p></li>
+<li><p>first-class attribute: 정식 속성 - 메타데이터가 아니라 볼륨 모델에 직접 정의된 필드</p></li>
+<li><p>sustained upper limit / burst limit: 지속 상한 / 버스트 허용치 - 계속 유지되는 최대치와, 짧은 순간 초과를 허용하는 최대치</p></li>
+<li><p>microversion: 마이크로버전 - 하위 호환성을 유지하며 REST API 변경을 단계적으로 도입하는 OpenStack 버전 체계</p></li>
+<li><p>capability: 백엔드 기능 정보 - 드라이버가 volume stats로 보고하고 스케줄러가 백엔드 선택에 사용하는 값</p></li>
+<li><p>NoValidBackend: 적합한 백엔드 없음 - 스케줄러가 요청 조건을 만족하는 백엔드를 찾지 못했을 때의 오류</p></li>
+<li><p>user message: 사용자 메시지 - 비동기 작업 실패를 사용자에게 알리기 위해 Cinder가 남기는 메시지</p></li>
+<li><p>RPC cast: 비동기 RPC 호출 - 응답을 기다리지 않고 보내는 RPC 호출</p></li>
+<li><p>rolling upgrade: 롤링 업그레이드 - 서비스를 멈추지 않고 노드를 차례로 업그레이드하는 방식</p></li>
+<li><p>obj_make_compatible: 객체 하위 호환 변환 - 이전 버전 서비스에 보낼 때 새 필드를 제거하는 versioned object 메서드</p></li>
+<li><p>third-party CI: 서드파티 CI - 벤더가 자기 스토리지 하드웨어로 운영하는 외부 테스트 시스템</p></li>
+</ul>
+</div>
+<p>The URL of launchpad blueprint:</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">런치패드 블루프린트 URL:</span></p>
+</div>
+<p><a class="reference external" href="https://blueprints.launchpad.net/cinder/+spec/per-volume-qos">https://blueprints.launchpad.net/cinder/+spec/per-volume-qos</a></p>
+<p>Allow an administrator to set maximum IOPS and throughput limits on an
+individual volume, at creation and later on an existing volume, without a
+dedicated volume type.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">관리자가 전용 볼륨 타입 없이 개별 볼륨에 최대 IOPS와 처리량 상한을 설정할 수 있게 합니다. 볼륨 생성 시점은 물론 이미 있는 볼륨에도 나중에 설정할 수 있습니다.</span></p>
+</div>
+<section id="problem-description">
+<h2>Problem description<a class="headerlink" href="#problem-description" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">문제 설명</span></p>
+</div>
+<p>QoS is bound to a volume type through a QoS spec. Giving volumes different
+limits requires one volume type per combination, which leads to many nearly
+identical types. Changing the limits of an existing volume requires a retype,
+which is heavy and may trigger a migration on some backends. Some deployments
+work around this with QoS values in volume metadata, but metadata is editable
+by the volume owner, so a tenant can raise its own limit.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">QoS는 QoS spec을 통해 볼륨 타입에 묶여 있습니다. 볼륨마다 다른 상한을 주려면 조합마다 볼륨 타입이 하나씩 필요해, 거의 같은 타입이 많이 생깁니다. 기존 볼륨의 상한을 바꾸려면 retype이 필요한데, retype은 무거운 작업이고 일부 백엔드에서는 마이그레이션을 일으킬 수 있습니다. 일부 배포 환경은 볼륨 메타데이터에 QoS 값을 넣는 방식으로 우회하지만, 메타데이터는 볼륨 소유자가 수정할 수 있어 테넌트가 자기 상한을 직접 올릴 수 있습니다.</span></p>
+</div>
+</section>
+<section id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">사용 사례</span></p>
+</div>
+<ul class="simple">
+<li><p>An operator creates a volume with <code class="docutils literal notranslate"><span class="pre">max_iops=3000</span></code> and
+<code class="docutils literal notranslate"><span class="pre">max_bps=125000000</span></code> without a type for those exact values.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">운영자가 정확히 그 값에 맞는 타입 없이 max_iops=3000, max_bps=125000000으로 볼륨을 생성합니다.</span></p>
+</div>
+</li>
+<li><p>An operator changes the limits of an in-use volume without detaching or
+retyping it, or removes the override to return to the type default.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">운영자가 사용 중(in-use)인 볼륨을 분리(detach)하거나 retype하지 않고 상한을 변경하거나, 볼륨별 설정을 제거해 타입 기본값으로 되돌립니다.</span></p>
+</div>
+</li>
+<li><p>An end user can see the limits of a volume but cannot change them.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">최종 사용자는 볼륨의 상한을 볼 수 있지만 변경할 수는 없습니다.</span></p>
+</div>
+</li>
+</ul>
+</section>
+<section id="proposed-change">
+<h2>Proposed change<a class="headerlink" href="#proposed-change" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">제안하는 변경</span></p>
+</div>
+<p>Add two optional per-volume limits, <code class="docutils literal notranslate"><span class="pre">max_iops</span></code> and <code class="docutils literal notranslate"><span class="pre">max_bps</span></code> (bytes per
+second), stored as first-class volume attributes (not metadata). Both are
+sustained upper limits for read and write combined, not burst limits.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">선택 항목인 볼륨별 상한 두 개, max_iops와 max_bps(초당 바이트)를 추가하고, 메타데이터가 아닌 정식 볼륨 속성으로 저장합니다. 둘 다 read와 write를 합친 지속 상한이며, burst 허용치가 아닙니다.</span></p>
+</div>
+<p>This spec covers back-end QoS only (<code class="docutils literal notranslate"><span class="pre">consumer=back-end</span></code>): the limits are
+applied by the volume driver on the storage system. Front-end (hypervisor)
+QoS is out of scope.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">이 스펙은 back-end QoS(consumer=back-end)만 다룹니다. 즉 상한은 볼륨 드라이버가 스토리지 시스템에 적용합니다. front-end(하이퍼바이저) QoS는 범위 밖입니다.</span></p>
+</div>
+<ul class="simple">
+<li><p>A new microversion adds an optional <code class="docutils literal notranslate"><span class="pre">qos</span></code> object to volume create and a
+volume action <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code> for <code class="docutils literal notranslate"><span class="pre">available</span></code> or <code class="docutils literal notranslate"><span class="pre">in-use</span></code> volumes.
+Both are admin-only by default policy.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 microversion이 볼륨 생성 요청에 선택 항목인 qos 객체를 추가하고, available 또는 in-use 상태 볼륨에 쓰는 볼륨 action os-set_qos를 추가합니다. 둘 다 기본 정책상 관리자 전용입니다.</span></p>
+</div>
+</li>
+<li><p>New optional driver method <code class="docutils literal notranslate"><span class="pre">update_volume_qos(context,</span> <span class="pre">volume,</span> <span class="pre">qos)</span></code>. The
+base driver raises <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code>, so a driver without support
+fails the request explicitly instead of silently ignoring the limits.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">선택 구현 드라이버 메서드 update_volume_qos(context, volume, qos)를 새로 추가합니다. base 드라이버는 NotImplementedError를 발생시키므로, 지원하지 않는 드라이버는 상한을 조용히 무시하지 않고 요청을 명시적으로 실패시킵니다.</span></p>
+</div>
+</li>
+<li><p>New backend capability <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code> (boolean, default
+<code class="docutils literal notranslate"><span class="pre">False</span></code>) reported in the volume stats. A driver that implements
+<code class="docutils literal notranslate"><span class="pre">update_volume_qos</span></code> reports <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 백엔드 capability per_volume_qos_support(불리언, 기본값 False)를 볼륨 통계(volume stats)로 보고합니다. update_volume_qos를 구현한 드라이버는 True로 보고합니다.</span></p>
+</div>
+</li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">qos</span></code> is given on create, the scheduler only considers backends
+reporting <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support=True</span></code>. If none match, the request fails
+with <code class="docutils literal notranslate"><span class="pre">NoValidBackend</span></code> before any volume is created on a backend.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">생성 요청에 qos가 있으면 스케줄러는 per_volume_qos_support=True를 보고하는 백엔드만 고려합니다. 맞는 백엔드가 없으면 백엔드에 볼륨이 생성되기 전에 NoValidBackend로 요청이 실패합니다.</span></p>
+</div>
+</li>
+<li><p>On create with <code class="docutils literal notranslate"><span class="pre">qos</span></code> the volume manager calls <code class="docutils literal notranslate"><span class="pre">update_volume_qos</span></code> after
+the driver created the volume, so drivers do not need to change
+<code class="docutils literal notranslate"><span class="pre">create_volume</span></code> and its variants.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">qos가 포함된 생성 요청에서는 드라이버가 볼륨을 만든 뒤 볼륨 매니저가 update_volume_qos를 호출합니다. 따라서 드라이버는 create_volume과 그 변형 메서드들을 고칠 필요가 없습니다.</span></p>
+</div>
+</li>
+<li><p>For <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code> the driver is called first and the database is updated
+only on success. On failure a user message is created and the stored
+values stay unchanged.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">os-set_qos에서는 드라이버를 먼저 호출하고, 성공했을 때만 데이터베이스를 갱신합니다. 실패하면 사용자 메시지(user message)가 생성되고 저장된 값은 바뀌지 않습니다.</span></p>
+</div>
+</li>
+<li><p>A per-volume limit takes precedence over the equivalent limit in the
+volume type QoS spec. The driver maps <code class="docutils literal notranslate"><span class="pre">max_iops</span></code> and <code class="docutils literal notranslate"><span class="pre">max_bps</span></code> to its
+own QoS spec keys (for example <code class="docutils literal notranslate"><span class="pre">maxIOPS</span></code> or <code class="docutils literal notranslate"><span class="pre">total_iops_sec</span></code>). Limits
+not set per volume keep coming from the QoS spec.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨별 상한은 볼륨 타입 QoS spec의 같은 의미의 상한보다 우선합니다. 드라이버가 max_iops와 max_bps를 자신의 QoS spec 키(예: maxIOPS 또는 total_iops_sec)에 대응시킵니다. 볼륨별로 설정하지 않은 상한은 계속 QoS spec에서 가져옵니다.</span></p>
+</div>
+</li>
+<li><p>Volumes created from a snapshot, volume or backup do not inherit the limits.
+Migration keeps them. Retype does not touch them.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">스냅샷, 볼륨, 백업에서 생성한 볼륨은 상한을 물려받지 않습니다. 마이그레이션은 상한을 유지하고, retype은 상한을 건드리지 않습니다.</span></p>
+</div>
+</li>
+</ul>
+<p>NetApp ONTAP and Dell PowerFlex are proposed as the first implementations.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">첫 구현으로 NetApp ONTAP과 Dell PowerFlex를 제안합니다.</span></p>
+</div>
+<section id="alternatives">
+<h3>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">대안</span></p>
+</div>
+<ul class="simple">
+<li><p>Volume types and QoS specs: does not scale per volume, retype only.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 타입과 QoS spec: 볼륨 단위로 확장되지 않고, 변경은 retype으로만 가능합니다.</span></p>
+</div>
+</li>
+<li><p>Volume metadata keys: owner-editable, hidden API/driver contract.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 메타데이터 키: 소유자가 수정할 수 있고, API와 드라이버 사이의 계약이 드러나지 않습니다.</span></p>
+</div>
+</li>
+<li><p>Per-GB values in type extra specs: only the capacity-proportional case.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">타입 extra spec의 GB당 값: 용량 비례 상한만 표현할 수 있습니다.</span></p>
+</div>
+</li>
+<li><p>Driver rejection only, without a scheduler capability: the request would
+fail only after the volume was created on an unsupported backend.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">스케줄러 capability 없이 드라이버 거부에만 의존: 지원하지 않는 백엔드에 볼륨이 생성된 뒤에야 요청이 실패합니다.</span></p>
+</div>
+</li>
+</ul>
+</section>
+<section id="data-model-impact">
+<h3>Data model impact<a class="headerlink" href="#data-model-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">데이터 모델 영향</span></p>
+</div>
+<p>Two nullable integer columns on <code class="docutils literal notranslate"><span class="pre">volumes</span></code>: <code class="docutils literal notranslate"><span class="pre">qos_max_iops</span></code> and
+<code class="docutils literal notranslate"><span class="pre">qos_max_bps</span></code>. <code class="docutils literal notranslate"><span class="pre">NULL</span></code> means use the volume type QoS spec, so existing rows
+need no data migration. The <code class="docutils literal notranslate"><span class="pre">Volume</span></code> object gets a new version, and
+<code class="docutils literal notranslate"><span class="pre">obj_make_compatible</span></code> drops the fields for older targets.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">volumes 테이블에 nullable 정수 컬럼 두 개, qos_max_iops와 qos_max_bps를 추가합니다. NULL은 볼륨 타입 QoS spec을 따른다는 뜻이므로 기존 행에 데이터 마이그레이션이 필요 없습니다. Volume 객체는 새 버전이 되고, obj_make_compatible이 이전 버전 대상에 대해서는 이 필드들을 제거합니다.</span></p>
+</div>
+</section>
+<section id="rest-api-impact">
+<h3>REST API impact<a class="headerlink" href="#rest-api-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">REST API 영향</span></p>
+</div>
+<p>Both changes are introduced in one new microversion.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">두 변경 모두 하나의 새 microversion으로 도입합니다.</span></p>
+</div>
+<p>Create a volume with limits:</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">상한을 지정해 볼륨 생성:</span></p>
+</div>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/v3/{project_id}/volumes</span></code>, response 202, errors 400 and 403.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">POST /v3/{project_id}/volumes, 응답 202, 오류 400과 403.</span></p>
+</div>
+</li>
+<li><p>New optional attribute (integers &gt;= 1, <code class="docutils literal notranslate"><span class="pre">qos</span></code> must not be empty):</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 선택 속성(1 이상의 정수, qos는 비어 있으면 안 됨):</span></p>
+</div>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">"volume"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="nt">"qos"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"max_iops"</span><span class="p">:</span><span class="w"> </span><span class="mi">3000</span><span class="p">,</span><span class="w"> </span><span class="nt">"max_bps"</span><span class="p">:</span><span class="w"> </span><span class="mi">125000000</span><span class="p">}}}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Set or clear limits on an existing volume:</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">기존 볼륨의 상한 설정 또는 해제:</span></p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/v3/{project_id}/volumes/{volume_id}/action</span></code></p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">POST /v3/{project_id}/volumes/{volume_id}/action</span></p>
+</div>
+</li>
+<li><p>Body: <code class="docutils literal notranslate"><span class="pre">{&quot;os-set_qos&quot;:</span> <span class="pre">{&quot;max_iops&quot;:</span> <span class="pre">5000,</span> <span class="pre">&quot;max_bps&quot;:</span> <span class="pre">null}}</span></code>. <code class="docutils literal notranslate"><span class="pre">null</span></code>
+clears that limit (back to the type default). At least one key is required
+and <code class="docutils literal notranslate"><span class="pre">additionalProperties</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">본문: {"os-set_qos": {"max_iops": 5000, "max_bps": null}}. null은 해당 상한을 해제합니다(타입 기본값으로 복귀). 키는 최소 하나 필요하며 additionalProperties는 False입니다.</span></p>
+</div>
+</li>
+<li><p>Response 202. Errors: 400 (invalid values or volume not <code class="docutils literal notranslate"><span class="pre">available</span></code> or
+<code class="docutils literal notranslate"><span class="pre">in-use</span></code>), 403 (policy), 404 (volume not found).</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">응답 202. 오류: 400(잘못된 값, 또는 볼륨이 available이나 in-use 상태가 아님), 403(정책), 404(볼륨 없음).</span></p>
+</div>
+</li>
+<li><p>Asynchronous (RPC cast). The new values show in the volume detail after the
+backend accepted them. A backend failure is reported via user messages.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">비동기 방식(RPC cast)입니다. 새 값은 백엔드가 받아들인 뒤에 볼륨 상세 정보에 나타납니다. 백엔드 실패는 사용자 메시지로 보고됩니다.</span></p>
+</div>
+</li>
+</ul>
+<p>Volume detail returns <code class="docutils literal notranslate"><span class="pre">qos</span></code> with <code class="docutils literal notranslate"><span class="pre">max_iops</span></code> and <code class="docutils literal notranslate"><span class="pre">max_bps</span></code> (<code class="docutils literal notranslate"><span class="pre">null</span></code> when
+not set) from the new microversion.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 microversion부터 볼륨 상세 정보는 max_iops와 max_bps를 담은 qos를 반환합니다(설정되지 않았으면 null).</span></p>
+</div>
+<p>Policy: new rule <code class="docutils literal notranslate"><span class="pre">volume:set_qos</span></code>, default <code class="docutils literal notranslate"><span class="pre">rule:admin_api</span></code>, also checked
+when <code class="docutils literal notranslate"><span class="pre">qos</span></code> is present on create. Deployers can relax it for project admins.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">정책: 새 규칙 volume:set_qos, 기본값 rule:admin_api이며, 생성 요청에 qos가 있을 때도 검사합니다. 배포자는 프로젝트 관리자에게 허용하도록 완화할 수 있습니다.</span></p>
+</div>
+</section>
+<section id="security-impact">
+<h3>Security impact<a class="headerlink" href="#security-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">보안 영향</span></p>
+</div>
+<p>None</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음</span></p>
+</div>
+</section>
+<section id="active-active-ha-impact">
+<h3>Active/Active HA impact<a class="headerlink" href="#active-active-ha-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Active/Active HA 영향</span></p>
+</div>
+<p>None</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음</span></p>
+</div>
+</section>
+<section id="notifications-impact">
+<h3>Notifications impact<a class="headerlink" href="#notifications-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">알림 영향</span></p>
+</div>
+<p>None</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음</span></p>
+</div>
+</section>
+<section id="other-end-user-impact">
+<h3>Other end user impact<a class="headerlink" href="#other-end-user-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">기타 최종 사용자 영향</span></p>
+</div>
+<p>New <code class="docutils literal notranslate"><span class="pre">qos</span></code> attribute in volume detail. python-cinderclient and openstacksdk
+need the new create argument and action.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 상세 정보에 새 qos 속성이 생깁니다. python-cinderclient와 openstacksdk에 새 생성 인자와 action 지원이 필요합니다.</span></p>
+</div>
+</section>
+<section id="performance-impact">
+<h3>Performance Impact<a class="headerlink" href="#performance-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">성능 영향</span></p>
+</div>
+<p>One extra backend call after creation, only when <code class="docutils literal notranslate"><span class="pre">qos</span></code> was given.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">생성 후 백엔드 호출이 한 번 늘어나며, qos가 지정된 경우에만 해당합니다.</span></p>
+</div>
+</section>
+<section id="other-deployer-impact">
+<h3>Other deployer impact<a class="headerlink" href="#other-deployer-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">기타 배포자 영향</span></p>
+</div>
+<p>New database migration. The API refuses to send the new RPC to an older volume
+service during a rolling upgrade.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 데이터베이스 마이그레이션이 추가됩니다. 롤링 업그레이드 중에는 API가 이전 버전 볼륨 서비스로 새 RPC를 보내지 않습니다.</span></p>
+</div>
+</section>
+<section id="developer-impact">
+<h3>Developer impact<a class="headerlink" href="#developer-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">개발자 영향</span></p>
+</div>
+<p>Driver maintainers may implement <code class="docutils literal notranslate"><span class="pre">update_volume_qos</span></code> and then report
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support=True</span></code> in the volume stats. The support matrix
+gets a new row. Per-volume values must override the QoS spec.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">드라이버 메인테이너는 update_volume_qos를 구현할 수 있으며, 구현하면 볼륨 통계에 per_volume_qos_support=True를 보고합니다. support matrix에 새 행이 추가됩니다. 볼륨별 값은 QoS spec보다 우선해야 합니다.</span></p>
+</div>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">구현</span></p>
+</div>
+<section id="assignee-s">
+<h3>Assignee(s)<a class="headerlink" href="#assignee-s" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">담당자</span></p>
+</div>
+<dl class="simple">
+<dt>Primary assignee:</dt><dd><p>Inyong Hong &lt;hongp&gt;</p>
+</dd>
+<dt>Other contributors:</dt><dd><p>None</p>
+</dd>
+</dl>
+</section>
+<section id="work-items">
+<h3>Work Items<a class="headerlink" href="#work-items" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">작업 항목</span></p>
+</div>
+<ul class="simple">
+<li><p>Columns, migration, <code class="docutils literal notranslate"><span class="pre">Volume</span></code> object version.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">컬럼, 마이그레이션, Volume 객체 버전.</span></p>
+</div>
+</li>
+<li><p>Microversion: create schema, <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code>, view, policy.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Microversion: 생성 스키마, os-set_qos, view, 정책.</span></p>
+</div>
+</li>
+<li><p>RPC <code class="docutils literal notranslate"><span class="pre">set_volume_qos</span></code>, manager logic, create flow hook.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">RPC set_volume_qos, 매니저 로직, 생성 흐름 훅.</span></p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code> capability and scheduler filtering on create.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">per_volume_qos_support capability와 생성 시 스케줄러 필터링.</span></p>
+</div>
+</li>
+<li><p>Driver base method, support matrix, NetApp ONTAP and Dell PowerFlex.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">드라이버 base 메서드, support matrix, NetApp ONTAP과 Dell PowerFlex.</span></p>
+</div>
+</li>
+<li><p>Unit tests, api-ref, release note, client and SDK support.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">단위 테스트, api-ref, 릴리스 노트, 클라이언트와 SDK 지원.</span></p>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">의존성</span></p>
+</div>
+<p>None</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음</span></p>
+</div>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">테스트</span></p>
+</div>
+<p>Tempest API tests for create with <code class="docutils literal notranslate"><span class="pre">qos</span></code> and <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code>, skipped when
+the backend does not support per-volume QoS. The LVM driver used in the gate
+does not implement it, so driver coverage comes from vendor third-party CI.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">qos를 포함한 생성과 os-set_qos에 대한 Tempest API 테스트를 추가하며, 백엔드가 볼륨별 QoS를 지원하지 않으면 건너뜁니다. 게이트에서 쓰는 LVM 드라이버는 이를 구현하지 않으므로, 드라이버 검증은 벤더 서드파티 CI가 담당합니다.</span></p>
+</div>
+</section>
+<section id="documentation-impact">
+<h2>Documentation Impact<a class="headerlink" href="#documentation-impact" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">문서 영향</span></p>
+</div>
+<p>api-ref, microversion history, driver docs, support matrix, release note.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">api-ref, microversion 이력, 드라이버 문서, support matrix, 릴리스 노트.</span></p>
+</div>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">참고 자료</span></p>
+</div>
+<p>None</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음</span></p>
+</div>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="../../index.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Block Storage Service Specifications (cinder)"></i></a>
+          
+          
+            <a href="remove-me.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: No specs have yet been approved."></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2026-10-08 21:31:55</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>Cinder Specs 0.0.1.dev686</h4></a>
+      <ul>
+<li><a class="reference internal" href="#">Per-volume QoS at create time and online update</a><ul>
+<li><a class="reference internal" href="#problem-description">Problem description</a></li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#proposed-change">Proposed change</a><ul>
+<li><a class="reference internal" href="#alternatives">Alternatives</a></li>
+<li><a class="reference internal" href="#data-model-impact">Data model impact</a></li>
+<li><a class="reference internal" href="#rest-api-impact">REST API impact</a></li>
+<li><a class="reference internal" href="#security-impact">Security impact</a></li>
+<li><a class="reference internal" href="#active-active-ha-impact">Active/Active HA impact</a></li>
+<li><a class="reference internal" href="#notifications-impact">Notifications impact</a></li>
+<li><a class="reference internal" href="#other-end-user-impact">Other end user impact</a></li>
+<li><a class="reference internal" href="#performance-impact">Performance Impact</a></li>
+<li><a class="reference internal" href="#other-deployer-impact">Other deployer impact</a></li>
+<li><a class="reference internal" href="#developer-impact">Developer impact</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li><a class="reference internal" href="#assignee-s">Assignee(s)</a></li>
+<li><a class="reference internal" href="#work-items">Work Items</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#documentation-impact">Documentation Impact</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "specs/2027.1/per-volume-qos" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/cinder-specs/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: a199b2d4a7191e272a20025a54a0415684504f46";
+    var repositoryName = "openstack/cinder-specs";
+    var bugProject = "cinder-specs";
+    var bugTitle = "Per-volume QoS at create time and online update in Cinder Specs";
+    var fieldTags = "doc";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 0.0.1.dev686 on 2026-10-08 21:31:55";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+</script>
+
+
+  </body>
+</html>
