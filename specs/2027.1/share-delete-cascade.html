@@ -234,31 +234,13 @@ each snapshot, wait for completion, and then delete the share.</p>
 <div class="bilingual-entry docutils container">
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">일반 share 삭제는 의존 스냅샷이 있는지 검사합니다. 사용자는 보통 스냅샷을 하나씩 삭제하고, 완료를 기다린 뒤 share를 삭제합니다.</span></p>
 </div>
-<section id="interaction-with-deferred-deletion">
-<h3>Interaction with deferred deletion<a class="headerlink" href="#interaction-with-deferred-deletion" title="Link to this heading">¶</a></h3>
+<p>A share with N snapshots therefore needs N+1 delete requests and N waits.
+Every client that automates this, such as orchestration tools and cleanup
+scripts, reimplements the same ordering, polling, and partial-failure
+handling.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">지연 삭제(deferred deletion)와의 상호작용</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">따라서 스냅샷이 N개인 share는 삭제 요청 N+1번과 대기 N번이 필요합니다. 이를 자동화하는 모든 클라이언트(오케스트레이션 도구, 정리 스크립트 등)가 같은 순서 제어, 폴링, 부분 실패 처리를 각자 구현합니다.</span></p>
 </div>
-<p>Deferred deletion separates quota release from backend completion. The API
-marks instances <code class="docutils literal notranslate"><span class="pre">deferred_deleting</span></code> and sends an asynchronous manager RPC.
-The manager attempts quota release before its first driver deletion call.
-Backend failures leave <code class="docutils literal notranslate"><span class="pre">error_deferred_deleting</span></code> for periodic retry. A
-snapshot can therefore remain on the backend after quota has been returned; its
-status alone proves neither backend removal nor completed quota accounting.</p>
-<div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">지연 삭제는 quota 반환과 backend 삭제 완료를 분리합니다. API는 instance를 deferred_deleting으로 표시하고 비동기 manager RPC를 보냅니다. manager는 첫 driver 삭제 호출 전에 quota 반환을 시도합니다. backend 삭제가 실패하면 error_deferred_deleting 상태로 남고 주기 작업이 재시도합니다. 따라서 quota가 반환된 뒤에도 스냅샷이 backend에 남아 있을 수 있으며, 상태만으로는 backend에서 제거됐는지도, quota 처리가 끝났는지도 증명할 수 없습니다.</span></p>
-</div>
-<p>Ordinary DB snapshot lists exclude both deferred states unless
-<code class="docutils literal notranslate"><span class="pre">list_deferred_delete=True</span></code>. The current <code class="docutils literal notranslate"><span class="pre">share_snapshot_get_all_for_share</span></code>
-wrapper discards its <code class="docutils literal notranslate"><span class="pre">filters</span></code> argument, and the existing parent dependency
-check uses that wrapper. An <code class="docutils literal notranslate"><span class="pre">available</span></code> share can consequently pass that
-check while hidden snapshots remain. A deferred parent is already rejected by
-the existing allowed-state check; the gap is an available parent with deferred
-children, including children left after the setting was disabled.</p>
-<div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">일반 DB 스냅샷 목록은 list_deferred_delete=True가 없으면 두 deferred 상태를 제외합니다. 현재 share_snapshot_get_all_for_share wrapper는 filters 인자를 버리고, 기존 부모 의존성 검사는 이 wrapper를 사용합니다. 그 결과 숨겨진 스냅샷이 남아 있어도 available share가 검사를 통과할 수 있습니다. deferred 상태인 부모는 기존 허용 상태 검사에서 이미 거부되므로, 문제는 deferred 자식을 가진 available 부모입니다. 설정을 끈 뒤에 남은 자식도 여기에 포함됩니다.</span></p>
-</div>
-</section>
 </section>
 <section id="use-cases">
 <h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
@@ -301,6 +283,37 @@ remain blockers; existing share-group checks remain. Shares created from
 snapshots are not recursively deleted.</p>
 <div class="bilingual-entry docutils container">
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">복제되지 않은 share instance 하나와, 일반 스냅샷마다 instance가 하나인 경우를 지원합니다. 복제된 share(has_replicas)와 busy share(task_state가 BUSY_TASK_STATES에 속함, migration 포함)는 기존 검사가 계속 거부합니다. backup과 group snapshot member는 계속 삭제를 막고, 기존 share group 검사도 유지됩니다. 스냅샷에서 생성된 share는 재귀적으로 삭제하지 않습니다.</span></p>
+</div>
+</section>
+<section id="deferred-deletion">
+<h3>Deferred deletion<a class="headerlink" href="#deferred-deletion" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">지연 삭제(deferred deletion)</span></p>
+</div>
+<p>Deferred deletion separates quota release from backend completion. The API
+marks instances <code class="docutils literal notranslate"><span class="pre">deferred_deleting</span></code> and sends an asynchronous manager RPC.
+The manager attempts quota release before its first driver deletion call.
+Backend failures leave <code class="docutils literal notranslate"><span class="pre">error_deferred_deleting</span></code> for periodic retry. A
+snapshot can therefore remain on the backend after quota has been returned; its
+status alone proves neither backend removal nor completed quota accounting.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">지연 삭제는 quota 반환과 backend 삭제 완료를 분리합니다. API는 instance를 deferred_deleting으로 표시하고 비동기 manager RPC를 보냅니다. manager는 첫 driver 삭제 호출 전에 quota 반환을 시도합니다. backend 삭제가 실패하면 error_deferred_deleting 상태로 남고 주기 작업이 재시도합니다. 따라서 quota가 반환된 뒤에도 스냅샷이 backend에 남아 있을 수 있으며, 상태만으로는 backend에서 제거됐는지도, quota 처리가 끝났는지도 증명할 수 없습니다.</span></p>
+</div>
+<p>Ordinary DB snapshot lists exclude both deferred states unless
+<code class="docutils literal notranslate"><span class="pre">list_deferred_delete=True</span></code>. The existing parent dependency check calls
+<code class="docutils literal notranslate"><span class="pre">share_snapshot_get_all_for_share</span></code> without that flag, so an <code class="docutils literal notranslate"><span class="pre">available</span></code>
+share can pass the check while deferred snapshots remain. A separate bug fix
+makes that wrapper forward its <code class="docutils literal notranslate"><span class="pre">filters</span></code> argument; it does not change this
+check. A deferred parent is already rejected by the existing allowed-state
+check; the gap is an available parent with deferred children, including
+children left after the setting was disabled.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">일반 DB 스냅샷 목록은 list_deferred_delete=True가 없으면 두 deferred 상태를 제외합니다. 기존 부모 의존성 검사는 이 플래그 없이 share_snapshot_get_all_for_share를 호출하므로, deferred 스냅샷이 남아 있어도 available share가 검사를 통과할 수 있습니다. 이 wrapper가 filters 인자를 그대로 전달하도록 하는 수정은 별도 버그 수정으로 진행하지만, 이 검사는 그 수정으로 바뀌지 않습니다. deferred 상태인 부모는 기존 허용 상태 검사에서 이미 거부되므로, 문제는 deferred 자식을 가진 available 부모입니다. 설정을 끈 뒤에 남은 자식도 여기에 포함됩니다.</span></p>
+</div>
+<p>Cascade therefore does not support deferred deletion, and the admission rules
+below reject it explicitly.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">그래서 cascade는 지연 삭제를 지원하지 않으며, 아래 승인 규칙이 이를 명시적으로 거부합니다.</span></p>
 </div>
 </section>
 <section id="admission">
@@ -752,9 +765,10 @@ with cascade admission; update their callers and tests with the manager RPC.</p>
 </li>
 <li><p>With the setting disabled and parent <code class="docutils literal notranslate"><span class="pre">available</span></code>, either deferred child
 state, alone or mixed with ordinary children, returns <code class="docutils literal notranslate"><span class="pre">409</span></code> without state,
-quota, RPC, or notification changes. Test the filter-discarding wrapper gap.</p>
+quota, RPC, or notification changes. Test that hidden deferred children are
+detected.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">설정이 꺼져 있고 부모가 available일 때, 두 deferred 자식 상태 중 하나가 단독으로 있든 일반 자식과 섞여 있든 상태·quota·RPC·알림 변경 없이 409를 반환합니다. filters를 버리는 wrapper로 생기는 공백도 테스트합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">설정이 꺼져 있고 부모가 available일 때, 두 deferred 자식 상태 중 하나가 단독으로 있든 일반 자식과 섞여 있든 상태·quota·RPC·알림 변경 없이 409를 반환합니다. 숨은 deferred 자식이 감지되는지도 테스트합니다.</span></p>
 </div>
 </li>
 <li><p>A deferred parent retains existing rejection; turning the setting off does
@@ -1042,13 +1056,11 @@ force-delete/reset-state recovery.</p>
       <h4 class="docs-sidebar-section-title">Page Contents</h4>
       <ul>
 <li><a class="reference internal" href="#">Share deletion with dependent snapshots</a><ul>
-<li><a class="reference internal" href="#problem-description">Problem description</a><ul>
-<li><a class="reference internal" href="#interaction-with-deferred-deletion">Interaction with deferred deletion</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#problem-description">Problem description</a></li>
 <li><a class="reference internal" href="#use-cases">Use Cases</a></li>
 <li><a class="reference internal" href="#proposed-change">Proposed change</a><ul>
 <li><a class="reference internal" href="#scope">Scope</a></li>
+<li><a class="reference internal" href="#deferred-deletion">Deferred deletion</a></li>
 <li><a class="reference internal" href="#admission">Admission</a></li>
 <li><a class="reference internal" href="#manager-flow">Manager flow</a></li>
 <li><a class="reference internal" href="#failure-and-recovery">Failure and recovery</a></li>
