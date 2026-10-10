@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Share deletion with dependent snapshots &#8212; manila-specs 0.0.1.dev226 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fe63c2af" />
+    <link rel="stylesheet" type="text/css" href="../../_static/basic.css?v=29da98fa" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bilingual.css?v=09332d3e" />
+    <script src="../../_static/documentation_options.js?v=dda92cec"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Lustre share driver for Manila" href="../hibiscus/lustre-driver.html" />
+    <link rel="prev" title="Share servers with multiple subnets" href="../release_independent/share-server-multiple-subnet.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link href="../../_static/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Fonts -->
+<link href="../../_static/css/font-awesome.min.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="../../_static/css/combined.css" rel="stylesheet">
+
+<!-- Search CSS -->
+<link href="../../_static/css/search.css" rel="stylesheet">
+
+<!-- Pygments CSS -->
+<link href="../../_static/pygments.css" rel="stylesheet">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DD299CMF7V">
+</script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
+gtag('config', 'G-DD299CMF7V');
+</script>
+
+
+  </head><body>
+
+<!-- SOURCE_FILE: https://opendev.org/openstack/manila-specs/src/doc/source/specs/indri/share-delete-cascade.rst -->
+
+<script>
+    (function (window, document) {
+        var loader = function () {
+            var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];
+            script.src = "https://search.openstack.org/widget/embed.min.js?t="+Date.now();
+            tag.parentNode.insertBefore(script, tag);
+        };
+        window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);
+    })(window, document);
+</script>
+
+<nav class="navbar navbar-default navbar-expand-md" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="brand-wrapper">
+        <a class="navbar-brand" href="https://www.openstack.org/">
+        <img src="../../_static/images/logo-full.svg" width="135px" height="35px"/>
+        </a>
+      </div>
+      <button class="navbar-toggler" data-bs-target="#navbar-main-1" aria-controls="navbar-main-1" data-bs-toggle="collapse" type="button">
+        <span class="navbar-toggler-icon"></span>
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <div class="search-icon show"><i class="fa fa-search"></i> Global Search</div>
+      <div class="collapse navbar-collapse" id="navbar-main-1">
+<div class="search-container tiny">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</div>
+      <ul class="nav navbar-nav navbar-main ms-auto mb-2 mb-lg-0 justify-content-end show" role="navigation">
+<li class="search-container-mobile">
+    <div class="openstack-search-bar" data-baseUrl="search.openstack.org" data-context="docs-openstack"></div>
+</li>
+        <li class="nav-item dropdown"> <!--Software -->
+          <a href="https://www.openstack.org/software/" class="nav-link dropdown-toggle" aria-expanded="false">Software</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/">Overview</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/openstack-components">OpenStack Components</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/sdks">SDKs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/project-navigator/deployment-tools">Deployment Tools</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/assets/software/projectmap/openstack-map.pdf" target="_blank">OpenStack Map</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/software/sample-configs/">Sample Configs</a></li>
+          </ul>
+        </li>
+        <li class="nav-item drop-down"> <!-- Use Cases -->
+          <a href="https://www.openstack.org/use-cases/" class="nav-link dropdown-toggle" role="button">Use Cases</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/">Users in Production</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/bare-metal/">Ironic Bare Metal</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/edge-computing/">Edge Computing</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/telecoms-and-nfv/">Telecom &amp; NFV</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/science/">Science and HPC</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/containers/">Containers</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/use-cases/enterprise/">Enterprise</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/surveys/landing">User Survey</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"> <!-- Events -->
+          <a href="https://openinfra.dev/summit" class="nav-link dropdown-toggle" role="button" id="dropdownMenuEvents">Events</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://openinfra.dev/summit">OpenInfra Summit</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/ptg/">Project Teams Gathering</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/opendev-2020/">OpenDev</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/community-events/">Community Events</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/events/openstackdays">OpenStack &amp; OpenInfra Days</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/videos/">Summit Videos</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Community -->
+          <a href="https://www.openstack.org/community/" class="nav-link dropdown-toggle" role="button">Community</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/">Welcome! Start Here</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/tech-committee">OpenStack Technical Committee</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/speakers/">Speakers Bureau</a></li>
+            <li><a class="dropdown-item" href="https://wiki.openstack.org">OpenStack Wiki</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/coa/">Get Certified (COA)</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/jobs/">Jobs</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketing/">Marketing Resources</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/news/">Community News</a></li>
+            <li><a class="dropdown-item" href="https://superuser.openstack.org">Superuser Magazine</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/community/supporting-organizations/">OpenInfra Foundation Supporting Organizations</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">OpenInfra Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><!-- Marketplace -->
+          <a href="https://www.openstack.org/marketplace/" class="nav-link dropdown-toggle" role="button">Marketplace</a>
+          <ul class="dropdown-menu dropdown-hover">
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/training/">Training</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/distros/">Distros &amp; Appliances</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/public-clouds/">Public Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/hosted-private-clouds/">Hosted Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/remotely-managed-private-clouds/">Remotely Managed Private Clouds</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/consulting/">Consulting &amp; Integrators</a></li>
+            <li><a class="dropdown-item" href="https://www.openstack.org/marketplace/drivers/">Drivers</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"><!-- Blog -->
+          <a class="nav-link" href="https://www.openstack.org/blog/">Blog</a>
+        </li>
+        <li class="nav-item"><!-- Docs -->
+          <a class="nav-link" href="https://docs.openstack.org/">Docs</a>
+        </li>
+        <li class="nav-item dropdown join-nav-section"> <!-- Join -->
+          <a href="https://openinfra.dev/join/" class="nav-link dropdown-toggle" role="button">Join</a>
+          <ul class="dropdown-menu" style="display: none;">
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sign up for Foundation Membership</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev/join/">Sponsor the Foundation</a></li>
+            <li><a class="dropdown-item" href="https://openinfra.dev">More about the Foundation</a></li>
+          </ul>
+        </li>
+        <li class="nav-item"> <!-- Login -->
+          <a href="https://www.openstack.org/Security/login/?BackURL=/home/" class="sign-in-btn">Log In</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- /.container -->
+</nav>
+
+    <div class="container docs-book-wrapper">
+      <div class="row">
+        <div class="col-lg-9 col-md-8 col-sm-8 col-lg-push-3 col-md-push-4 col-sm-push-4 order-4">
+<div class="row docs-title">
+  <div class="col-lg-8">
+      <h1>Share deletion with dependent snapshots</h1>
+    
+  </div>
+  <div class="docs-actions">
+    
+    <a href="../release_independent/share-server-multiple-subnet.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Share servers with multiple subnets"></i></a>
+    
+    
+    <a href="../hibiscus/lustre-driver.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Lustre share driver for Manila"></i></a>
+    
+    <a id="logABugLink1" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+    
+  </div>
+</div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="docs-body" role="main">
+
+  <section id="share-deletion-with-dependent-snapshots">
+<h1>Share deletion with dependent snapshots<a class="headerlink" href="#share-deletion-with-dependent-snapshots" title="Link to this heading">¶</a></h1>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">의존 스냅샷이 있는 share 삭제</span></p>
+</div>
+<div class="bilingual-glossary docutils container">
+<p class="bilingual-glossary-title"><strong>어려운 용어·숙어</strong></p>
+<ul class="simple">
+<li><p>cascade deletion: 연쇄 삭제 - 부모 리소스를 지울 때 딸린 자식 리소스까지 함께 지우는 방식</p></li>
+<li><p>deferred deletion: 지연 삭제 - quota를 먼저 반환하고 backend 삭제는 비동기·주기적으로 마무리하는 Manila 기능 (is_deferred_deletion_enabled 설정)</p></li>
+<li><p>admission: 승인 단계 - API가 요청을 받아들이기 전에 권한·상태·범위를 검사하고 상태를 바꾸는 단계</p></li>
+<li><p>share instance / snapshot instance: share 인스턴스 / 스냅샷 인스턴스 - 사용자에게 보이는 share·스냅샷의 실제 backend 사본을 나타내는 DB 레코드</p></li>
+<li><p>hidden child: 숨은 자식 - 기본 목록 조회에서 빠지는 deferred 상태의 스냅샷</p></li>
+<li><p>wrapper: 래퍼 - 내부 함수를 감싸 호출하는 공개 DB API 함수</p></li>
+<li><p>quota release: quota 반환 - 삭제된 리소스가 쓰던 할당량을 프로젝트에 돌려주는 처리</p></li>
+<li><p>RPC pin: RPC 버전 고정 - 롤링 업그레이드 중 옛 서비스가 이해하는 버전으로 RPC를 제한하는 설정</p></li>
+<li><p>microversion: 마이크로버전 - 하위 호환성을 유지하며 REST API 변경을 단계적으로 도입하는 OpenStack 버전 체계</p></li>
+<li><p>conditional update: 조건부 업데이트 - 현재 값이 기대한 값일 때만 원자적으로 바꾸는 DB 업데이트</p></li>
+<li><p>row lock: 행 잠금 - 동시 변경을 막기 위해 DB 행을 잠시 잠그는 것</p></li>
+<li><p>durable intent: 영속적 의도 기록 - 서비스가 재시작돼도 작업을 이어갈 수 있도록 남기는 기록</p></li>
+<li><p>idempotent: 멱등 - 같은 작업을 여러 번 해도 결과가 한 번 한 것과 같은 성질</p></li>
+<li><p>force delete: 강제 삭제 - 상태 검사를 건너뛰는 관리자 삭제. Manila에서는 backend 삭제가 실패해도 DB 레코드를 지움</p></li>
+<li><p>reset-state: 상태 재설정 - 관리자가 리소스의 상태 값을 직접 바꾸는 작업</p></li>
+<li><p>orphan: 고아 리소스 - DB에는 없고 backend에만 남은 리소스</p></li>
+<li><p>driver CI: 드라이버 CI - 각 backend driver를 실제 스토리지로 검증하는 테스트 시스템</p></li>
+<li><p>crash window: 크래시 구간 - 서비스가 그 사이에 죽으면 상태가 어긋날 수 있는 구간</p></li>
+<li><p>exactly-once delivery: 정확히 한 번 전달 - 메시지가 중복이나 유실 없이 한 번만 처리된다는 보장</p></li>
+</ul>
+</div>
+<p>Allow users to delete a share and its ordinary snapshots with one request.
+Following Cinder, delete snapshots sequentially before deleting the share.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">사용자가 share와 그 일반 스냅샷을 한 번의 요청으로 삭제할 수 있게 합니다. Cinder처럼, share를 삭제하기 전에 스냅샷을 순차적으로 삭제합니다.</span></p>
+</div>
+<section id="problem-description">
+<h2>Problem description<a class="headerlink" href="#problem-description" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">문제 설명</span></p>
+</div>
+<p>Ordinary share deletion checks for dependent snapshots. Users normally delete
+each snapshot, wait for completion, and then delete the share.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">일반 share 삭제는 의존 스냅샷이 있는지 검사합니다. 사용자는 보통 스냅샷을 하나씩 삭제하고, 완료를 기다린 뒤 share를 삭제합니다.</span></p>
+</div>
+<section id="interaction-with-deferred-deletion">
+<h3>Interaction with deferred deletion<a class="headerlink" href="#interaction-with-deferred-deletion" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">지연 삭제(deferred deletion)와의 상호작용</span></p>
+</div>
+<p>Deferred deletion separates quota release from backend completion. The API
+marks instances <code class="docutils literal notranslate"><span class="pre">deferred_deleting</span></code> and sends an asynchronous manager RPC.
+The manager attempts quota release before its first driver deletion call.
+Backend failures leave <code class="docutils literal notranslate"><span class="pre">error_deferred_deleting</span></code> for periodic retry. A
+snapshot can therefore remain on the backend after quota has been returned; its
+status alone proves neither backend removal nor completed quota accounting.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">지연 삭제는 quota 반환과 backend 삭제 완료를 분리합니다. API는 instance를 deferred_deleting으로 표시하고 비동기 manager RPC를 보냅니다. manager는 첫 driver 삭제 호출 전에 quota 반환을 시도합니다. backend 삭제가 실패하면 error_deferred_deleting 상태로 남고 주기 작업이 재시도합니다. 따라서 quota가 반환된 뒤에도 스냅샷이 backend에 남아 있을 수 있으며, 상태만으로는 backend에서 제거됐는지도, quota 처리가 끝났는지도 증명할 수 없습니다.</span></p>
+</div>
+<p>Ordinary DB snapshot lists exclude both deferred states unless
+<code class="docutils literal notranslate"><span class="pre">list_deferred_delete=True</span></code>. The current <code class="docutils literal notranslate"><span class="pre">share_snapshot_get_all_for_share</span></code>
+wrapper discards its <code class="docutils literal notranslate"><span class="pre">filters</span></code> argument, and the existing parent dependency
+check uses that wrapper. An <code class="docutils literal notranslate"><span class="pre">available</span></code> share can consequently pass that
+check while hidden snapshots remain. A deferred parent is already rejected by
+the existing allowed-state check; the gap is an available parent with deferred
+children, including children left after the setting was disabled.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">일반 DB 스냅샷 목록은 list_deferred_delete=True가 없으면 두 deferred 상태를 제외합니다. 현재 share_snapshot_get_all_for_share wrapper는 filters 인자를 버리고, 기존 부모 의존성 검사는 이 wrapper를 사용합니다. 그 결과 숨겨진 스냅샷이 남아 있어도 available share가 검사를 통과할 수 있습니다. deferred 상태인 부모는 기존 허용 상태 검사에서 이미 거부되므로, 문제는 deferred 자식을 가진 available 부모입니다. 설정을 끈 뒤에 남은 자식도 여기에 포함됩니다.</span></p>
+</div>
+</section>
+</section>
+<section id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">사용 사례</span></p>
+</div>
+<ul>
+<li><p>Remove an obsolete share and its snapshots with one explicit request.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">더 이상 쓰지 않는 share와 그 스냅샷을 명시적인 요청 한 번으로 제거합니다.</span></p>
+</div>
+</li>
+<li><p>Simplify cleanup of temporary environments and automation.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">임시 환경과 자동화의 정리 작업을 단순화합니다.</span></p>
+</div>
+</li>
+</ul>
+</section>
+<section id="proposed-change">
+<h2>Proposed change<a class="headerlink" href="#proposed-change" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">제안하는 변경</span></p>
+</div>
+<p>Add <code class="docutils literal notranslate"><span class="pre">cascade=true</span></code> to share DELETE. Omitted or false preserves existing
+behavior. Cascade deletes children through their existing manager lifecycle.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">share DELETE에 cascade=true를 추가합니다. 생략하거나 false면 기존 동작을 유지합니다. cascade는 자식들을 기존 manager 생명주기를 통해 삭제합니다.</span></p>
+</div>
+<section id="scope">
+<h3>Scope<a class="headerlink" href="#scope" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">범위</span></p>
+</div>
+<p>Support one non-replicated share instance and one instance per ordinary
+snapshot. Existing checks continue to reject replicated shares
+(<code class="docutils literal notranslate"><span class="pre">has_replicas</span></code>) and busy shares (<code class="docutils literal notranslate"><span class="pre">task_state</span></code> in <code class="docutils literal notranslate"><span class="pre">BUSY_TASK_STATES</span></code>,
+which covers migration). Backups and group snapshot members
+remain blockers; existing share-group checks remain. Shares created from
+snapshots are not recursively deleted.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">복제되지 않은 share instance 하나와, 일반 스냅샷마다 instance가 하나인 경우를 지원합니다. 복제된 share(has_replicas)와 busy share(task_state가 BUSY_TASK_STATES에 속함, migration 포함)는 기존 검사가 계속 거부합니다. backup과 group snapshot member는 계속 삭제를 막고, 기존 share group 검사도 유지됩니다. 스냅샷에서 생성된 share는 재귀적으로 삭제하지 않습니다.</span></p>
+</div>
+</section>
+<section id="admission">
+<h3>Admission<a class="headerlink" href="#admission" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">승인(admission) 단계</span></p>
+</div>
+<p>Cascade requires <code class="docutils literal notranslate"><span class="pre">is_deferred_deletion_enabled=False</span></code> in manila-api
+(<code class="docutils literal notranslate"><span class="pre">[DEFAULT]</span></code>).
+Return <code class="docutils literal notranslate"><span class="pre">409</span> <span class="pre">Conflict</span></code> when enabled, even with no children, or when any child
+instance is <code class="docutils literal notranslate"><span class="pre">deferred_deleting</span></code> or <code class="docutils literal notranslate"><span class="pre">error_deferred_deleting</span></code>. Deferred work
+is neither joined nor converted into immediate cascade deletion.
+Rejecting regardless of child count keeps the result of a cascade request a
+function of deployment configuration rather than of the share’s current
+snapshot count.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">cascade를 쓰려면 manila-api의 [DEFAULT]에 is_deferred_deletion_enabled=False가 필요합니다. 이 설정이 켜져 있으면 자식이 없어도 409 Conflict를 반환하고, 자식 instance 중 하나라도 deferred_deleting이나 error_deferred_deleting이면 역시 409를 반환합니다. 진행 중인 deferred 작업에 합류하지도, 즉시 cascade 삭제로 전환하지도 않습니다. 자식 수와 관계없이 거부해야 cascade 요청의 결과가 share의 현재 스냅샷 수가 아니라 배포 설정에 따라 결정됩니다.</span></p>
+</div>
+<p>Before admission:</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">승인 전에:</span></p>
+</div>
+<ul>
+<li><p>Check <code class="docutils literal notranslate"><span class="pre">share:delete</span></code> and every child’s <code class="docutils literal notranslate"><span class="pre">share:delete_snapshot</span></code> as the
+requesting user; preserve deletion locks and busy checks.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">요청한 사용자 권한으로 share:delete와 모든 자식의 share:delete_snapshot을 검사합니다. 삭제 잠금(lock)과 busy 검사를 유지합니다.</span></p>
+</div>
+</li>
+<li><p>Load every child instance with an instance-level, parent-scoped lookup
+(<code class="docutils literal notranslate"><span class="pre">share_snapshot_instance_get_all_with_filters</span></code> by <code class="docutils literal notranslate"><span class="pre">share_instance_ids</span></code>),
+which never excludes deferred states. Do not rely on
+<code class="docutils literal notranslate"><span class="pre">share_snapshot_get_all_for_share</span></code>.
+Reject either deferred state with <code class="docutils literal notranslate"><span class="pre">409</span></code> before state, quota, or RPC changes.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">모든 자식 instance를 부모 범위의 instance 단위 조회(share_instance_ids로 share_snapshot_instance_get_all_with_filters 호출)로 가져옵니다. 이 조회는 deferred 상태를 제외하지 않습니다. share_snapshot_get_all_for_share에는 의존하지 않습니다. 두 deferred 상태 중 하나라도 있으면 상태·quota·RPC를 바꾸기 전에 409로 거부합니다.</span></p>
+</div>
+</li>
+<li><p>Allow parent <code class="docutils literal notranslate"><span class="pre">available</span></code>, <code class="docutils literal notranslate"><span class="pre">error</span></code>, or <code class="docutils literal notranslate"><span class="pre">inactive</span></code> and child <code class="docutils literal notranslate"><span class="pre">available</span></code>
+or <code class="docutils literal notranslate"><span class="pre">error</span></code>. Preserve existing parent rejection for both deferred states.
+Require a usable host with children and reject active clone creation.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">부모는 available, error, inactive를, 자식은 available, error를 허용합니다. 두 deferred 상태에 대한 기존 부모 거부를 유지합니다. 자식이 있으면 사용 가능한 host가 있어야 하고, 진행 중인 clone 생성은 거부합니다.</span></p>
+</div>
+</li>
+<li><p>Conditional DB-update helpers atomically change the parent and selected
+children to <code class="docutils literal notranslate"><span class="pre">deleting</span></code> in one transaction. Reject changed states or child
+membership without updating any target.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">조건부 DB 업데이트 helper가 한 트랜잭션 안에서 부모와 선택된 자식을 원자적으로 deleting으로 바꿉니다. 그사이 상태나 자식 구성이 바뀌었으면 어떤 대상도 업데이트하지 않고 거부합니다.</span></p>
+</div>
+</li>
+</ul>
+<p>Reuse available-state checks for snapshot creation, clone creation, and revert.
+Snapshot manage and any forced snapshot creation must reject a deleting share.
+Recheck states at DB writes for create/manage, clone, revert, and snapshot
+deletion with short row locks, released before backend calls, to prevent races.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">스냅샷 생성, clone 생성, revert에는 기존 available 상태 검사를 재사용합니다. 스냅샷 manage와 강제(forced) 스냅샷 생성은 deleting 상태인 share를 거부해야 합니다. 경쟁 상태를 막기 위해 create/manage, clone, revert, 스냅샷 삭제의 DB 쓰기 시점에 짧은 row lock으로 상태를 다시 확인하고, backend 호출 전에 lock을 해제합니다.</span></p>
+</div>
+</section>
+<section id="manager-flow">
+<h3>Manager flow<a class="headerlink" href="#manager-flow" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Manager 처리 흐름</span></p>
+</div>
+<p>After admission, send one versioned manager RPC. Keep the parent <code class="docutils literal notranslate"><span class="pre">deleting</span></code>
+during child work; with zero children, use existing non-deferred share
+deletion.
+If the share RPC API is pinned below the version that adds cascade, the API
+returns <code class="docutils literal notranslate"><span class="pre">409</span></code> before any state change, so mixed-version deployments never
+send cascade work to an older manager.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">승인 후 versioned manager RPC를 한 번 보냅니다. 자식을 처리하는 동안 부모는 deleting을 유지합니다. 자식이 없으면 기존 비지연(non-deferred) share 삭제를 사용합니다. share RPC API가 cascade를 추가한 버전보다 낮게 고정(pin)돼 있으면 API는 상태를 바꾸기 전에 409를 반환합니다. 그래서 버전이 섞인 배포에서도 cascade 작업이 옛 manager로 가지 않습니다.</span></p>
+</div>
+<ol class="arabic">
+<li><p>Delete selected snapshots in a stable, sequential <code class="docutils literal notranslate"><span class="pre">for</span></code> loop, reusing
+access cleanup, driver deletion, DB cleanup, and quota release with
+<code class="docutils literal notranslate"><span class="pre">force=False</span></code> and <code class="docutils literal notranslate"><span class="pre">deferred_delete=False</span></code>.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">선택된 스냅샷을 정해진 순서의 순차 for 루프로 삭제합니다. access 정리, driver 삭제, DB 정리, quota 반환을 force=False, deferred_delete=False로 재사용합니다.</span></p>
+</div>
+</li>
+<li><p>Stop on the first exception or retained child; set parent <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code>.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">첫 예외가 나거나 자식이 남으면 멈추고 부모를 error_deleting으로 설정합니다.</span></p>
+</div>
+</li>
+<li><p>Re-query every remaining instance, including deferred states. Only an empty
+result permits existing parent deletion with <code class="docutils literal notranslate"><span class="pre">force=False</span></code> and
+<code class="docutils literal notranslate"><span class="pre">deferred_delete=False</span></code>. A filtered-empty ordinary list is insufficient.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">deferred 상태를 포함해 남은 instance를 모두 다시 조회합니다. 결과가 비어 있을 때만 force=False, deferred_delete=False로 기존 부모 삭제를 진행합니다. 필터 때문에 비어 보이는 일반 목록으로는 충분하지 않습니다.</span></p>
+</div>
+</li>
+</ol>
+</section>
+<section id="failure-and-recovery">
+<h3>Failure and recovery<a class="headerlink" href="#failure-and-recovery" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">실패와 복구</span></p>
+</div>
+<p>If child 4 of 10 has a backend deletion failure, children 1-3 are gone;
+child 4 is <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code>; children 5-10 stay <code class="docutils literal notranslate"><span class="pre">deleting</span></code> without driver
+calls. The parent becomes <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code> without a driver call.
+Ordinary retry preserves status checks; it cannot restart failed or active work.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">10개 중 4번째 자식의 backend 삭제가 실패하면, 1~3번은 이미 삭제됐고 4번은 error_deleting, 5~10번은 driver 호출 없이 deleting으로 남습니다. 부모는 driver 호출 없이 error_deleting이 됩니다. 일반 재시도는 상태 검사를 그대로 적용하므로, 실패했거나 진행 중인 작업을 다시 시작할 수 없습니다.</span></p>
+</div>
+<p>Interrupted resources may remain <code class="docutils literal notranslate"><span class="pre">deleting</span></code> as in ordinary deletion, with no
+durable intent or automatic resumption.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">중단된 리소스는 일반 삭제와 마찬가지로 deleting에 남을 수 있으며, 영속적인 의도 기록(durable intent)이나 자동 재개는 없습니다.</span></p>
+</div>
+</section>
+<section id="administrator-retry">
+<h3>Administrator retry<a class="headerlink" href="#administrator-retry" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">관리자 재시도</span></p>
+</div>
+<p>Cinder recovers this state with <code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">?cascade=true&amp;force=true</span></code>, which
+skips status checks and re-runs the loop with real driver calls. Manila’s
+<code class="docutils literal notranslate"><span class="pre">force</span></code> instead discards DB rows when backend deletion fails, so reusing it
+would hide backend failures rather than retry them. This proposal adds a retry
+that keeps Cinder’s recovery path without Manila’s force semantics.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Cinder는 이 상태를 DELETE ?cascade=true&amp;force=true로 복구합니다. 이 요청은 상태 검사를 건너뛰고 실제 driver 호출로 루프를 다시 실행합니다. 반면 Manila의 force는 backend 삭제가 실패하면 DB row를 버리므로, 이를 재사용하면 backend 실패를 재시도하는 대신 숨기게 됩니다. 이 제안은 Manila force의 의미를 빼고 Cinder의 복구 경로를 유지하는 재시도를 추가합니다.</span></p>
+</div>
+<p>A cascade request on a parent in <code class="docutils literal notranslate"><span class="pre">deleting</span></code> or <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code> is a retry.
+It requires the new <code class="docutils literal notranslate"><span class="pre">share:delete_cascade_retry</span></code> policy, which defaults to
+the same admin rule as <code class="docutils literal notranslate"><span class="pre">share:force_delete</span></code>; without it, the existing
+invalid-status rejection applies. A retry:</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">deleting이나 error_deleting 상태인 부모에 대한 cascade 요청은 재시도로 봅니다. 새 share:delete_cascade_retry policy가 필요하며, 기본값은 share:force_delete와 같은 관리자 규칙입니다. 이 policy가 없으면 기존의 잘못된 상태(invalid-status) 거부가 적용됩니다. 재시도는 다음과 같이 동작합니다:</span></p>
+</div>
+<ul>
+<li><p>Admits the parent in <code class="docutils literal notranslate"><span class="pre">deleting</span></code> or <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code> and children in
+<code class="docutils literal notranslate"><span class="pre">available</span></code>, <code class="docutils literal notranslate"><span class="pre">error</span></code>, <code class="docutils literal notranslate"><span class="pre">deleting</span></code>, or <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code>.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">부모는 deleting이나 error_deleting, 자식은 available, error, deleting, error_deleting 상태를 허용합니다.</span></p>
+</div>
+</li>
+<li><p>Applies every other admission rule unchanged: deferred deletion disabled,
+no deferred child states, no replicas, busy task states, backups, or group
+snapshot members, and locks honored.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">나머지 승인 규칙은 그대로 적용합니다: 지연 삭제 비활성, deferred 자식 상태 없음, replica·busy task 상태·backup·group snapshot member 없음, 잠금 존중.</span></p>
+</div>
+</li>
+<li><p>Atomically moves the parent and remaining children to <code class="docutils literal notranslate"><span class="pre">deleting</span></code> and sends
+the same manager RPC. Children already deleted are no longer listed, so the
+loop resumes where it stopped.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">부모와 남은 자식을 원자적으로 deleting으로 바꾸고 같은 manager RPC를 보냅니다. 이미 삭제된 자식은 더 이상 목록에 없으므로 루프는 멈춘 곳부터 이어집니다.</span></p>
+</div>
+</li>
+<li><p>Uses <code class="docutils literal notranslate"><span class="pre">force=False</span></code> throughout. A repeated backend failure stops the loop
+again with <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code>; no DB row is discarded.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">처음부터 끝까지 force=False를 사용합니다. backend 실패가 반복되면 루프는 다시 error_deleting으로 멈추고, DB row는 버리지 않습니다.</span></p>
+</div>
+</li>
+</ul>
+<p>The API cannot distinguish a stopped worker from one still running. The
+administrator must confirm that the earlier worker is no longer processing
+the share, for example after <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code> or a manila-share restart,
+before retrying. This matches the precondition of Cinder’s force cascade.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">API는 멈춘 worker와 아직 실행 중인 worker를 구분할 수 없습니다. 관리자는 재시도 전에 이전 worker가 더 이상 이 share를 처리하지 않는지 확인해야 합니다(예: error_deleting이 된 뒤, 또는 manila-share 재시작 후). 이는 Cinder force cascade의 전제 조건과 같습니다.</span></p>
+</div>
+<p>Existing individual force-delete and reset-state recovery remain available.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">기존의 개별 force-delete와 reset-state 복구도 계속 사용할 수 있습니다.</span></p>
+</div>
+</section>
+<section id="out-of-scope">
+<h3>Out of scope<a class="headerlink" href="#out-of-scope" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">범위 밖</span></p>
+</div>
+<p>Parent deletion must wait for actual child backend deletion. Deferred support
+needs durable parent intent, coordination with periodic retries, and quota
+accounting that prevents a second release. These require a separate follow-up
+specification; this proposal adds none of that machinery.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">부모 삭제는 자식의 실제 backend 삭제를 기다려야 합니다. 지연 삭제를 지원하려면 영속적인 부모 의도 기록, 주기 재시도와의 조율, quota 이중 반환을 막는 회계 처리가 필요합니다. 이는 별도의 후속 스펙이 다뤄야 하며, 이 제안은 그런 장치를 추가하지 않습니다.</span></p>
+</div>
+<p>This specification covers non-deferred deletion with hidden-child rejection.
+A separate deferred-support spec must resolve durable intent, periodic retries,
+and idempotent quota accounting. Automatic restart recovery, schema changes,
+and force-cascade remain follow-up work; immediate
+deletion retains its existing DB/quota crash window.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">이 스펙은 숨은 자식을 거부하는 비지연 삭제를 다룹니다. 영속적 의도 기록, 주기 재시도, 멱등적 quota 회계는 별도의 지연 삭제 지원 스펙이 해결해야 합니다. 자동 재시작 복구, 스키마 변경, force-cascade는 후속 작업으로 남으며, 즉시 삭제는 기존의 DB/quota 크래시 구간을 그대로 가집니다.</span></p>
+</div>
+</section>
+<section id="alternatives">
+<h3>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">대안</span></p>
+</div>
+<ul>
+<li><p>Keep client orchestration: repeats authorization, ordering, and recovery
+logic in every client instead of one server-side lifecycle.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">클라이언트 오케스트레이션 유지: 서버 측 생명주기 하나 대신 모든 클라이언트가 권한 검사, 순서, 복구 로직을 반복해야 합니다.</span></p>
+</div>
+</li>
+<li><p>Delete the parent then clean child DB rows: cannot prove backend snapshot
+deletion and bypasses access cleanup and ordinary quota handling.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">부모를 먼저 삭제하고 자식 DB row를 정리: backend 스냅샷 삭제를 증명할 수 없고, access 정리와 일반 quota 처리를 우회합니다.</span></p>
+</div>
+</li>
+<li><p>Require a bulk-delete driver method: forces changes across drivers before
+availability; existing per-resource methods suffice for this proposal.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">일괄 삭제 driver 메서드 요구: 기능을 쓰기 전에 여러 driver를 바꿔야 합니다. 이 제안에는 기존 리소스별 메서드로 충분합니다.</span></p>
+</div>
+</li>
+<li><p>Reuse <code class="docutils literal notranslate"><span class="pre">force</span></code> for cascade recovery, as Cinder does: rejected because
+Manila’s force discards DB rows after backend failures, which can orphan
+backend snapshots instead of retrying them.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Cinder처럼 cascade 복구에 force 재사용: 기각. Manila의 force는 backend 실패 후 DB row를 버려서, backend 스냅샷을 재시도하는 대신 고아로 남길 수 있습니다.</span></p>
+</div>
+</li>
+<li><p>Restore untouched children after a failure: pass each child’s prior status
+in the RPC and return children that received no driver call to that status.
+Not selected; administrator retry covers this case and also recovers
+resources left <code class="docutils literal notranslate"><span class="pre">deleting</span></code> by a manila-share restart.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">실패 후 손대지 않은 자식 복원: 각 자식의 이전 상태를 RPC로 넘기고, driver 호출을 받지 않은 자식을 그 상태로 되돌립니다. 미채택. 관리자 재시도가 이 경우를 다루고, manila-share 재시작으로 deleting에 남은 리소스까지 복구합니다.</span></p>
+</div>
+</li>
+<li><p>Restrict deployment to deferred-disabled environments: selected here, with
+explicit hidden-child rejection. Waiting for periodic deletion or overriding
+deferred policy with a force-cascade action requires a separate design.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">지연 삭제가 꺼진 환경으로 제한: 이번에 선택한 방식이며, 숨은 자식을 명시적으로 거부합니다. 주기 삭제를 기다리거나 force-cascade 동작으로 지연 삭제 정책을 덮어쓰는 것은 별도 설계가 필요합니다.</span></p>
+</div>
+</li>
+</ul>
+</section>
+<section id="data-model-impact">
+<h3>Data model impact<a class="headerlink" href="#data-model-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">데이터 모델 영향</span></p>
+</div>
+<p>None. Cascade intent is passed only through the manager RPC; no new fields,
+status values, or migrations are added.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음. cascade 의도는 manager RPC로만 전달되며, 새 필드·상태 값·마이그레이션을 추가하지 않습니다.</span></p>
+</div>
+</section>
+<section id="rest-api-impact">
+<h3>REST API impact<a class="headerlink" href="#rest-api-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">REST API 영향</span></p>
+</div>
+<p>In the new microversion, represented by <code class="docutils literal notranslate"><span class="pre">2.N</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>DELETE /v2/{project_id}/shares/{share_id}?cascade=true
+X-OpenStack-Manila-API-Version: 2.N
+</pre></div>
+</div>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">2.N으로 표기하는 새 microversion에서:</span></p>
+</div>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">(요청 예시) 2.N microversion 헤더와 cascade=true 쿼리 파라미터로 share DELETE를 요청합니다.</span></p>
+</div>
+<p>Return <code class="docutils literal notranslate"><span class="pre">202</span></code> with an empty body; backend completion is asynchronous. Invalid
+or duplicate booleans and explicit cascade below <code class="docutils literal notranslate"><span class="pre">2.N</span></code> return <code class="docutils literal notranslate"><span class="pre">400</span></code>. Keep
+policy/missing-resource <code class="docutils literal notranslate"><span class="pre">403</span></code>/<code class="docutils literal notranslate"><span class="pre">404</span></code> and existing invalid-status mappings.
+Unsupported scope, overlapping admission, enabled deferred deletion, either
+deferred child state, or an RPC version pin below cascade support return
+<code class="docutils literal notranslate"><span class="pre">409</span></code>. A retry on a <code class="docutils literal notranslate"><span class="pre">deleting</span></code> or <code class="docutils literal notranslate"><span class="pre">error_deleting</span></code> parent without
+<code class="docutils literal notranslate"><span class="pre">share:delete_cascade_retry</span></code> keeps the existing invalid-status response. No
+new query parameter is added for retry, and the force-delete body is
+unchanged.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">202와 빈 본문을 반환하며, backend 삭제 완료는 비동기입니다. 잘못되거나 중복된 boolean 값, 2.N 미만에서 명시한 cascade는 400을 반환합니다. policy 거부·리소스 없음의 403/404와 기존 잘못된 상태 매핑은 유지합니다. 지원하지 않는 범위, 겹치는 승인, 지연 삭제 활성화, 두 deferred 자식 상태 중 하나, cascade 지원 버전 미만의 RPC pin은 409를 반환합니다. share:delete_cascade_retry 없이 deleting이나 error_deleting 부모에 재시도하면 기존의 잘못된 상태 응답을 그대로 받습니다. 재시도용 쿼리 파라미터는 추가하지 않으며, force-delete 본문도 바뀌지 않습니다.</span></p>
+</div>
+</section>
+<section id="driver-impact">
+<h3>Driver impact<a class="headerlink" href="#driver-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">드라이버 영향</span></p>
+</div>
+<p>None. No new driver method or capability is added; <code class="docutils literal notranslate"><span class="pre">delete_snapshot</span></code> and
+<code class="docutils literal notranslate"><span class="pre">delete_share</span></code> are reused. Driver CI must verify snapshot deletion while the
+parent is <code class="docutils literal notranslate"><span class="pre">deleting</span></code>. Backend dependency failures retain the parent.
+Administrator retry may call <code class="docutils literal notranslate"><span class="pre">delete_snapshot</span></code> or <code class="docutils literal notranslate"><span class="pre">delete_share</span></code> for a
+resource already removed from the backend; drivers that report such a call as
+an error stop the retry safely, and driver CI should cover this case.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음. 새 driver 메서드나 capability를 추가하지 않고 delete_snapshot과 delete_share를 재사용합니다. driver CI는 부모가 deleting인 동안 스냅샷 삭제가 되는지 검증해야 합니다. backend 의존성 때문에 실패하면 부모는 유지됩니다. 관리자 재시도는 이미 backend에서 제거된 리소스에 delete_snapshot이나 delete_share를 호출할 수 있습니다. 이런 호출을 오류로 보고하는 driver는 재시도를 안전하게 멈추며, driver CI가 이 경우를 다뤄야 합니다.</span></p>
+</div>
+</section>
+<section id="security-impact">
+<h3>Security impact<a class="headerlink" href="#security-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">보안 영향</span></p>
+</div>
+<p>Grant no force permissions; honor locks and authorize each target before
+manager elevation, because one request deletes multiple resources. Retry adds
+the admin-default <code class="docutils literal notranslate"><span class="pre">share:delete_cascade_retry</span></code> policy; it relaxes only status
+checks and never discards DB rows.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">force 권한을 부여하지 않습니다. 한 요청이 여러 리소스를 삭제하므로, manager 권한 상승 전에 잠금을 존중하고 대상마다 권한을 검사합니다. 재시도는 관리자 기본값의 share:delete_cascade_retry policy를 추가하며, 이 policy는 상태 검사만 완화하고 DB row를 버리지 않습니다.</span></p>
+</div>
+</section>
+<section id="notifications-impact">
+<h3>Notifications impact<a class="headerlink" href="#notifications-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">알림 영향</span></p>
+</div>
+<p>None. Existing <code class="docutils literal notranslate"><span class="pre">share.delete.start</span></code>/<code class="docutils literal notranslate"><span class="pre">share.delete.end</span></code> events and payloads
+stay in the parent lifecycle; child-phase failures never enter it.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음. 기존 share.delete.start/share.delete.end 이벤트와 payload는 부모 생명주기에만 머물며, 자식 단계의 실패는 여기에 들어가지 않습니다.</span></p>
+</div>
+</section>
+<section id="other-end-user-impact">
+<h3>Other end user impact<a class="headerlink" href="#other-end-user-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">기타 최종 사용자 영향</span></p>
+</div>
+<p>Add <code class="docutils literal notranslate"><span class="pre">--cascade</span></code> with microversion negotiation. Document partial failure,
+deferred-mode rejection, administrator retry, and existing administrative
+recovery.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">microversion 협상과 함께 –cascade를 추가합니다. 부분 실패, 지연 삭제 모드에서의 거부, 관리자 재시도, 기존 관리자 복구 방법을 문서화합니다.</span></p>
+</div>
+</section>
+<section id="performance-impact">
+<h3>Performance Impact<a class="headerlink" href="#performance-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">성능 영향</span></p>
+</div>
+<p>Sequential deletion keeps one manager worker busy for the child phase. Backend
+call counts follow ordinary deletion; admission adds DB checks and short locks.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">순차 삭제는 자식 단계 동안 manager worker 하나를 점유합니다. backend 호출 수는 일반 삭제와 같고, 승인 단계에 DB 검사와 짧은 lock이 추가됩니다.</span></p>
+</div>
+</section>
+<section id="other-deployer-impact">
+<h3>Other deployer impact<a class="headerlink" href="#other-deployer-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">기타 배포자 영향</span></p>
+</div>
+<p>Set <code class="docutils literal notranslate"><span class="pre">is_deferred_deletion_enabled=False</span></code> in manila-api’s <code class="docutils literal notranslate"><span class="pre">[DEFAULT]</span></code> to use
+cascade. Cascade becomes available once every manila-share service is
+upgraded and the RPC pin is lifted. Disabling it does not make pending
+deferred children eligible: both deferred states must be absent. No new
+option is added; non-cascade behavior and existing immediate quota handling
+remain unchanged. Operators who delegate retry must grant
+<code class="docutils literal notranslate"><span class="pre">share:delete_cascade_retry</span></code> explicitly.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">cascade를 쓰려면 manila-api의 [DEFAULT]에 is_deferred_deletion_enabled=False를 설정합니다. 모든 manila-share 서비스가 업그레이드되고 RPC pin이 해제되면 cascade를 쓸 수 있습니다. 설정을 꺼도 대기 중인 deferred 자식이 대상이 되지는 않으며, 두 deferred 상태가 모두 없어야 합니다. 새 옵션은 추가하지 않고, cascade가 아닌 동작과 기존 즉시 quota 처리는 바뀌지 않습니다. 재시도를 다른 사람에게 위임하려는 운영자는 share:delete_cascade_retry를 명시적으로 부여해야 합니다.</span></p>
+</div>
+</section>
+<section id="developer-impact">
+<h3>Developer impact<a class="headerlink" href="#developer-impact" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">개발자 영향</span></p>
+</div>
+<p>Shared DB state-update helpers and snapshot-operation guards must cooperate
+with cascade admission; update their callers and tests with the manager RPC.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">공용 DB 상태 업데이트 helper와 스냅샷 작업 guard가 cascade 승인과 맞물려 동작해야 합니다. 호출부와 테스트를 manager RPC와 함께 갱신합니다.</span></p>
+</div>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">구현</span></p>
+</div>
+<section id="assignee-s">
+<h3>Assignee(s)<a class="headerlink" href="#assignee-s" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">담당자</span></p>
+</div>
+<p>Primary assignee: Inyong Hong (hong-p).</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">주 담당자: Inyong Hong (hong-p).</span></p>
+</div>
+</section>
+<section id="work-items">
+<h3>Work Items<a class="headerlink" href="#work-items" title="Link to this heading">¶</a></h3>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">작업 항목</span></p>
+</div>
+<ul>
+<li><p>Register the blueprint and assign the microversion.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">blueprint를 등록하고 microversion을 배정합니다.</span></p>
+</div>
+</li>
+<li><p>Add hidden-child admission, atomic updates, and the identified state checks.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">숨은 자식 승인 검사, 원자적 업데이트, 앞서 정한 상태 검사를 추가합니다.</span></p>
+</div>
+</li>
+<li><p>Add sequential manager deletion, RPC, and the unfiltered completion gate.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">순차 manager 삭제, RPC, 필터 없는 완료 게이트를 추가합니다.</span></p>
+</div>
+</li>
+<li><p>Add the <code class="docutils literal notranslate"><span class="pre">share:delete_cascade_retry</span></code> policy and retry admission.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">share:delete_cascade_retry policy와 재시도 승인을 추가합니다.</span></p>
+</div>
+</li>
+<li><p>Add client support, tests, API history, documentation, and a release note.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">클라이언트 지원, 테스트, API 이력, 문서, release note를 추가합니다.</span></p>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">의존성</span></p>
+</div>
+<p>None. Existing libraries suffice; client support is covered under Work Items.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">없음. 기존 라이브러리로 충분하며, 클라이언트 지원은 작업 항목에 포함돼 있습니다.</span></p>
+</div>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">테스트</span></p>
+</div>
+<ul>
+<li><p>Omitted/false cascade, zero children, policy denial, and invalid versions.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">cascade 생략/false, 자식 없음, policy 거부, 잘못된 버전.</span></p>
+</div>
+</li>
+<li><p>Enabled deferred deletion returns <code class="docutils literal notranslate"><span class="pre">409</span></code>, even without children.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">지연 삭제가 켜져 있으면 자식이 없어도 409를 반환합니다.</span></p>
+</div>
+</li>
+<li><p>With the setting disabled and parent <code class="docutils literal notranslate"><span class="pre">available</span></code>, either deferred child
+state, alone or mixed with ordinary children, returns <code class="docutils literal notranslate"><span class="pre">409</span></code> without state,
+quota, RPC, or notification changes. Test the filter-discarding wrapper gap.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">설정이 꺼져 있고 부모가 available일 때, 두 deferred 자식 상태 중 하나가 단독으로 있든 일반 자식과 섞여 있든 상태·quota·RPC·알림 변경 없이 409를 반환합니다. filters를 버리는 wrapper로 생기는 공백도 테스트합니다.</span></p>
+</div>
+</li>
+<li><p>A deferred parent retains existing rejection; turning the setting off does
+not bypass hidden-child checks. The completion gate also includes them.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">deferred 부모는 기존 거부를 유지하고, 설정을 꺼도 숨은 자식 검사를 우회하지 않습니다. 완료 게이트도 숨은 자식을 포함합니다.</span></p>
+</div>
+</li>
+<li><p>Instance/status validation, conflicting-update rollback, and create/manage
+(including forced creation), clone, revert, and concurrent deletion races.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">instance/상태 검증, 충돌하는 업데이트의 롤백, create/manage(강제 생성 포함), clone, revert, 동시 삭제 경쟁 상태.</span></p>
+</div>
+</li>
+<li><p>Child-before-parent ordering, child-4 failure, quota/access cleanup,
+unchanged notifications, and admin recovery.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">자식 먼저·부모 나중 순서, 4번 자식 실패, quota/access 정리, 알림 불변, 관리자 복구.</span></p>
+</div>
+</li>
+<li><p>Retry after child-4 failure resumes from child 4 and deletes the parent;
+retry without the policy is rejected; a repeated failure stops again without
+discarding DB rows; retry still rejects deferred states.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">4번 자식 실패 후 재시도하면 4번부터 이어서 부모까지 삭제합니다. policy 없는 재시도는 거부됩니다. 실패가 반복되면 DB row를 버리지 않고 다시 멈춥니다. 재시도도 deferred 상태는 계속 거부합니다.</span></p>
+</div>
+</li>
+</ul>
+<p>Add DB concurrency and Tempest share-with-snapshots tests; validate driver CI.
+No exactly-once delivery or automatic restart recovery is claimed.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">DB 동시성 테스트와 스냅샷이 있는 share에 대한 Tempest 테스트를 추가하고 driver CI로 검증합니다. 정확히 한 번 전달(exactly-once)이나 자동 재시작 복구는 보장하지 않습니다.</span></p>
+</div>
+</section>
+<section id="documentation-impact">
+<h2>Documentation Impact<a class="headerlink" href="#documentation-impact" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">문서 영향</span></p>
+</div>
+<p>Document the option, supported scope, deferred configuration/rejection reasons,
+asynchronous completion, administrator retry and its precondition, and
+force-delete/reset-state recovery.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">옵션, 지원 범위, 지연 삭제 설정과 거부 사유, 비동기 완료, 관리자 재시도와 그 전제 조건, force-delete/reset-state 복구를 문서화합니다.</span></p>
+</div>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">참고 자료</span></p>
+</div>
+<ul>
+<li><p><a class="reference external" href="https://github.com/openstack/cinder/blob/41304dd2fde5a10550ea151ac5afcf25c4b4c108/cinder/volume/api.py#L473">Cinder cascade admission</a></p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Cinder cascade 승인 코드</span></p>
+</div>
+</li>
+<li><p><a class="reference external" href="https://github.com/openstack/cinder/blob/41304dd2fde5a10550ea151ac5afcf25c4b4c108/cinder/volume/manager.py#L994">Cinder manager loop</a></p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Cinder manager 삭제 루프</span></p>
+</div>
+</li>
+<li><p><a class="reference external" href="https://github.com/openstack/manila/blob/20b721293904f59ae429539fb70dc1343c68dc3b/manila/share/api.py">Manila share API and deferred setting</a></p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Manila share API와 지연 삭제 설정</span></p>
+</div>
+</li>
+<li><p><a class="reference external" href="https://github.com/openstack/manila/blob/20b721293904f59ae429539fb70dc1343c68dc3b/manila/share/manager.py#L4209">Manila snapshot quota release and periodic retry</a></p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Manila 스냅샷 quota 반환과 주기 재시도</span></p>
+</div>
+</li>
+<li><p><a class="reference external" href="https://github.com/openstack/manila/blob/20b721293904f59ae429539fb70dc1343c68dc3b/manila/db/sqlalchemy/api.py#L3944">Manila DB deferred filtering and snapshot helper</a></p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Manila DB의 deferred 필터링과 스냅샷 helper</span></p>
+</div>
+</li>
+<li><p><a class="reference external" href="https://bugs.launchpad.net/manila/+bug/TBD">share_snapshot_get_all_for_share discards filters (bug fix)</a></p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">share_snapshot_get_all_for_share가 filters를 버리는 문제 (버그 수정)</span></p>
+</div>
+</li>
+</ul>
+</section>
+</section>
+
+
+              </div>
+            </div>
+          </div>
+          <div class="docs-actions">
+          
+            <a href="../release_independent/share-server-multiple-subnet.html"><i class="fa fa-angle-double-left" data-toggle="tooltip" data-placement="top" title="Previous: Share servers with multiple subnets"></i></a>
+          
+          
+            <a href="../hibiscus/lustre-driver.html"><i class="fa fa-angle-double-right" data-toggle="tooltip" data-placement="top" title="Next: Lustre share driver for Manila"></i></a>
+          
+            <a id="logABugLink3" href="" target="_blank" title="Found an error? Report a bug against this page"><i class="fa fa-bug" data-toggle="tooltip" data-placement="top" title="Report a Bug"></i></a>
+          
+          </div>
+          <div class="row docs-byline bottom">
+            <div class="docs-updated">this page last updated: 2026-10-06 17:10:44</div>
+          </div>
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 docs-license">
+<a href="https://creativecommons.org/licenses/by/3.0/">
+ <img src="../../_static/images/docs/license.png" alt="Creative Commons Attribution 3.0 License"/>
+</a>
+<p>
+ Except where otherwise noted, this document is licensed under
+ <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons
+ Attribution 3.0 License</a>. See all <a href="https://www.openstack.org/legal">
+ OpenStack Legal Documents</a>.
+</p>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 docs-actions-wrapper">
+            <!-- ID buglinkbottom added so that pre-filled doc bugs
+                 are sent to Launchpad projects related to the
+                 document -->
+              <a href="#" id="logABugLink2" class="docs-footer-actions"><i class="fa fa-bug"></i> found an error? report a bug</a>
+            </div>
+          </div>
+        </div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-lg-pull-9 col-md-pull-8 col-sm-pull-8 order-1 docs-sidebar">
+  <div class="btn-group docs-sidebar-releases">
+    <button onclick="location.href='/'" class="btn docs-sidebar-home" data-toggle="tooltip" data-placement="top" title="OpenStack Docs Home"><i class="fa fa-arrow-circle-o-left"></i></button>
+<button type="button" data-bs-toggle="dropdown" class="btn dropdown-toggle docs-sidebar-release-select">OpenStack Documentation</button>
+<ul class="dropdown-menu docs-sidebar-dropdown" role="menu">
+  <li class="dropdown-header">Guides</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#install-guides">Install Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#user-guides">User Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#configuration-guides">Configuration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#ops-and-admin-guides">Operations and Administration Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#api-guides">API Guides</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/index.html#contributor-guides">Contributor Guides</a></li>
+  <li class="dropdown-header">Languages</li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/de/">Deutsch (German)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/fr/">Français (French)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/id/">Bahasa Indonesia (Indonesian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/it/">Italiano (Italian)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ja/">日本語 (Japanese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/ko_KR/">한국어 (Korean)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/pt_BR/">Português (Portuguese)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/tr_TR/">Türkçe (Türkiye)</a></li>
+  <li><a class="dropdown-item" href="https://docs.openstack.org/zh_CN/">简体中文 (Simplified Chinese)</a></li>
+</ul>
+  </div>
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="table-of-contents">
+      <a href="../../index.html" class="docs-sidebar-section-title"><h4>manila-specs 0.0.1.dev226</h4></a>
+      <ul>
+<li class="toctree-l1"><a class="reference internal" href="../release_independent/integrate-manilaclient.html">Integrate manilaclient OSC commands into OSC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_independent/manila-support-openstackclient.html">OSC support for Manila</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_independent/mechanism-to-prevent-race-conditions.html">Mechanism to Prevent Race Conditions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_independent/openstacksdk-manila-support.html">Support Manila APIs in the OpenStackSDK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_independent/scenario-tests.html">Scenario tests design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_independent/service-startup-reconciliation.html">Service Startup Reconciliation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_independent/share-server-multiple-subnet.html">Share servers with multiple subnets</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Share deletion with dependent snapshots</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#problem-description">Problem description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#proposed-change">Proposed change</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation">Implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation-impact">Documentation Impact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../hibiscus/lustre-driver.html">Lustre share driver for Manila</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hibiscus/manila-per-process-healthchecks.html">Per-Process Healthcheck Endpoints</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hibiscus/share-server-replica.html">Share Server Replica</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gazpacho/allow-force-deletion-of-used-subnets.html">Allow force deletion of used subnets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gazpacho/qos_types.html">Manila qos types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gazpacho/remove-v1.html">Remove v1 API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gazpacho/spec-lite-add-human-readable-export-location-to-share-manage.html">Spec Lite: Add human readable export location to share manage</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../flamingo/share_backup_out_of_place_restore.html">Manila - Share backup out of place restore</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flamingo/share_encryption.html">Manila share encryption</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dalmatian/add-ensure-shares-api.html">Add new ensure shares API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dalmatian/spec-lite-pass-resource-metadata-updates-to-backend-drivers.html">Spec Lite: Pass resource metadata updates to backend drivers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../caracal/deferred_deletion.html">Manila share and share snapshot deferred deletion</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../bobcat/allow-locking-shares-against-deletion.html">Allow locking shares against deletion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bobcat/protect-access-rules.html">Prevent Access rules from being viewed or manipulated by non-owners</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../bobcat/spec-lite-netapp-activeiq-weigher.html">Spec Lite: Scheduler Weigher based on Netapp Active IQ</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../antelope/backup_share.html">Manila backup &amp; restore share</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../zed/manila-oversubscription-enhancements.html">Manila oversubscription enhancements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../yoga/metadata-for-share-resources.html">Metadata for all user facing resources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yoga/share-transfer-between-project.html">Transfer share between project</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../xena/affinity-antiaffinity-filter.html">Affinity and anti-affinity scheduler filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../xena/share-support-recycle-bin.html">Support Share Recycle Bin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../xena/spec-lite-add-human-readable-export-locations.html">Spec Lite: Add human readable export location support</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../wallaby/security-service-updates-in-use-share-network.html">Security Service Updates for In Use Share Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wallaby/share-size-limited-by-share-type.html">The share size can be limited by share type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wallaby/spec-lite-add-max-shares-on-share-server-limit.html">Spec Lite: Add new share server limits</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../victoria/share-server-migration.html">Share Server Migration</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ussuri/create-share-from-snapshot-in-another-pool.html">Create share from snapshots in another pool or back end</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ussuri/query-user-messages-filter-by-comparison-timestamp.html">Support to query user messages filtering by timestamp comparison</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../train/share-network-multiple-subnets.html">Making manila share networks span multiple subnets (with AZs)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../train/update-share-type-name-or-description.html">Update share-type’s metadata</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../stein/availability-zone-improvements.html">Storage Availability Zone improvements in Stein</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../stein/manage-unmanage-with-share-servers.html">Manage / Unmanage with Share Servers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../rocky/metadata-for-access-rule-resource.html">Support metadata for access rule</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../queens/add-count-info-in-list-response.html">Show resource’s total count info in share list APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../queens/ensure-share.html">Ensure share</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pike/add-share-groups-quota.html">Add share_groups quota</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pike/ceilometer-integration.html">Integration with ceilometer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pike/gather_share_usage_size.html">Share usage size tracking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pike/like-filter.html">Flexible API filters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pike/manila-ipv6.html">Support IPv6 access in manila</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pike/support-filter-share-by-export-location.html">Support retrieving shares filtered by export-location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pike/support-quotas-per-share-type.html">Support quotas per share type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pike/user-messages.html">User Messages</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/add-db-manage-purge.html">Manila db purge utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/add-share-type-filter-to-get-pools.html">Support retrieve pools filtered by share-type</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/create-share-from-snapshot-extra-spec.html">Create share from snapshot extra spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/fix-and-improve-access-rules.html">Fix and improve access rules and interactions with share drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/manila-share-groups.html">Add share groups to Manila</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/manila-share-revert-to-snapshot.html">Add share revert-to-snapshot feature to manila</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/mountable-snapshots.html">Add mountable snapshots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/ocata-migration-improvements.html">Share migration Ocata improvements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ocata/support-quota-usage-in-detail.html">Add detail API to quota-set API collection</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../newton/auth-access-keys.html">Store authentication secrets in access mappings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../newton/hpb-support.html">manila networking support for hierarchical port bindings for neutron</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../newton/newton-migration-improvements.html">Newton Share Migration Improvements</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../unimplemented/add-json-schema-validation-for-api.html">API Validation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unimplemented/priority-for-access-rules.html">Add new priority attribute for access rules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unimplemented/share-and-backend-capabilities-improvements.html">Improve share and back end capabilities in Stein</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unimplemented/spec-lite-limit-max-replica-amount.html">Spec Lite: Limit number of allowed replicas per share</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unimplemented/stochastic-weighing-scheduler.html">Stochastic Weighing Scheduler</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to: manila-specs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs_deadlines.html">Process and Deadlines for Specs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../template.html">Spec Template</a></li>
+</ul>
+
+    </div>
+
+  <div class="docs-sidebar-toc">
+    <div class="docs-sidebar-section" id="local-table-of-contents">
+      <h4 class="docs-sidebar-section-title">Page Contents</h4>
+      <ul>
+<li><a class="reference internal" href="#">Share deletion with dependent snapshots</a><ul>
+<li><a class="reference internal" href="#problem-description">Problem description</a><ul>
+<li><a class="reference internal" href="#interaction-with-deferred-deletion">Interaction with deferred deletion</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#proposed-change">Proposed change</a><ul>
+<li><a class="reference internal" href="#scope">Scope</a></li>
+<li><a class="reference internal" href="#admission">Admission</a></li>
+<li><a class="reference internal" href="#manager-flow">Manager flow</a></li>
+<li><a class="reference internal" href="#failure-and-recovery">Failure and recovery</a></li>
+<li><a class="reference internal" href="#administrator-retry">Administrator retry</a></li>
+<li><a class="reference internal" href="#out-of-scope">Out of scope</a></li>
+<li><a class="reference internal" href="#alternatives">Alternatives</a></li>
+<li><a class="reference internal" href="#data-model-impact">Data model impact</a></li>
+<li><a class="reference internal" href="#rest-api-impact">REST API impact</a></li>
+<li><a class="reference internal" href="#driver-impact">Driver impact</a></li>
+<li><a class="reference internal" href="#security-impact">Security impact</a></li>
+<li><a class="reference internal" href="#notifications-impact">Notifications impact</a></li>
+<li><a class="reference internal" href="#other-end-user-impact">Other end user impact</a></li>
+<li><a class="reference internal" href="#performance-impact">Performance Impact</a></li>
+<li><a class="reference internal" href="#other-deployer-impact">Other deployer impact</a></li>
+<li><a class="reference internal" href="#developer-impact">Developer impact</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li><a class="reference internal" href="#assignee-s">Assignee(s)</a></li>
+<li><a class="reference internal" href="#work-items">Work Items</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#documentation-impact">Documentation Impact</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  </div>
+</div>
+      </div>
+    </div>
+<footer>
+  <div class="container">
+    <div class="row footer-links">
+      <div class="col-lg-2 col-sm-2">
+        <h3>OpenStack</h3>
+        <ul>
+          <li><a href="https://www.openstack.org/software/project-navigator/">Projects</a></li>
+          <li><a href="https://security.openstack.org/">OpenStack Security</a></li>
+          <li><a href="https://openstack.org/blog/">Blog</a></li>
+          <li><a href="https://openstack.org/news/">News</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Community</h3>
+        <ul>
+          <li><a href="https://www.meetup.com/pro/openinfradev/">User Groups</a></li>
+          <li><a href="https://openstack.org/community/events/">Events</a></li>
+          <li><a href="https://openstack.org/community/jobs/">Jobs</a></li>
+          <li><a href="https://openinfra.dev/members/">Companies</a></li>
+          <li><a href="https://docs.openstack.org/contributors">Contribute</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Documentation</h3>
+        <ul>
+          <li><a href="https://docs.openstack.org">OpenStack Manuals</a></li>
+          <li><a href="https://openstack.org/software/start/">Getting Started</a></li>
+          <li><a href="https://developer.openstack.org">API Documentation</a></li>
+          <li><a href="https://wiki.openstack.org">Wiki</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-sm-2">
+        <h3>Branding &amp; Legal</h3>
+        <ul>
+          <li><a href="https://openinfra.dev/legal">Legal Docs</a></li>
+          <li><a href="https://openstack.org/brand/">Logos &amp; Guidelines</a></li>
+          <li><a href="https://openinfra.dev/legal/trademark-policy">Trademark Policy</a></li>
+          <li><a href="https://openinfra.dev/privacy-policy">Privacy Policy</a></li>
+          <li><a href="https://docs.openstack.org/contributors/common/setup-gerrit.html#individual-contributor-license-agreement">OpenInfra CLA</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-sm-4">
+        <h3>Stay In Touch</h3>
+        <a href="https://twitter.com/OpenStack" target="_blank" class="social-icons footer-twitter"></a>
+        <a href="https://www.facebook.com/openinfradev" target="_blank" class="social-icons footer-facebook"></a>
+        <a href="https://www.linkedin.com/company/open-infrastructure-foundation" target="_blank" class="social-icons footer-linkedin"></a>
+        <a href="https://www.youtube.com/user/OpenStackFoundation" target="_blank" class="social-icons footer-youtube"></a>
+        <p class="fine-print">
+          The OpenStack project is provided under the
+          <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>. Docs.openstack.org is powered by
+          <a href="https://rackspace.com" target="_blank">Rackspace Cloud Computing</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- jQuery -->
+<script src="../../_static/js/jquery-3.2.1.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="../../_static/js/bootstrap.bundle.min.js"></script>
+
+<!-- The rest of the JS -->
+<script src="../../_static/js/navigation.js"></script>
+
+<!-- Docs JS -->
+<script src="../../_static/js/docs.js"></script>
+
+<!-- Javascript for page -->
+<script>
+  /* Build a description of this page including SHA, source location on git
+   * repo, build time and the project's launchpad bug tag. Set the HREF of the
+   * bug buttons
+   */
+    var lineFeed = "%0A";
+    var gitURL = "Source: Can't derive source file URL";
+
+    /* there have been cases where "pagename" wasn't set; better check for it */
+    /* "giturl" is the URL of the source file on Git and is auto-generated by
+     * openstackdocstheme.
+     *
+     * "pagename" is a standard sphinx parameter containing the name of
+     * the source file, without extension.
+     */
+
+    var sourceFile = "specs/indri/share-delete-cascade" + ".rst";
+    gitURL = "Source: https://opendev.org/openstack/manila-specs/src/doc/source" + "/" + sourceFile;
+
+    /* gitsha, project and bug_tag rely on variables in conf.py */
+    var gitSha = "SHA: 92b0e801cadcf3fb3a536d3c2ffa4abe1fa8a986";
+    var repositoryName = "openstack/manila-specs";
+    var bugProject = "manila";
+    var bugTitle = "Share deletion with dependent snapshots in manila-specs";
+    var fieldTags = "";
+    var useStoryboard = "";
+
+    /* "last_updated" is the build date and time. It relies on the
+       conf.py variable "html_last_updated_fmt", which should include
+       year/month/day as well as hours and minutes                   */
+    var buildstring = "Release: 0.0.1.dev226 on 2026-10-06 17:10:44";
+
+    var fieldComment = encodeURI(buildstring) +
+                       lineFeed + encodeURI(gitSha) +
+                       lineFeed + encodeURI(gitURL) ;
+
+    logABug(bugTitle, bugProject, fieldComment, fieldTags, repositoryName, useStoryboard);
+</script>
+
+
+  </body>
+</html>
