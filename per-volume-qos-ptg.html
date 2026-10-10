@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A short PTG speaking draft for the Cinder per-volume QoS proposal, in simple English.">
+  <link rel="icon" href="./_static/favicon.ico">
+  <title>Per-volume QoS · PTG Speaking Draft</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c2730; background: #f3f6f8; }
+    body { margin: 0; }
+    main { max-width: 760px; margin: 0 auto; padding: 48px 24px 72px; }
+    nav { display: flex; flex-wrap: wrap; gap: 12px 24px; font-size: .95rem; }
+    a { color: #176896; text-underline-offset: 3px; }
+    .eyebrow { color: #2a7ab0; font-size: .8rem; font-weight: 700; letter-spacing: .12em; margin: 36px 0 12px; }
+    h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 12px; }
+    .subtitle, footer { color: #52626d; line-height: 1.6; }
+    article { background: #fff; border: 1px solid #dbe4e9; border-radius: 12px; margin-top: 28px; padding: 24px 32px; font-size: 1.15rem; line-height: 1.85; }
+    article p { margin: 0 0 1.3em; }
+    article p:last-child { margin-bottom: 0; }
+    footer { margin-top: 24px; font-size: .85rem; }
+    @media (max-width: 560px) { main { padding: 28px 16px 48px; } article { padding: 22px; } }
+    @media print { :root { background: white; } main { max-width: none; padding: 0; } nav { display: none; } .eyebrow { margin-top: 0; } article { border: 0; padding: 0; font-size: 12pt; line-height: 1.6; } article p { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Document links">
+      <a href="./index.html">All documents</a>
+      <a href="./specs/2027.1/per-volume-qos.html">Read the spec</a>
+    </nav>
+    <p class="eyebrow">CINDER / PTG</p>
+    <h1>Per-volume QoS</h1>
+    <p class="subtitle">PTG speaking draft · Simple English</p>
+    <article aria-label="Speaking draft">
+      <p>Hello everyone. I would like to propose per-volume QoS support in Cinder.</p>
+
+      <p>We need this feature in our environment, so we made local changes and are using them now. We have implemented it in the NetApp, Dell PowerFlex, and Dell PowerStore drivers. We would like to bring this feature upstream.</p>
+
+      <p>Our current code stores QoS values in volume metadata to keep the changes small. For upstream, the spec proposes adding new database fields and a new API action to change QoS. It also adds an optional QoS field to the volume create API.</p>
+
+      <p>Let me briefly explain the main points.</p>
+
+      <p>Today, we need different volume types for different QoS values. To change QoS on an existing volume, we need to change its volume type.</p>
+
+      <p>With this proposal, we can set the maximum IOPS and throughput for each volume without changing its type. We can set these values when creating a volume, or change them while the volume is in use, without detaching it. These limits cover reads and writes together. Burst settings stay as they are.</p>
+
+      <p>Users can change the values within a range set by the administrator in the volume type. If no range is set for a limit, only an administrator can set it. Administrators can also set values outside the range.</p>
+
+      <p>Values set on a volume take priority over the matching QoS values in its volume type. If we clear a value, the volume uses the type's setting for that limit again.</p>
+
+      <p>For now, this proposal only covers QoS applied by the storage backend. We plan to add a common driver method to update QoS. When creating a volume with QoS values, Cinder will choose only a backend that supports this feature.</p>
+
+      <p>For the first upstream drivers, the current spec proposes NetApp ONTAP and Dell PowerFlex.</p>
+
+      <p>We would appreciate your feedback on this feature and the proposed design. Is there anything we should change or consider?</p>
+
+      <p>Thank you.</p>
+    </article>
+    <footer>
+      Checked against the <a href="./specs/2027.1/per-volume-qos.html">2027.1 per-volume QoS spec</a> on October 10, 2026.
+      This is a proposal; upstream support is planned.
+    </footer>
+  </main>
+</body>
+</html>

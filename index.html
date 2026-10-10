@@ -65,6 +65,10 @@
       <div id="status">문서 목록을 불러오는 중입니다…</div>
       <ul id="docs">
         <li>
+          <a href="./per-volume-qos-ptg.html">Per-volume QoS · PTG Speaking Draft</a>
+          <span class="path">per-volume-qos-ptg.html</span>
+        </li>
+        <li>
           <a href="./storage-acronym-glossary.html">Storage Developer Glossary · 259 terms</a>
           <span class="path">storage-acronym-glossary.html</span>
         </li>
@@ -127,6 +131,9 @@
     const status = document.querySelector("#status");
     const count = document.querySelector("#count");
     let documents = [{
+      path: "per-volume-qos-ptg.html",
+      title: "Per-volume QoS · PTG Speaking Draft"
+    }, {
       path: "storage-acronym-glossary.html",
       title: "Storage Developer Glossary · 259 terms"
     }, {
@@ -161,6 +168,7 @@
       title: "In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션"
     }];
     const knownTitles = {
+      "per-volume-qos-ptg.html": "Per-volume QoS · PTG Speaking Draft",
       "bootc-baremetal-ironic.html": "디스크 이미지에서 컨테이너 이미지로 · bootc 베어메탈 배포",
       "pvc-rebinding/index.html": "In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션",
       "declarative-underlays.html": "OpenStack 언더레이를 Cluster API로 선언적 운영",
