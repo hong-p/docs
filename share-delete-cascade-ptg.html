@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A short PTG speaking draft for the Manila share cascade delete proposal, in simple English.">
+  <link rel="icon" href="./_static/favicon.ico">
+  <title>Share Cascade Delete · PTG Speaking Draft</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c2730; background: #f3f6f8; }
+    body { margin: 0; }
+    main { max-width: 760px; margin: 0 auto; padding: 48px 24px 72px; }
+    nav { display: flex; flex-wrap: wrap; gap: 12px 24px; font-size: .95rem; }
+    a { color: #176896; text-underline-offset: 3px; }
+    .eyebrow { color: #2a7ab0; font-size: .8rem; font-weight: 700; letter-spacing: .12em; margin: 36px 0 12px; }
+    h1 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 12px; }
+    .subtitle, footer { color: #52626d; line-height: 1.6; }
+    article { background: #fff; border: 1px solid #dbe4e9; border-radius: 12px; margin-top: 28px; padding: 24px 32px; font-size: 1.15rem; line-height: 1.85; }
+    article p { margin: 0 0 1.3em; }
+    article p:last-child { margin-bottom: 0; }
+    footer { margin-top: 24px; font-size: .85rem; }
+    @media (max-width: 560px) { main { padding: 28px 16px 48px; } article { padding: 22px; } }
+    @media print { :root { background: white; } main { max-width: none; padding: 0; } nav { display: none; } .eyebrow { margin-top: 0; } article { border: 0; padding: 0; font-size: 12pt; line-height: 1.6; } article p { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Document links">
+      <a href="./index.html">All documents</a>
+      <a href="./ptg-speaking-notes.html#share-delete-cascade">All PTG speaking drafts</a>
+      <a href="./specs/2027.1/share-delete-cascade.html">Read the spec</a>
+    </nav>
+    <p class="eyebrow">MANILA / PTG</p>
+    <h1>Share Cascade Delete</h1>
+    <p class="subtitle">PTG speaking draft · Simple English</p>
+    <article aria-label="Speaking draft">
+      <p>Hi everyone.</p>
+
+      <p>I’d like to propose a cascade delete option for Manila. With this option, users can delete a share and its snapshots in one request.</p>
+
+      <p>We already use this feature in our local version of Manila. We would like to add it to upstream as well. Cinder already has a similar feature, so I suggest following the same basic approach.</p>
+
+      <p>Our local version only supports the NetApp driver. We also kept the changes to Manila small. Because of this, our local version is a little different from this spec.</p>
+
+      <p>There are three main points in this proposal.</p>
+
+      <p>First, Manila deletes the snapshots one by one, and then deletes the share. If a snapshot cannot be deleted, the process stops and the share is kept.</p>
+
+      <p>Second, it uses the existing driver methods for deleting snapshots and shares. There is no need to add a new driver method.</p>
+
+      <p>Third, the first version has a limited scope. It does not support shares with replicas or deferred deletion. We can discuss support for those later.</p>
+
+      <p>One difference from Cinder is how we retry after a failure.</p>
+
+      <p>Cinder uses both cascade and force to retry. But force delete works differently in Manila. In Manila, force can remove database records even if deletion on the storage backend fails.</p>
+
+      <p>So I suggest retrying with the same cascade option, without adding a force option. By default, only admins would be allowed to retry a failed or stopped cascade delete. Regular members could still use cascade for a normal delete.</p>
+
+      <p>The retry would try to delete the remaining snapshots, and then the share. If deletion fails again, it would stop and keep the database records.</p>
+
+      <p>I’d like to hear your thoughts, especially on this retry approach and the scope of the first version.</p>
+
+      <p>Thank you.</p>
+    </article>
+    <footer>
+      Checked against the <a href="./specs/2027.1/share-delete-cascade.html">2027.1 share cascade delete spec</a> on October 10, 2026.
+      This is a proposal; upstream support is planned.
+    </footer>
+  </main>
+</body>
+</html>
