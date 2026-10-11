@@ -56,7 +56,7 @@
       이 페이지가 GitHub 저장소의 파일 트리를 읽어 목록에 자동으로 표시합니다.
     </p>
 
-    <p class="intro" style="margin-top: 20px;"><a href="./ptg-speaking-notes.html" style="color: #176896;">PTG 발언문 모음 · CBT Backup / Per-volume QoS / Share Cascade Delete</a></p>
+    <p class="intro" style="margin-top: 20px;"><a href="./ptg-speaking-notes.html" style="color: #176896;">PTG 발언문 모음 · CBT Backup / Per-volume QoS / Share Cascade Delete / Snapshot Create Force</a></p>
 
     <section class="catalog" aria-label="문서 카탈로그">
       <div class="toolbar">
@@ -66,6 +66,10 @@
       </div>
       <div id="status">문서 목록을 불러오는 중입니다…</div>
       <ul id="docs">
+        <li>
+          <a href="./snapshot-create-force-ptg.html">Snapshot create force · PTG Speaking Draft</a>
+          <span class="path">snapshot-create-force-ptg.html</span>
+        </li>
         <li>
           <a href="./ptg-speaking-notes.html">PTG Speaking Drafts · 발언문 모음</a>
           <span class="path">ptg-speaking-notes.html</span>
@@ -141,6 +145,9 @@
     const status = document.querySelector("#status");
     const count = document.querySelector("#count");
     let documents = [{
+      path: "snapshot-create-force-ptg.html",
+      title: "Snapshot create force · PTG Speaking Draft"
+    }, {
       path: "ptg-speaking-notes.html",
       title: "PTG Speaking Drafts · 발언문 모음"
     }, {
@@ -184,6 +191,7 @@
       title: "In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션"
     }];
     const knownTitles = {
+      "snapshot-create-force-ptg.html": "Snapshot create force · PTG Speaking Draft",
       "ptg-speaking-notes.html": "PTG Speaking Drafts · 발언문 모음",
       "share-delete-cascade-ptg.html": "Share Cascade Delete · PTG Speaking Draft",
       "per-volume-qos-ptg.html": "Per-volume QoS · PTG Speaking Draft",

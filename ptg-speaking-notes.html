@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="PTG speaking drafts in one place: Cinder CBT backup, per-volume QoS, and Manila share cascade delete.">
+  <meta name="description" content="PTG speaking drafts in one place: Cinder CBT backup, per-volume QoS, Manila share cascade delete, and snapshot create force.">
   <link rel="icon" href="./_static/favicon.ico">
   <title>PTG Speaking Drafts · Hong-p Docs</title>
   <style>
@@ -42,6 +42,7 @@
           <li><a href="#cbt-backup">Cinder · CBT Backup</a></li>
           <li><a href="#per-volume-qos">Cinder · Per-volume QoS</a></li>
           <li><a href="#share-delete-cascade">Manila · Share Cascade Delete</a></li>
+          <li><a href="#snapshot-create-force">Manila · Snapshot Create Force</a></li>
         </ul>
       </div>
     </nav>
@@ -129,6 +130,36 @@
     <footer>
       Checked against the <a href="./specs/2027.1/share-delete-cascade.html">2027.1 share cascade delete spec</a> on October 10, 2026.
       This is a proposal; upstream support is planned.
+    </footer>
+    </section>
+    <section id="snapshot-create-force" aria-labelledby="snapshot-create-force-title">
+      <p class="eyebrow">MANILA / PTG</p>
+      <h2 id="snapshot-create-force-title">Snapshot Create Force</h2>
+      <p class="subtitle">Time slot: 14:30–14:55</p>
+      <nav class="section-links" aria-label="Snapshot create force links"><a href="./specs/2027.1/share-delete-cascade.html">Share cascade deletion spec</a><a href="#contents">Back to contents</a></nav>
+    <article aria-label="Speaking draft">
+      <p>Hi everyone. While working on the share cascade deletion spec, I found an issue with the force parameter in the snapshot create API.</p>
+
+      <p>The API reference documents this parameter, but the controller ignores it. So if the source share is in the error state, for example, setting force=true still returns HTTP 400, saying that the share must be available. I reported this as bug 2169703.</p>
+
+      <p>There is also an older report, bug 1811336. In May 2019, Tom Barron commented that this had been discussed at the PTG and suggested removing the option because no clear use case had been identified. That bug expired, but the parameter is still documented today.</p>
+
+      <p>I’d like to discuss whether we should support this option or deprecate and remove it.</p>
+
+      <p>Does anyone have a real use case for creating a snapshot from a share that is not available? For example, would this help with recovery if the share is in an error state in Manila but is still usable on the backend?</p>
+
+      <p>If we keep it, we need to define which share states should allow forced snapshot creation. This also affects the cascade deletion spec: even with force=true, snapshot creation should be blocked while the source share is being deleted.</p>
+
+      <p>If there is no clear use case, we could follow the earlier recommendation and remove the option through the appropriate deprecation process.</p>
+
+      <p>What do people think? Should we fix the API to honor force=true, with clear state restrictions, or move toward removing it?</p>
+    </article>
+    <footer>
+      References:
+      <a href="https://bugs.launchpad.net/manila/+bug/2169703">Bug 2169703</a> ·
+      <a href="https://bugs.launchpad.net/manila/+bug/1811336/comments/3">Tom Barron’s May 2, 2019 comment on bug 1811336</a> ·
+      <a href="https://docs.openstack.org/api-ref/shared-file-system/#create-share-snapshot">Snapshot create API reference</a>.
+      Draft prepared on October 10, 2026.
     </footer>
     </section>
   </main>
