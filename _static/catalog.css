@@ -21,12 +21,20 @@ h1 { font-size: clamp(32px, 4.2vw, 48px); line-height: 1.35; letter-spacing: -2p
 .library-stamp { min-width: 170px; padding-left: 35px; border-left: 1px solid var(--line); display: flex; flex-direction: column; align-items: flex-start; color: var(--muted); font-size: 12px; }
 .library-stamp .stamp-label { margin: 0; font-size: 9px; }
 .library-stamp strong { font-size: 68px; line-height: 1.25; font-weight: 400; letter-spacing: -3px; color: var(--green); }
-.featured { display: flex; justify-content: space-between; align-items: center; gap: 20px; background: #244d43; color: #fff; border-radius: 14px; padding: 28px 32px; transition: background .15s; }
-.featured:hover { background: #193d34; }
-.featured-label { color: #c0d5ba; font-size: 10px; letter-spacing: 1.8px; font-weight: 650; }
-.featured h2 { margin: 12px 0 9px; font-size: 23px; letter-spacing: -.7px; }
-.featured p { color: #d1ded7; margin: 0; font-size: 12px; line-height: 1.8; }
-.featured-arrow { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border: 1px solid #728d7e; border-radius: 50%; font-size: 23px; }
+.recent-grid { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.recent-grid li:first-child { grid-row: span 2; }
+.featured { height: 100%; display: flex; flex-direction: column; align-items: flex-start; background: #e9efe8; color: var(--ink); border: 1px solid #d7e1d6; border-radius: 12px; padding: 24px; transition: background .15s; }
+.featured:hover { background: #dce8dc; }
+.featured-label { color: var(--green); font-size: 10px; letter-spacing: 1px; font-weight: 650; }
+.featured h3 { margin: 12px 0 9px; font-size: 18px; line-height: 1.45; letter-spacing: -.5px; overflow-wrap: anywhere; }
+.featured p { color: #52665b; margin: 0 0 24px; font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+.featured-meta { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: auto; gap: 10px; }
+.featured-meta time { color: #52665b; }
+.featured-meta > span:last-child { font-size: 21px; }
+.recent-grid li:first-child .featured { background: #244d43; color: white; border-color: #244d43; }
+.recent-grid li:first-child .featured:hover { background: #193d34; }
+.recent-grid li:first-child .featured-label, .recent-grid li:first-child p, .recent-grid li:first-child time { color: #d1ded7; }
+.recent-grid li:first-child h3 { font-size: 27px; margin-top: 24px; }
 .library { margin-top: 54px; }
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .section-heading h2 { font-size: 20px; letter-spacing: -.5px; margin: 0; }
@@ -65,12 +73,8 @@ footer strong { color: var(--ink); font-size: 12px; font-weight: 600; }
 @media (max-width: 850px) { .controls { flex-wrap: wrap; gap: 14px; } .search-sort { width: 100%; } .search { flex: 1; } .search input { width: 100%; } }
 @media (max-width: 600px) {
   .page { padding: 0 20px; } .topbar { height: 76px; } .hero { padding: 40px 0 32px; } h1 { font-size: 34px; letter-spacing: -1.5px; } .eyebrow { font-size: 8px; letter-spacing: 1.5px; } .intro { font-size: 12px; } .library-stamp { display: none; }
-  .featured { padding: 23px; gap: 16px; } .featured h2 { font-size: 20px; } .featured p { font-size: 11px; } .featured-arrow { width: 34px; height: 34px; font-size: 20px; }
+  .recent-grid { grid-template-columns: 1fr; } .recent-grid li:first-child { grid-row: auto; } .featured { padding: 22px; } .recent-grid li:first-child h3 { font-size: 23px; margin-top: 12px; }
   .library { margin-top: 36px; } .section-heading { align-items: flex-start; flex-direction: column; gap: 8px; } .section-heading h2 { font-size: 19px; } .section-heading p { font-size: 11px; }
   .tabs { gap: 2px; } .tabs button { padding: 9px 11px; } .document { padding: 21px 4px; flex-direction: column; align-items: stretch; gap: 12px; } .document h3 { font-size: 16px; } .document-meta { justify-content: space-between; } footer { margin-top: 40px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-
-.show-all { display: block; margin: 22px auto 0; padding: 11px 20px; border: 1px solid var(--line); border-radius: 7px; color: var(--green); background: #fff; font-size: 13px; }
-.show-all:hover { background: #edf1ea; }
-.fallback-docs summary { cursor: pointer; padding: 20px 0; color: var(--green); font-size: 13px; }

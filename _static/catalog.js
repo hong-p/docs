@@ -6,9 +6,6 @@
   const sort = document.querySelector('#sort');
   const buttons = [...document.querySelectorAll('[data-category]')];
   const status = document.querySelector('#status');
-  const showAll = document.querySelector('#show-all');
-  const recentLimit = 5;
-  let expanded = false;
   const cacheKey = 'hong-p-docs-catalog-v1';
   let documents = initial;
   let category = 'all';
@@ -27,21 +24,36 @@
   function dateLabel(value) {
     return new Intl.DateTimeFormat('sv-SE', {timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date(value)).replaceAll('-', '. ');
   }
+  function byUpdated(a, b) {
+    return (Date.parse(b.updated) || 0) - (Date.parse(a.updated) || 0) || a.title.localeCompare(b.title, 'ko');
+  }
+  function renderRecent() {
+    const fragment = document.createDocumentFragment();
+    for (const entry of [...documents].sort(byUpdated).slice(0, 5)) {
+      const item = node('li');
+      const link = node('a', 'featured');
+      link.href = './' + entry.path.split('/').map(encodeURIComponent).join('/');
+      link.append(node('span', 'featured-label', labels[entry.category]), node('h3', '', entry.title), node('p', '', entry.description));
+      const meta = node('div', 'featured-meta');
+      const date = node(entry.updated ? 'time' : 'span', '', entry.updated ? dateLabel(entry.updated) : '수정일 미확인');
+      if (entry.updated) date.dateTime = entry.updated;
+      const arrow = node('span', '', '↗');
+      arrow.setAttribute('aria-hidden', 'true');
+      meta.append(date, arrow); link.append(meta); item.append(link); fragment.append(item);
+    }
+    document.querySelector('#recent-docs').replaceChildren(fragment);
+  }
   function render() {
+    renderRecent();
     const query = filter.value.trim().toLocaleLowerCase();
     const visible = documents.filter(entry => (category === 'all' || entry.category === category) &&
       `${entry.title} ${entry.description} ${entry.path} ${labels[entry.category]}`.toLocaleLowerCase().includes(query));
     visible.sort((a, b) => {
       const titleOrder = a.title.localeCompare(b.title, 'ko');
-      return sort.value === 'title' ? titleOrder : (Date.parse(b.updated) || 0) - (Date.parse(a.updated) || 0) || titleOrder;
+      return sort.value === 'title' ? titleOrder : byUpdated(a, b);
     });
-    const recentView = category === 'all' && !query && sort.value === 'updated';
-    const displayed = recentView && !expanded ? visible.slice(0, recentLimit) : visible;
-    showAll.hidden = !recentView || visible.length <= recentLimit;
-    showAll.textContent = expanded ? '최근 5개만 보기' : `전체 문서 보기 (${visible.length})`;
-    showAll.setAttribute('aria-expanded', String(expanded));
     const fragment = document.createDocumentFragment();
-    for (const entry of displayed) {
+    for (const entry of visible) {
       const item = node('li');
       const link = node('a', 'document');
       link.href = './' + entry.path.split('/').map(encodeURIComponent).join('/');
@@ -63,19 +75,17 @@
       empty.append(reset); fragment.append(empty);
     }
     list.replaceChildren(fragment);
-    document.querySelector('#count').textContent = displayed.length < visible.length ? `${displayed.length} / ${visible.length}` : visible.length;
+    document.querySelector('#count').textContent = visible.length;
     document.querySelector('#total').textContent = documents.length;
   }
   function setCategory(value) {
     category = value;
-    expanded = false;
     buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.category === value)));
     render();
   }
   buttons.forEach(button => button.addEventListener('click', () => setCategory(button.dataset.category)));
-  filter.addEventListener('input', () => { expanded = false; render(); });
-  sort.addEventListener('change', () => { expanded = false; render(); });
-  showAll.addEventListener('click', () => { expanded = !expanded; render(); });
+  filter.addEventListener('input', render);
+  sort.addEventListener('change', render);
   document.querySelector('#controls').hidden = false;
   render();
 
