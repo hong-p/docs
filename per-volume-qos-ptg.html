@@ -54,12 +54,18 @@
 
       <p>For the first upstream drivers, the current spec proposes NetApp ONTAP and Dell PowerFlex.</p>
 
-      <p>We would appreciate your feedback on this feature and the proposed design. Is there anything we should change or consider?</p>
+      <p>We would appreciate your feedback on this feature and the proposed design. In particular, we have two questions.</p>
+
+      <p>First, users can set limits only within a range defined in the volume type extra specs. Is this a good way to let users control their own limits?</p>
+
+      <p>Second, if the current limits of a volume are outside the range of the new volume type, we plan to reject the retype. Is this the right behavior?</p>
+
+      <p>Is there anything else we should change or consider?</p>
 
       <p>Thank you.</p>
     </article>
     <footer>
-      Checked against the <a href="./specs/2027.1/per-volume-qos.html">2027.1 per-volume QoS spec</a> on October 10, 2026.
+      Checked against the <a href="./specs/2027.1/per-volume-qos.html">2027.1 per-volume QoS spec</a> on October 11, 2026.
       This is a proposal; upstream support is planned.
     </footer>
   </main>
