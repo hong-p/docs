@@ -3,270 +3,51 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenStack, Kubernetes, 스토리지에 관한 기술 노트와 설계 제안, PTG 발언문을 모아두는 Hong-p의 문서 라이브러리.">
   <link rel="icon" href="./_static/favicon.ico">
-  <title>Hong-p Docs</title>
-  <style>
-    :root {
-      color-scheme: light;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f3f6f8;
-      color: #1c2730;
-    }
-    body { margin: 0; }
-    main { max-width: 920px; margin: 0 auto; padding: 64px 24px 80px; }
-    .eyebrow { color: #2a7ab0; font-size: .78rem; font-weight: 700;
-      letter-spacing: .14em; margin: 0 0 12px; }
-    h1 { font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.05;
-      margin: 0 0 16px; }
-    .intro { color: #52626d; font-size: 1.08rem; line-height: 1.7;
-      max-width: 700px; margin: 0; }
-    .catalog { background: #fff; border: 1px solid #dbe4e9; border-radius: 12px;
-      box-shadow: 0 12px 30px rgba(32, 58, 72, .08); margin-top: 36px;
-      overflow: hidden; }
-    .toolbar { align-items: center; background: #f8fafb; border-bottom: 1px solid #e4ebef;
-      display: flex; gap: 16px; justify-content: space-between; padding: 16px 20px; }
-    label { color: #52626d; font-size: .9rem; font-weight: 600; }
-    input { border: 1px solid #c8d5dc; border-radius: 7px; box-sizing: border-box;
-      font: inherit; max-width: 360px; padding: 9px 11px; width: 48%; }
-    #count { color: #6b7b84; font-size: .86rem; white-space: nowrap; }
-    #status { color: #6b7b84; padding: 20px; }
-    #docs { list-style: none; margin: 0; padding: 0; }
-    #docs li { border-bottom: 1px solid #edf1f3; padding: 18px 20px; }
-    #docs li:last-child { border-bottom: 0; }
-    #docs a { color: #176896; font-size: 1.05rem; font-weight: 650; text-decoration: none; }
-    #docs a:hover { text-decoration: underline; }
-    .path { color: #7a8991; display: block; font-family: ui-monospace, SFMono-Regular,
-      Menlo, monospace; font-size: .8rem; margin-top: 5px; }
-    .empty { color: #6b7b84; padding: 20px; }
-    footer { color: #71818a; font-size: .84rem; line-height: 1.6; margin-top: 22px; }
-    footer a { color: #176896; }
-    @media (max-width: 560px) {
-      main { padding: 40px 16px 60px; }
-      .toolbar { align-items: stretch; flex-direction: column; gap: 9px; }
-      input { max-width: none; width: 100%; }
-    }
-  </style>
+  <link rel="stylesheet" href="./_static/catalog.css">
+  <title>Hong-p Docs · 문서 라이브러리</title>
 </head>
 <body>
-  <main>
-    <p class="eyebrow">HONG-P / DOCUMENTS</p>
-    <h1>문서 목록</h1>
-    <p class="intro">
-      GitHub Pages에 게시된 HTML 문서입니다. 새 HTML 파일을 저장소에 추가하면
-      이 페이지가 GitHub 저장소의 파일 트리를 읽어 목록에 자동으로 표시합니다.
-    </p>
-
-    <p class="intro" style="margin-top: 20px;"><a href="./ptg-speaking-notes.html" style="color: #176896;">PTG 발언문 모음 · CBT Backup / Per-volume QoS / Share Cascade Delete / Snapshot Create Force</a></p>
-
-    <section class="catalog" aria-label="문서 카탈로그">
-      <div class="toolbar">
-        <label for="filter">문서 검색</label>
-        <input id="filter" type="search" placeholder="제목 또는 경로 검색">
-        <span id="count" aria-live="polite"></span>
-      </div>
-      <div id="status">문서 목록을 불러오는 중입니다…</div>
-      <ul id="docs">
-        <li>
-          <a href="./snapshot-create-force-ptg.html">Snapshot create force · PTG Speaking Draft</a>
-          <span class="path">snapshot-create-force-ptg.html</span>
-        </li>
-        <li>
-          <a href="./ptg-speaking-notes.html">PTG Speaking Drafts · 발언문 모음</a>
-          <span class="path">ptg-speaking-notes.html</span>
-        </li>
-        <li>
-          <a href="./share-delete-cascade-ptg.html">Share Cascade Delete · PTG Speaking Draft</a>
-          <span class="path">share-delete-cascade-ptg.html</span>
-        </li>
-        <li>
-          <a href="./per-volume-qos-ptg.html">Per-volume QoS · PTG Speaking Draft</a>
-          <span class="path">per-volume-qos-ptg.html</span>
-        </li>
-        <li>
-          <a href="./storage-acronym-glossary.html">Storage Developer Glossary · 259 terms</a>
-          <span class="path">storage-acronym-glossary.html</span>
-        </li>
-        <li>
-          <a href="./specs/2026.2/incremental-backup-cbt.html">Incremental Backup with CBT</a>
-          <span class="path">specs/2026.2/incremental-backup-cbt.html</span>
-        </li>
-        <li>
-          <a href="./specs/2027.1/per-volume-qos.html">Per-volume QoS at create time and online update</a>
-          <span class="path">specs/2027.1/per-volume-qos.html</span>
-        </li>
-        <li>
-          <a href="./specs/2027.1/share-delete-cascade.html">Share deletion with dependent snapshots</a>
-          <span class="path">specs/2027.1/share-delete-cascade.html</span>
-        </li>
-        <li>
-          <a href="./cinder-cbt-implementation-guide.html">Cinder CBT 백업 구조와 구현</a>
-          <span class="path">cinder-cbt-implementation-guide.html</span>
-        </li>
-        <li>
-          <a href="./kubecon-china-2026-summary.html">KubeCon China 2026 통합 행사 분석 리포트</a>
-          <span class="path">kubecon-china-2026-summary.html</span>
-        </li>
-        <li>
-          <a href="./kubeedge-edge-resource-control.html">KubeEdge 엣지 리소스 업데이트 제어</a>
-          <span class="path">kubeedge-edge-resource-control.html</span>
-        </li>
-        <li>
-          <a href="./confidential-containers-lightweight.html">작업에 맞춘 경량 컨피덴셜 컨테이너</a>
-          <span class="path">confidential-containers-lightweight.html</span>
-        </li>
-        <li>
-          <a href="./declarative-underlays.html">OpenStack 언더레이를 Cluster API로 선언적 운영</a>
-          <span class="path">declarative-underlays.html</span>
-        </li>
-        <li>
-          <a href="./bootc-baremetal-ironic.html">디스크 이미지에서 컨테이너 이미지로 · bootc 베어메탈 배포</a>
-          <span class="path">bootc-baremetal-ironic.html</span>
-        </li>
-        <li>
-          <a href="./pvc-rebinding/index.html">In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션</a>
-          <span class="path">pvc-rebinding/index.html</span>
-        </li>
-      </ul>
-    </section>
-
-    <footer>
-      현재 문서 출처:
-      <a href="https://review.opendev.org/c/openstack/cinder-specs/+/985089">
-        OpenStack Cinder spec review 985089
-      </a>
-    </footer>
-  </main>
-
-  <script>
-    const apiUrl =
-      "https://api.github.com/repos/hong-p/docs/git/trees/main?recursive=1";
-    const filter = document.querySelector("#filter");
-    const list = document.querySelector("#docs");
-    const status = document.querySelector("#status");
-    const count = document.querySelector("#count");
-    let documents = [{
-      path: "snapshot-create-force-ptg.html",
-      title: "Snapshot create force · PTG Speaking Draft"
-    }, {
-      path: "ptg-speaking-notes.html",
-      title: "PTG Speaking Drafts · 발언문 모음"
-    }, {
-      path: "share-delete-cascade-ptg.html",
-      title: "Share Cascade Delete · PTG Speaking Draft"
-    }, {
-      path: "per-volume-qos-ptg.html",
-      title: "Per-volume QoS · PTG Speaking Draft"
-    }, {
-      path: "storage-acronym-glossary.html",
-      title: "Storage Developer Glossary · 259 terms"
-    }, {
-      path: "specs/2026.2/incremental-backup-cbt.html",
-      title: "Incremental Backup with CBT"
-    }, {
-      path: "specs/2027.1/per-volume-qos.html",
-      title: "Per-volume QoS at create time and online update"
-    }, {
-      path: "specs/2027.1/share-delete-cascade.html",
-      title: "Share deletion with dependent snapshots"
-    }, {
-      path: "cinder-cbt-implementation-guide.html",
-      title: "Cinder CBT 백업 구조와 구현"
-    }, {
-      path: "kubecon-china-2026-summary.html",
-      title: "KubeCon China 2026 통합 행사 분석 리포트"
-    }, {
-      path: "kubeedge-edge-resource-control.html",
-      title: "KubeEdge 엣지 리소스 업데이트 제어"
-    }, {
-      path: "confidential-containers-lightweight.html",
-      title: "작업에 맞춘 경량 컨피덴셜 컨테이너"
-    }, {
-      path: "declarative-underlays.html",
-      title: "OpenStack 언더레이를 Cluster API로 선언적 운영"
-    }, {
-      path: "bootc-baremetal-ironic.html",
-      title: "디스크 이미지에서 컨테이너 이미지로 · bootc 베어메탈 배포"
-    }, {
-      path: "pvc-rebinding/index.html",
-      title: "In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션"
-    }];
-    const knownTitles = {
-      "snapshot-create-force-ptg.html": "Snapshot create force · PTG Speaking Draft",
-      "ptg-speaking-notes.html": "PTG Speaking Drafts · 발언문 모음",
-      "share-delete-cascade-ptg.html": "Share Cascade Delete · PTG Speaking Draft",
-      "per-volume-qos-ptg.html": "Per-volume QoS · PTG Speaking Draft",
-      "bootc-baremetal-ironic.html": "디스크 이미지에서 컨테이너 이미지로 · bootc 베어메탈 배포",
-      "pvc-rebinding/index.html": "In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션",
-      "declarative-underlays.html": "OpenStack 언더레이를 Cluster API로 선언적 운영",
-      "confidential-containers-lightweight.html": "작업에 맞춘 경량 컨피덴셜 컨테이너",
-      "kubeedge-edge-resource-control.html": "KubeEdge 엣지 리소스 업데이트 제어",
-      "storage-acronym-glossary.html": "Storage Developer Glossary · 259 terms",
-      "specs/2026.2/incremental-backup-cbt.html": "Incremental Backup with CBT",
-      "specs/2027.1/per-volume-qos.html": "Per-volume QoS at create time and online update",
-      "specs/2027.1/share-delete-cascade.html": "Share deletion with dependent snapshots",
-      "cinder-cbt-implementation-guide.html": "Cinder CBT 백업 구조와 구현",
-      "kubecon-china-2026-summary.html": "KubeCon China 2026 통합 행사 분석 리포트"
-    };
-
-    function titleFor(path) {
-      if (knownTitles[path]) return knownTitles[path];
-      const name = path.split("/").pop().replace(/\.html$/, "");
-      return name.replace(/[-_]+/g, " ").replace(/\b\w/g, letter =>
-        letter.toUpperCase());
-    }
-
-    function linkFor(path) {
-      return "./" + path.split("/").map(encodeURIComponent).join("/");
-    }
-
-    function render() {
-      const query = filter.value.trim().toLowerCase();
-      const visible = documents.filter(document =>
-        `${document.title} ${document.path}`.toLowerCase().includes(query));
-      list.replaceChildren();
-      visible.forEach(entry => {
-        const item = document.createElement("li");
-        const link = document.createElement("a");
-        link.href = linkFor(entry.path);
-        link.textContent = entry.title;
-        const path = document.createElement("span");
-        path.className = "path";
-        path.textContent = entry.path;
-        item.append(link, path);
-        list.append(item);
-      });
-      if (!visible.length) {
-        const empty = document.createElement("li");
-        empty.className = "empty";
-        empty.textContent = "검색 결과가 없습니다.";
-        list.append(empty);
-      }
-      count.textContent = `${visible.length}개 문서`;
-    }
-
-    filter.addEventListener("input", render);
-    render();
-
-    fetch(apiUrl, {headers: {Accept: "application/vnd.github+json"}})
-      .then(response => {
-        if (!response.ok) throw new Error(`GitHub API ${response.status}`);
-        return response.json();
-      })
-      .then(tree => {
-        documents = tree.tree
-          .filter(item => item.type === "blob" && item.path.endsWith(".html") &&
-            item.path !== "index.html")
-          .map(item => ({path: item.path, title: titleFor(item.path)}))
-          .sort((left, right) => left.path.localeCompare(right.path));
-        status.textContent = "GitHub 저장소의 HTML 파일 목록입니다.";
-        render();
-      })
-      .catch(error => {
-        console.warn("문서 목록을 자동으로 갱신하지 못했습니다.", error);
-        status.textContent =
-          "자동 목록을 불러오지 못해 현재 등록된 문서만 표시합니다.";
-        render();
-      });
-  </script>
+  <a class="skip-link" href="#library">문서 목록으로 건너뛰기</a>
+  <div class="page">
+    <header class="topbar"><a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">h.</span> hong-p<span class="brand-divider">/</span>docs</a><a class="repo-link" href="https://github.com/hong-p/docs">GitHub <span aria-hidden="true">↗</span></a></header>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div><p class="eyebrow">NOTES, IDEAS & CONVERSATIONS</p><h1 id="page-title">읽고, 만들고,<br>함께 나누는 기록<span class="accent">.</span></h1><p class="intro">OpenStack과 Kubernetes, 그리고 스토리지.<br>기술 노트부터 설계 제안과 PTG 발언문까지 모았습니다.</p></div>
+        <div class="library-stamp"><span class="stamp-label">THE COLLECTION</span><strong id="total">16</strong><span>개의 문서와 아이디어</span></div>
+      </section>
+      <a class="featured" href="./ptg-speaking-notes.html"><div><span class="featured-label">MEETING NOTES · PTG</span><h2>PTG 발언문, 한곳에서.</h2><p>CBT Backup · Per-volume QoS · Share Cascade Delete · Snapshot Create Force</p></div><span class="featured-arrow" aria-hidden="true">↗</span></a>
+      <section id="library" class="library" aria-labelledby="library-title">
+        <div class="section-heading"><h2 id="library-title">문서 둘러보기 <span id="count" aria-live="polite">16</span></h2><p>최근 수정하거나 추가한 문서부터</p></div>
+        <div class="controls" id="controls" hidden>
+          <div class="tabs" role="group" aria-label="문서 종류"><button type="button" data-category="all" aria-pressed="true">전체</button><button type="button" data-category="ptg" aria-pressed="false">PTG 발언문</button><button type="button" data-category="spec" aria-pressed="false">설계 제안</button><button type="button" data-category="notes" aria-pressed="false">기술 노트</button></div>
+          <div class="search-sort"><label class="search"><span aria-hidden="true">⌕</span><span class="sr-only">문서 검색</span><input id="filter" type="search" placeholder="문서 검색" autocomplete="off"></label><label><span class="sr-only">정렬 기준</span><select id="sort"><option value="updated">최근 수정순</option><option value="title">제목순</option></select></label></div>
+        </div>
+        <ul id="docs" class="documents">
+        <li><a class="document" href="./ptg-speaking-notes.html"><div class="document-body"><span class="tag ptg">PTG 발언문</span><h3>PTG 발언문 모음</h3><p>Cinder와 Manila의 네 가지 안건을 한곳에서 읽는 영어 발언문.</p></div><div class="document-meta"><time datetime="2026-10-11T13:12:31+09:00">2026. 10. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./snapshot-create-force-ptg.html"><div class="document-body"><span class="tag ptg">PTG 발언문</span><h3>Snapshot Create Force</h3><p>스냅샷 생성 API의 force 옵션 지원과 제거 방향 논의.</p></div><div class="document-meta"><time datetime="2026-10-11T13:12:31+09:00">2026. 10. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./per-volume-qos-ptg.html"><div class="document-body"><span class="tag ptg">PTG 발언문</span><h3>Per-volume QoS</h3><p>볼륨별 QoS 설정과 온라인 변경을 제안하는 PTG 발언문.</p></div><div class="document-meta"><time datetime="2026-10-11T13:11:47+09:00">2026. 10. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./share-delete-cascade-ptg.html"><div class="document-body"><span class="tag ptg">PTG 발언문</span><h3>Share Cascade Delete</h3><p>공유와 스냅샷의 일괄 삭제, 실패 후 재시도에 관한 제안.</p></div><div class="document-meta"><time datetime="2026-10-11T13:11:47+09:00">2026. 10. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./specs/2027.1/per-volume-qos.html"><div class="document-body"><span class="tag spec">설계 제안</span><h3>Per-volume QoS at create time and online update</h3><p>볼륨 생성 시 QoS 지정과 사용 중인 볼륨의 QoS 변경.</p></div><div class="document-meta"><time datetime="2026-10-10T17:21:09+09:00">2026. 10. 10</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./specs/2027.1/share-delete-cascade.html"><div class="document-body"><span class="tag spec">설계 제안</span><h3>Share deletion with dependent snapshots</h3><p>의존하는 스냅샷과 함께 공유를 삭제하는 Manila 설계 제안.</p></div><div class="document-meta"><time datetime="2026-10-10T16:50:50+09:00">2026. 10. 10</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./bootc-baremetal-ironic.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>디스크 이미지에서 컨테이너 이미지로 · bootc 베어메탈 배포</h3><p>bootc와 Ironic을 활용한 컨테이너 기반 베어메탈 배포.</p></div><div class="document-meta"><time datetime="2026-09-11T00:21:49+09:00">2026. 09. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./confidential-containers-lightweight.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>작업에 맞춘 경량 컨피덴셜 컨테이너</h3><p>워크로드에 맞는 경량 컨피덴셜 컨테이너 설계.</p></div><div class="document-meta"><time datetime="2026-09-11T00:21:49+09:00">2026. 09. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./declarative-underlays.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>OpenStack 언더레이를 Cluster API로 선언적 운영</h3><p>Cluster API로 OpenStack 언더레이를 선언적으로 운영하기.</p></div><div class="document-meta"><time datetime="2026-09-11T00:21:49+09:00">2026. 09. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./kubecon-china-2026-summary.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>KubeCon China 2026 통합 행사 분석 리포트</h3><p>KubeCon China 2026 주요 발표와 기술 흐름 정리.</p></div><div class="document-meta"><time datetime="2026-09-11T00:21:49+09:00">2026. 09. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./kubeedge-edge-resource-control.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>KubeEdge 엣지 리소스 업데이트 제어</h3><p>엣지 환경에서 리소스 업데이트를 제어하는 방법.</p></div><div class="document-meta"><time datetime="2026-09-11T00:21:49+09:00">2026. 09. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./pvc-rebinding/index.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션</h3><p>Kubernetes 디스크 마이그레이션과 PVC 재연결.</p></div><div class="document-meta"><time datetime="2026-09-11T00:21:49+09:00">2026. 09. 11</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./cinder-cbt-implementation-guide.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>Cinder CBT 백업 구조와 구현</h3><p>변경 블록 추적을 활용한 증분 백업의 구조와 구현.</p></div><div class="document-meta"><time datetime="2026-09-08T07:20:01+08:00">2026. 09. 08</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./simon-meeting-agenda.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>Simon 미팅 아젠다</h3><p>Cinder 개발 방향과 구현에 관한 미팅 준비 자료.</p></div><div class="document-meta"><time datetime="2026-09-05T19:01:24+09:00">2026. 09. 05</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./storage-acronym-glossary.html"><div class="document-body"><span class="tag notes">기술 노트</span><h3>Storage Developer Glossary · 259 terms</h3><p>스토리지 개발에 자주 등장하는 용어와 약어 259개.</p></div><div class="document-meta"><time datetime="2026-09-05T16:28:26+09:00">2026. 09. 05</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        <li><a class="document" href="./specs/2026.2/incremental-backup-cbt.html"><div class="document-body"><span class="tag spec">설계 제안</span><h3>Incremental Backup with CBT</h3><p>CBT 기반 증분 백업을 위한 Cinder 설계 제안.</p></div><div class="document-meta"><time datetime="2026-08-30T23:59:30+09:00">2026. 08. 30</time><span class="arrow" aria-hidden="true">↗</span></div></a></li>
+        </ul>
+        <p class="catalog-note" id="status" role="status">수정일은 문서의 마지막 커밋 기준입니다.</p>
+      </section>
+    </main>
+    <footer><span><strong>hong-p / docs</strong><br>기록하고, 다음 대화를 준비하는 공간.</span><a href="https://github.com/hong-p/docs">View on GitHub ↗</a></footer>
+  </div>
+  <script id="catalog-data" type="application/json">[{"path": "ptg-speaking-notes.html", "title": "PTG 발언문 모음", "description": "Cinder와 Manila의 네 가지 안건을 한곳에서 읽는 영어 발언문.", "category": "ptg", "updated": "2026-10-11T13:12:31+09:00", "sha": "1133b483ed1aafec64c8f27f0ef95dd15bf577c3"}, {"path": "snapshot-create-force-ptg.html", "title": "Snapshot Create Force", "description": "스냅샷 생성 API의 force 옵션 지원과 제거 방향 논의.", "category": "ptg", "updated": "2026-10-11T13:12:31+09:00", "sha": "cbd3880748793be92cdb0acc97fad3c58c5faace"}, {"path": "per-volume-qos-ptg.html", "title": "Per-volume QoS", "description": "볼륨별 QoS 설정과 온라인 변경을 제안하는 PTG 발언문.", "category": "ptg", "updated": "2026-10-11T13:11:47+09:00", "sha": "4061f246c0b77585b02b1446dd33454fb9ec87e3"}, {"path": "share-delete-cascade-ptg.html", "title": "Share Cascade Delete", "description": "공유와 스냅샷의 일괄 삭제, 실패 후 재시도에 관한 제안.", "category": "ptg", "updated": "2026-10-11T13:11:47+09:00", "sha": "6c4bd785dd2ec0fb6091203dc1d5762bcbc82515"}, {"path": "specs/2027.1/per-volume-qos.html", "title": "Per-volume QoS at create time and online update", "description": "볼륨 생성 시 QoS 지정과 사용 중인 볼륨의 QoS 변경.", "category": "spec", "updated": "2026-10-10T17:21:09+09:00", "sha": "68fbbdf2430b2e28c55b49b59f61ae2ec7858a9c"}, {"path": "specs/2027.1/share-delete-cascade.html", "title": "Share deletion with dependent snapshots", "description": "의존하는 스냅샷과 함께 공유를 삭제하는 Manila 설계 제안.", "category": "spec", "updated": "2026-10-10T16:50:50+09:00", "sha": "f9ee89437a362c4d78a4ebbc7557444f6ac2d622"}, {"path": "bootc-baremetal-ironic.html", "title": "디스크 이미지에서 컨테이너 이미지로 · bootc 베어메탈 배포", "description": "bootc와 Ironic을 활용한 컨테이너 기반 베어메탈 배포.", "category": "notes", "updated": "2026-09-11T00:21:49+09:00", "sha": "194159338502fcc19a3ecdcb18da8669c097d662"}, {"path": "confidential-containers-lightweight.html", "title": "작업에 맞춘 경량 컨피덴셜 컨테이너", "description": "워크로드에 맞는 경량 컨피덴셜 컨테이너 설계.", "category": "notes", "updated": "2026-09-11T00:21:49+09:00", "sha": "e620143feeaf0ad0962ac8de06f92a065923c731"}, {"path": "declarative-underlays.html", "title": "OpenStack 언더레이를 Cluster API로 선언적 운영", "description": "Cluster API로 OpenStack 언더레이를 선언적으로 운영하기.", "category": "notes", "updated": "2026-09-11T00:21:49+09:00", "sha": "7303f335eccf7946c0a0d6cfba85f1874984c46f"}, {"path": "kubecon-china-2026-summary.html", "title": "KubeCon China 2026 통합 행사 분석 리포트", "description": "KubeCon China 2026 주요 발표와 기술 흐름 정리.", "category": "notes", "updated": "2026-09-11T00:21:49+09:00", "sha": "deeda9e711b14e261d6c28b58a064255c964c22b"}, {"path": "kubeedge-edge-resource-control.html", "title": "KubeEdge 엣지 리소스 업데이트 제어", "description": "엣지 환경에서 리소스 업데이트를 제어하는 방법.", "category": "notes", "updated": "2026-09-11T00:21:49+09:00", "sha": "20b9b95f139173b3c2a576f92af34a07cca9d04f"}, {"path": "pvc-rebinding/index.html", "title": "In-Place PVC Re-Binding · Kubernetes 디스크 마이그레이션", "description": "Kubernetes 디스크 마이그레이션과 PVC 재연결.", "category": "notes", "updated": "2026-09-11T00:21:49+09:00", "sha": "e0c5fe698ba577cf78f8a9cb30709e960bf80822"}, {"path": "cinder-cbt-implementation-guide.html", "title": "Cinder CBT 백업 구조와 구현", "description": "변경 블록 추적을 활용한 증분 백업의 구조와 구현.", "category": "notes", "updated": "2026-09-08T07:20:01+08:00", "sha": "259565fbdc32c1d7e97ce02a7f51307b0bc38145"}, {"path": "simon-meeting-agenda.html", "title": "Simon 미팅 아젠다", "description": "Cinder 개발 방향과 구현에 관한 미팅 준비 자료.", "category": "notes", "updated": "2026-09-05T19:01:24+09:00", "sha": "893e77339dd6d7b8cc70e1f4458f5841c70a0059"}, {"path": "storage-acronym-glossary.html", "title": "Storage Developer Glossary · 259 terms", "description": "스토리지 개발에 자주 등장하는 용어와 약어 259개.", "category": "notes", "updated": "2026-09-05T16:28:26+09:00", "sha": "649c5dc297ff012fcc6426157063c034ecfe70ce"}, {"path": "specs/2026.2/incremental-backup-cbt.html", "title": "Incremental Backup with CBT", "description": "CBT 기반 증분 백업을 위한 Cinder 설계 제안.", "category": "spec", "updated": "2026-08-30T23:59:30+09:00", "sha": "8ac07362b128b8cb3b88be355e973c8d48638430"}]</script>
+  <script src="./_static/catalog.js" defer></script>
 </body>
 </html>
