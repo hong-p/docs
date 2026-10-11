@@ -70,3 +70,7 @@ footer strong { color: var(--ink); font-size: 12px; font-weight: 600; }
   .tabs { gap: 2px; } .tabs button { padding: 9px 11px; } .document { padding: 21px 4px; flex-direction: column; align-items: stretch; gap: 12px; } .document h3 { font-size: 16px; } .document-meta { justify-content: space-between; } footer { margin-top: 40px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.show-all { display: block; margin: 22px auto 0; padding: 11px 20px; border: 1px solid var(--line); border-radius: 7px; color: var(--green); background: #fff; font-size: 13px; }
+.show-all:hover { background: #edf1ea; }
+.fallback-docs summary { cursor: pointer; padding: 20px 0; color: var(--green); font-size: 13px; }
