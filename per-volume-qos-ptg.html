@@ -44,7 +44,7 @@
 
       <p>Today, we need different volume types for different QoS values. To change QoS on an existing volume, we need to change its volume type.</p>
 
-      <p>With this proposal, we can set the maximum IOPS and throughput for each volume without changing its type. We can set these values when creating a volume, or change them while the volume is in use, without detaching it. These limits cover reads and writes together. Burst settings stay as they are.</p>
+      <p>With this proposal, we can set the maximum IOPS and throughput for each volume without changing its type. We can set these values when creating a volume, or change them while the volume is in use, without detaching it. Each limit counts reads and writes together.</p>
 
       <p>Users can change the values within a range set by the administrator in the volume type. If no range is set for a limit, only an administrator can set it. Administrators can also set values outside the range.</p>
 
