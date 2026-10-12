@@ -42,7 +42,7 @@
 
       <p>I’d like to discuss whether we should support this option or deprecate and remove it.</p>
 
-      <p>Does anyone have a real use case for creating a snapshot from a share that is not available? For example, would this help with recovery if the share is in an error state in Manila but is still usable on the backend?</p>
+      <p>Does anyone have a real use case for creating a snapshot from a share that is not available? I can think of extending_error and shrinking_error, where the data on the backend is likely still intact, but I’d like to hear your opinions.</p>
 
       <p>If we keep it, we need to define which share states should allow forced snapshot creation. This also affects the cascade deletion spec: even with force=true, snapshot creation should be blocked while the source share is being deleted.</p>
 
