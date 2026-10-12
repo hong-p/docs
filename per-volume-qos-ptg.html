@@ -46,7 +46,7 @@
 
       <p>With this proposal, we can set the maximum IOPS and throughput for each volume without changing its type. We can set these values when creating a volume, or change them while the volume is in use, without detaching it. Each limit counts reads and writes together.</p>
 
-      <p>Users can change the values within a range set by the administrator in the volume type. If no range is set for a limit, only an administrator can set it. Administrators can also set values outside the range.</p>
+      <p>The administrator sets a minimum and a maximum value in the volume type. Users can choose any value between them. Administrators can choose any value.</p>
 
       <p>Values set on a volume take priority over the matching QoS values in its volume type. If we clear a value, the volume uses the type's setting for that limit again.</p>
 
