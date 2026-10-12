@@ -117,7 +117,9 @@
 
       <p>One difference from Cinder is how we retry after a failure.</p>
 
-      <p>Cinder uses both cascade and force to retry. But force delete works differently in Manila. In Manila, force can remove database records even if deletion on the storage backend fails.</p>
+      <p>In Cinder, we can retry a failed cascade delete with both cascade and force. Force lets us skip the status checks and try the delete again.</p>
+
+      <p>But force delete works differently in Manila. It can remove database records even if deletion on the storage backend fails.</p>
 
       <p>So I suggest retrying with the same cascade option, without adding a force option. By default, only admins would be allowed to retry a failed or stopped cascade delete. Regular members could still use cascade for a normal delete.</p>
 
