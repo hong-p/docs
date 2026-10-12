@@ -38,7 +38,7 @@
 
       <p>We need this feature in our environment, so we made local changes and are using them now. We have implemented it in the NetApp, Dell PowerFlex, and Dell PowerStore drivers. We would like to bring this feature upstream.</p>
 
-      <p>Our current code stores QoS values in volume metadata to keep the changes small. For upstream, the spec proposes adding new database fields and a new API action to change QoS. It also adds an optional QoS field to the volume create API.</p>
+      <p>Our current code stores QoS values in volume metadata to keep the changes small. For upstream, we propose new database fields and a new API to change QoS. We also want to add a QoS option when you create a volume.</p>
 
       <p>Let me briefly explain the main points.</p>
 
@@ -48,17 +48,17 @@
 
       <p>The administrator sets a minimum and a maximum value in the volume type. Users can choose any value between them. Administrators can choose any value.</p>
 
-      <p>Values set on a volume take priority over the matching QoS values in its volume type. If we clear a value, the volume uses the type's setting for that limit again.</p>
+      <p>If you set a value on a volume, it takes priority over the volume type. If you clear it, the volume goes back to the type's setting.</p>
 
-      <p>For now, this proposal only covers QoS applied by the storage backend. We plan to add a common driver method to update QoS. When creating a volume with QoS values, Cinder will choose only a backend that supports this feature.</p>
+      <p>For now, this is only for QoS on the storage side. Each driver adds one method to update QoS. If you create a volume with QoS, Cinder picks only a backend that supports it.</p>
 
-      <p>For the first upstream drivers, the current spec proposes NetApp ONTAP and Dell PowerFlex.</p>
+      <p>We want to start with NetApp ONTAP and Dell PowerFlex.</p>
 
       <p>We would appreciate your feedback on this feature and the proposed design. In particular, we have two questions.</p>
 
-      <p>First, the administrator sets the allowed range in the volume type extra specs, and users can set limits for their own volumes only within that range. Is this a good approach?</p>
+      <p>First, is it a good idea to put the min and max values in the volume type extra specs?</p>
 
-      <p>Second, if the current limits of a volume are outside the range of the new volume type, we plan to reject the retype. Is this the right behavior?</p>
+      <p>Second, say a volume has a limit that is too high for the new volume type. We plan to block that retype. Is that OK?</p>
 
       <p>Is there anything else we should change or consider?</p>
 
