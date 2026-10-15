@@ -119,8 +119,8 @@
       <div class="qa">
         <p class="q">Q. What about replication and failover?</p>
         <p class="ko">복제(replication)와 failover는요?</p>
-        <p>A. The driver applies the limits to the secondary too. So the limits stay after failover.</p>
-        <p class="ko">드라이버가 secondary에도 상한을 적용합니다. 그래서 failover 뒤에도 상한이 유지됩니다.</p>
+        <p>A. When the replica is created, it already gets QoS from the volume type. But per-volume values can change later. So when they are set or changed, the driver applies them to the replica too. That way, the limits stay the same after failover.</p>
+        <p class="ko">복제본은 만들어질 때 이미 볼륨 타입의 QoS가 적용됩니다. 하지만 볼륨별 값은 나중에 바뀔 수 있습니다. 그래서 값을 설정하거나 바꿀 때 드라이버가 복제본에도 적용합니다. 그러면 failover 뒤에도 상한이 똑같이 유지됩니다.</p>
       </div>
       <div class="qa">
         <p class="q">Q. How will you test this in the gate? LVM doesn't support it.</p>
