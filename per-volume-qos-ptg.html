@@ -125,8 +125,8 @@
       <div class="qa">
         <p class="q">Q. How will you test this in the gate? LVM doesn't support it.</p>
         <p class="ko">게이트에서는 어떻게 테스트하나요? LVM은 지원하지 않는데요.</p>
-        <p>A. Driver tests will come from vendor third-party CI for NetApp and PowerFlex. We are also looking at RBD. It already has back-end QoS, so it could be tested in the upstream Ceph job.</p>
-        <p class="ko">드라이버 테스트는 NetApp과 PowerFlex의 벤더 서드파티 CI가 맡습니다. RBD도 검토하고 있습니다. RBD는 이미 back-end QoS가 있어서 upstream Ceph 잡에서 테스트할 수 있습니다.</p>
+        <p>A. Right, LVM doesn't support it. The RBD driver already has back-end QoS, so we will try to add support for RBD too, if possible. Then it can be tested in the upstream Ceph job.</p>
+        <p class="ko">맞습니다, LVM은 지원하지 않습니다. RBD 드라이버는 이미 back-end QoS가 있으니, 가능하면 RBD도 지원해 보겠습니다. 그러면 upstream Ceph 잡에서 테스트할 수 있습니다.</p>
       </div>
     </article>
     <footer>
