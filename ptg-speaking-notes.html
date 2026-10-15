@@ -28,6 +28,12 @@
     section { scroll-margin-top: 24px; margin-top: 48px; }
     .section-links { font-size: .95rem; }
     @media print { .contents, .section-links { display: none; } section { break-before: page; } section:first-of-type { break-before: auto; } }
+    .questions h3 { font-size: 1.2rem; margin: 0 0 16px; }
+    .qa { border-top: 1px solid #e3eaee; padding-top: 16px; margin-top: 16px; }
+    .qa:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+    .qa p { margin: 0 0 .4em; }
+    .qa .q { font-weight: 700; }
+    .qa .ko { color: #52626d; font-size: .95rem; line-height: 1.6; margin-bottom: .9em; }
   </style>
 </head>
 <body>
@@ -77,11 +83,13 @@
 
       <p>With this proposal, we can set the maximum IOPS and throughput for each volume without changing its type. We can set these values when creating a volume, or change them while the volume is in use, without detaching it. Each limit counts reads and writes together.</p>
 
-      <p>The administrator sets a minimum and a maximum value in the volume type. Users can choose any value between them. Administrators can choose any value.</p>
+      <p>The administrator turns this on for a volume type, and sets a minimum, a maximum, and a default value. Users can choose any value between the minimum and the maximum. Administrators can choose any value.</p>
 
-      <p>If you set a value on a volume, it takes priority over the volume type. If you clear it, the volume goes back to the type's setting.</p>
+      <p>If you set a value on a volume, it takes priority over the volume type. If you don't set one, or you clear it, the volume uses the type's default.</p>
 
-      <p>For now, this is only for QoS on the storage side. Each driver adds one method to update QoS. If you create a volume with QoS, Cinder picks only a backend that supports it.</p>
+      <p>When you retype a volume, it follows the new type. You can give new values in the retype request. If you don't, the new type's default is used.</p>
+
+      <p>For now, this is only for QoS on the storage side. Each driver adds one method to update QoS. Cinder puts these volumes only on backends that support it.</p>
 
       <p>We want to start with NetApp ONTAP and Dell PowerFlex.</p>
 
@@ -89,8 +97,71 @@
 
       <p>Thank you.</p>
     </article>
+    <article class="questions" aria-label="Expected questions">
+      <h3>Expected questions</h3>
+      <div class="qa">
+        <p class="q">Q. Why not use volume metadata or admin metadata?</p>
+        <p class="ko">왜 볼륨 메타데이터나 admin metadata를 쓰지 않나요?</p>
+        <p>A. Metadata is free-form text. There is no type check, no range check, and no API contract. With real columns, we get integers, validation, policy, and a microversioned API.</p>
+        <p class="ko">메타데이터는 자유 형식 텍스트라 타입 검사, 범위 검사, API 계약이 없습니다. 컬럼을 쓰면 정수 타입, 검증, 정책, microversion으로 관리되는 API를 얻습니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. Why put the range in volume type extra specs, not in the QoS spec?</p>
+        <p class="ko">범위를 왜 QoS spec이 아니라 볼륨 타입 extra spec에 두나요?</p>
+        <p>A. Users need to see the range. Users cannot read QoS specs, but we can show selected extra specs to them. Also, some drivers reject unknown keys in the QoS spec, for example NetApp.</p>
+        <p class="ko">사용자가 범위를 볼 수 있어야 합니다. 사용자는 QoS spec을 읽을 수 없지만, extra spec은 골라서 보여 줄 수 있습니다. 또 NetApp처럼 QoS spec에 모르는 키가 있으면 거부하는 드라이버가 있습니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. How does this work with front-end QoS?</p>
+        <p class="ko">front-end QoS와는 어떻게 함께 동작하나요?</p>
+        <p>A. We don't change front-end QoS. The hypervisor still applies it. So the real limit is the lower of the two.</p>
+        <p class="ko">front-end QoS는 바꾸지 않습니다. 하이퍼바이저가 계속 적용합니다. 그래서 실제 상한은 둘 중 낮은 값입니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. What happens if applying QoS fails after the volume is created?</p>
+        <p class="ko">볼륨을 만든 뒤 QoS 적용이 실패하면 어떻게 되나요?</p>
+        <p>A. The same as today when a driver fails to apply the type's QoS. The volume goes to error and we create a user message. We don't reschedule, because the volume already exists.</p>
+        <p class="ko">지금 드라이버가 타입 QoS 적용에 실패할 때와 같습니다. 볼륨은 error가 되고 사용자 메시지를 남깁니다. 볼륨이 이미 있으므로 재스케줄하지 않습니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. What about burst limits?</p>
+        <p class="ko">burst 상한은요?</p>
+        <p>A. Burst is out of scope for now. Burst settings in the QoS spec are not changed. We can add burst fields later in a new microversion.</p>
+        <p class="ko">burst는 지금은 범위 밖입니다. QoS spec의 burst 설정은 바뀌지 않습니다. 나중에 새 microversion으로 burst 필드를 추가할 수 있습니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. Can we extend this later, for example with read and write limits?</p>
+        <p class="ko">나중에 read/write 분리 상한 같은 걸로 확장할 수 있나요?</p>
+        <p>A. Yes. The API uses a qos object, so we can add new fields and new columns in a later microversion.</p>
+        <p class="ko">네. API가 qos 객체를 쓰므로, 이후 microversion에서 새 필드와 컬럼을 추가하면 됩니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. Do we need a total IOPS quota per project?</p>
+        <p class="ko">프로젝트 단위 총 IOPS 쿼터가 필요하지 않나요?</p>
+        <p>A. Good point, but it is out of scope for this spec. The range limits each volume, and the notifications let billing systems track changes. A project quota could be a follow-up.</p>
+        <p class="ko">좋은 지적이지만 이번 스펙의 범위 밖입니다. 범위가 볼륨마다 상한을 제한하고, 알림으로 과금 시스템이 변경을 추적할 수 있습니다. 프로젝트 쿼터는 후속 작업으로 할 수 있습니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. Why don't clones and snapshots inherit the limits?</p>
+        <p class="ko">클론과 스냅샷에서 만든 볼륨은 왜 상한을 물려받지 않나요?</p>
+        <p>A. To keep it simple. A new volume starts from its type's default, and you can give values when you create it.</p>
+        <p class="ko">단순하게 하려는 것입니다. 새 볼륨은 타입 기본값으로 시작하고, 생성할 때 값을 줄 수 있습니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. What about replication and failover?</p>
+        <p class="ko">복제(replication)와 failover는요?</p>
+        <p>A. The driver applies the limits to the secondary too. So the limits stay after failover.</p>
+        <p class="ko">드라이버가 secondary에도 상한을 적용합니다. 그래서 failover 뒤에도 상한이 유지됩니다.</p>
+      </div>
+      <div class="qa">
+        <p class="q">Q. How will you test this in the gate? LVM doesn't support it.</p>
+        <p class="ko">게이트에서는 어떻게 테스트하나요? LVM은 지원하지 않는데요.</p>
+        <p>A. Driver tests will come from vendor third-party CI for NetApp and PowerFlex. We are also looking at RBD. It already has back-end QoS, so it could be tested in the upstream Ceph job.</p>
+        <p class="ko">드라이버 테스트는 NetApp과 PowerFlex의 벤더 서드파티 CI가 맡습니다. RBD도 검토하고 있습니다. RBD는 이미 back-end QoS가 있어서 upstream Ceph 잡에서 테스트할 수 있습니다.</p>
+      </div>
+    </article>
     <footer>
-      Checked against the <a href="./specs/2027.1/per-volume-qos.html">2027.1 per-volume QoS spec</a> on October 11, 2026.
+      Checked against the <a href="./specs/2027.1/per-volume-qos.html">2027.1 per-volume QoS spec</a> on October 15, 2026.
       This is a proposal; upstream support is planned.
     </footer>
     </section>

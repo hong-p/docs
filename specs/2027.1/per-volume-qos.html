@@ -210,6 +210,8 @@ gtag('config', 'G-DD299CMF7V');
 <li><p>extra spec: 추가 사양 - 볼륨 타입에 붙이는 key/value 속성으로, 스케줄링이나 드라이버 동작을 지정함</p></li>
 <li><p>scoped key: 범위 접두어가 붙은 키 - per_volume_qos:처럼 콜론 앞 접두어가 있는 키로, capabilities:가 아니면 스케줄러가 무시함</p></li>
 <li><p>project member: 프로젝트 멤버 - 관리자 권한 없이 프로젝트 자원을 사용하는 일반 사용자 역할</p></li>
+<li><p>CapabilitiesFilter: 기능 필터 - 볼륨 타입 extra spec과 백엔드가 보고한 capability를 비교해 백엔드를 고르는 스케줄러 필터</p></li>
+<li><p>effective limit: 실제 적용 상한 - 볼륨별 값, 타입 기본값, 범위 최대값 순으로 계산해 실제로 적용하는 값</p></li>
 <li><p>third-party CI: 서드파티 CI - 벤더가 자기 스토리지 하드웨어로 운영하는 외부 테스트 시스템</p></li>
 </ul>
 </div>
@@ -287,83 +289,166 @@ apply unchanged.</p>
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">선택 항목인 볼륨별 상한 두 개, max_iops와 max_bps(초당 바이트)를 추가하고, 볼륨 메타데이터가 아니라 volumes 테이블의 새 컬럼에 저장합니다. 둘 다 read와 write를 합친 지속 상한입니다. burst 설정은 범위 밖이며, 볼륨 타입 QoS spec의 burst 상한은 바뀌지 않고 그대로 적용됩니다.</span></p>
 </div>
 <p>This spec covers back-end QoS only (<code class="docutils literal notranslate"><span class="pre">consumer=back-end</span></code>): the limits are
-applied by the volume driver on the storage system. Front-end (hypervisor)
-QoS is out of scope.</p>
+applied by the volume driver on the storage system. Front-end QoS specs are
+not changed and are still applied by the hypervisor, so the effective limit
+is the lower of the two.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">이 스펙은 back-end QoS(consumer=back-end)만 다룹니다. 즉 상한은 볼륨 드라이버가 스토리지 시스템에 적용합니다. front-end(하이퍼바이저) QoS는 범위 밖입니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">이 스펙은 back-end QoS(consumer=back-end)만 다룹니다. 즉 상한은 볼륨 드라이버가 스토리지 시스템에 적용합니다. front-end QoS spec은 바뀌지 않고 계속 하이퍼바이저가 적용하므로, 실제로 적용되는 상한은 둘 중 낮은 쪽입니다.</span></p>
+</div>
+<p>Volume type settings:</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 타입 설정:</span></p>
 </div>
 <ul class="simple">
-<li><p>A new microversion adds an optional <code class="docutils literal notranslate"><span class="pre">qos</span></code> object to volume create and a
-volume action <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code> for <code class="docutils literal notranslate"><span class="pre">available</span></code> or <code class="docutils literal notranslate"><span class="pre">in-use</span></code> volumes.</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">per_volume_qos_support='&lt;is&gt;</span> <span class="pre">True'</span></code> marks a volume type that allows
+per-volume limits, the same pattern as <code class="docutils literal notranslate"><span class="pre">multiattach</span></code>. The
+<code class="docutils literal notranslate"><span class="pre">CapabilitiesFilter</span></code> then places volumes of this type, also on retype and
+migration, only on backends reporting the new capability
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support=True</span></code>.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 microversion이 볼륨 생성 요청에 선택 항목인 qos 객체를 추가하고, available 또는 in-use 상태 볼륨에 쓰는 볼륨 action os-set_qos를 추가합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">per_volume_qos_support='&lt;is&gt; True'는 볼륨별 상한을 허용하는 볼륨 타입을 표시하며, multiattach와 같은 방식입니다. 그러면 CapabilitiesFilter가 이 타입의 볼륨을, retype과 마이그레이션 때도 포함해, 새 capability per_volume_qos_support=True를 보고하는 백엔드에만 배치합니다.</span></p>
 </div>
 </li>
-<li><p>The volume type defines the allowed range with the extra specs
+<li><p>For each limit, the type sets the allowed range and an optional default:
 <code class="docutils literal notranslate"><span class="pre">per_volume_qos:max_iops_min</span></code>, <code class="docutils literal notranslate"><span class="pre">per_volume_qos:max_iops_max</span></code>,
-<code class="docutils literal notranslate"><span class="pre">per_volume_qos:max_bps_min</span></code> and <code class="docutils literal notranslate"><span class="pre">per_volume_qos:max_bps_max</span></code>. The
-scheduler ignores these keys because they are scoped.</p>
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos:max_iops_default</span></code>, and the same three keys for
+<code class="docutils literal notranslate"><span class="pre">max_bps</span></code>. <code class="docutils literal notranslate"><span class="pre">_max</span></code> is required for a limit that has any of these keys,
+<code class="docutils literal notranslate"><span class="pre">_min</span></code> defaults to 1, and <code class="docutils literal notranslate"><span class="pre">_default</span></code> must be between them. The API
+checks this when the extra specs of a type with <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code>
+are set. On other types these scoped keys are ignored, as other scoped
+extra specs are.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 타입은 extra spec per_volume_qos:max_iops_min, per_volume_qos:max_iops_max, per_volume_qos:max_bps_min, per_volume_qos:max_bps_max로 허용 범위를 정의합니다. 이 키들은 scope가 붙어 있어 스케줄러가 무시합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">타입은 상한마다 허용 범위와 선택 항목인 기본값을 정합니다: per_volume_qos:max_iops_min, per_volume_qos:max_iops_max, per_volume_qos:max_iops_default, 그리고 max_bps용 같은 키 세 개입니다. 이 키 중 하나라도 있는 상한은 _max가 필수이고, _min은 기본값이 1이며, _default는 그 사이여야 합니다. API는 per_volume_qos_support가 있는 타입의 extra spec을 설정할 때 이를 검사합니다. 다른 타입에서는 다른 scope 키와 마찬가지로 이 키들을 무시합니다.</span></p>
 </div>
 </li>
-<li><p>The API checks each requested value against the range of the volume type
-and rejects a value outside it with 400. A limit without a range in the
-volume type cannot be set by a project member. Callers allowed by the
-<code class="docutils literal notranslate"><span class="pre">volume:set_qos:any_value</span></code> policy skip this check.</p>
+</ul>
+<p>Effective limits:</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">API는 요청한 각 값을 볼륨 타입의 범위와 비교하고, 범위를 벗어난 값은 400으로 거부합니다. 볼륨 타입에 범위가 없는 상한은 프로젝트 멤버가 설정할 수 없습니다. volume:set_qos:any_value 정책이 허용하는 호출자는 이 검사를 건너뜁니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">적용되는 상한:</span></p>
+</div>
+<ul class="simple">
+<li><p>For each limit, Cinder computes the value to apply: the per-volume value,
+else the type default, else the range maximum. If the type has no range for
+that limit, Cinder passes no value and the driver keeps applying the QoS
+spec as today.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Cinder는 상한마다 적용할 값을 계산합니다: 볼륨별 값, 없으면 타입 기본값, 그것도 없으면 범위의 최대값입니다. 타입에 그 상한의 범위가 없으면 Cinder는 값을 넘기지 않고, 드라이버는 지금처럼 QoS spec을 계속 적용합니다.</span></p>
 </div>
 </li>
-<li><p>New optional driver method <code class="docutils literal notranslate"><span class="pre">update_volume_qos(context,</span> <span class="pre">volume,</span> <span class="pre">qos)</span></code>. The
-base driver raises <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code>, so a driver without support
-fails the request explicitly instead of silently ignoring the limits.</p>
+<li><p>Type defaults are not copied into the volume. A changed default applies the
+next time the limits of the volume are applied.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">선택 구현 드라이버 메서드 update_volume_qos(context, volume, qos)를 새로 추가합니다. base 드라이버는 NotImplementedError를 발생시키므로, 지원하지 않는 드라이버는 상한을 조용히 무시하지 않고 요청을 명시적으로 실패시킵니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">타입 기본값은 볼륨에 복사하지 않습니다. 기본값을 바꾸면 그 볼륨의 상한이 다음에 적용될 때 반영됩니다.</span></p>
 </div>
 </li>
-<li><p>New backend capability <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code> (boolean, default
-<code class="docutils literal notranslate"><span class="pre">False</span></code>) reported in the volume stats. A driver that implements
-<code class="docutils literal notranslate"><span class="pre">update_volume_qos</span></code> reports <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<li><p>The driver maps the computed values to its own keys (for example
+<code class="docutils literal notranslate"><span class="pre">maxIOPS</span></code> or <code class="docutils literal notranslate"><span class="pre">total_iops_sec</span></code>), in place of the equivalent keys of the
+QoS spec. Other QoS spec keys, such as separate read and write limits, still
+apply.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 백엔드 capability per_volume_qos_support(불리언, 기본값 False)를 볼륨 통계(volume stats)로 보고합니다. update_volume_qos를 구현한 드라이버는 True로 보고합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">드라이버는 계산된 값을 자기 키(예: maxIOPS 또는 total_iops_sec)에 대응시켜, QoS spec의 같은 의미 키 대신 적용합니다. read와 write 분리 상한 같은 QoS spec의 다른 키는 계속 적용됩니다.</span></p>
 </div>
 </li>
-<li><p>When <code class="docutils literal notranslate"><span class="pre">qos</span></code> is given on create, the scheduler only considers backends
-reporting <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support=True</span></code>. If none match, the request fails
-with <code class="docutils literal notranslate"><span class="pre">NoValidBackend</span></code> before any volume is created on a backend.</p>
+</ul>
+<p>API checks:</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">생성 요청에 qos가 있으면 스케줄러는 per_volume_qos_support=True를 보고하는 백엔드만 고려합니다. 맞는 백엔드가 없으면 백엔드에 볼륨이 생성되기 전에 NoValidBackend로 요청이 실패합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">API 검사:</span></p>
+</div>
+<ul class="simple">
+<li><p>A new microversion adds an optional <code class="docutils literal notranslate"><span class="pre">qos</span></code> object to volume create and to
+<code class="docutils literal notranslate"><span class="pre">os-retype</span></code>, and a volume action <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code> for <code class="docutils literal notranslate"><span class="pre">available</span></code> or
+<code class="docutils literal notranslate"><span class="pre">in-use</span></code> volumes.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 microversion이 볼륨 생성과 os-retype에 선택 항목인 qos 객체를 추가하고, available 또는 in-use 상태 볼륨에 쓰는 볼륨 action os-set_qos를 추가합니다.</span></p>
 </div>
 </li>
-<li><p>On create with <code class="docutils literal notranslate"><span class="pre">qos</span></code> the volume manager calls <code class="docutils literal notranslate"><span class="pre">update_volume_qos</span></code> after
-the driver created the volume, so drivers do not need to change
-<code class="docutils literal notranslate"><span class="pre">create_volume</span></code> and its variants.</p>
+<li><p>The API rejects <code class="docutils literal notranslate"><span class="pre">qos</span></code> with 400 when the volume type does not have
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code>, and when a value is outside the range of the
+type. A limit without a range cannot be set by a project member. Callers
+allowed by the <code class="docutils literal notranslate"><span class="pre">volume:set_qos:any_value</span></code> policy skip the range check, but
+not the support check.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">qos가 포함된 생성 요청에서는 드라이버가 볼륨을 만든 뒤 볼륨 매니저가 update_volume_qos를 호출합니다. 따라서 드라이버는 create_volume과 그 변형 메서드들을 고칠 필요가 없습니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 타입에 per_volume_qos_support가 없거나 값이 타입의 범위를 벗어나면, API는 qos를 400으로 거부합니다. 범위가 없는 상한은 프로젝트 멤버가 설정할 수 없습니다. volume:set_qos:any_value 정책이 허용하는 호출자는 범위 검사를 건너뛰지만, 지원 여부 검사는 건너뛰지 않습니다.</span></p>
 </div>
 </li>
-<li><p>For <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code> the driver is called first and the database is updated
-only on success. On failure a user message is created and the stored
-values stay unchanged.</p>
+<li><p>If an administrator narrows the range of a type, values already set on
+volumes are kept. The new range is checked on the next <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code>.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">os-set_qos에서는 드라이버를 먼저 호출하고, 성공했을 때만 데이터베이스를 갱신합니다. 실패하면 사용자 메시지(user message)가 생성되고 저장된 값은 바뀌지 않습니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">관리자가 타입의 범위를 좁혀도 볼륨에 이미 설정된 값은 유지됩니다. 새 범위는 다음 os-set_qos 때 검사합니다.</span></p>
 </div>
 </li>
-<li><p>A per-volume limit takes precedence over the equivalent limit in the
-volume type QoS spec. The driver maps <code class="docutils literal notranslate"><span class="pre">max_iops</span></code> and <code class="docutils literal notranslate"><span class="pre">max_bps</span></code> to its
-own QoS spec keys (for example <code class="docutils literal notranslate"><span class="pre">maxIOPS</span></code> or <code class="docutils literal notranslate"><span class="pre">total_iops_sec</span></code>). Limits
-not set per volume keep coming from the QoS spec.</p>
+</ul>
+<p>Volume operations:</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨별 상한은 볼륨 타입 QoS spec의 같은 의미의 상한보다 우선합니다. 드라이버가 max_iops와 max_bps를 자신의 QoS spec 키(예: maxIOPS 또는 total_iops_sec)에 대응시킵니다. 볼륨별로 설정하지 않은 상한은 계속 QoS spec에서 가져옵니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 작업:</span></p>
+</div>
+<ul class="simple">
+<li><p>Create: for a type with <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code>, the volume manager calls
+<code class="docutils literal notranslate"><span class="pre">update_volume_qos</span></code> after the driver created the volume, so drivers do not
+need to change <code class="docutils literal notranslate"><span class="pre">create_volume</span></code> and its variants. If this fails, the volume
+is set to <code class="docutils literal notranslate"><span class="pre">error</span></code> and a user message is created, the same as when a driver
+fails to apply the volume type QoS spec during <code class="docutils literal notranslate"><span class="pre">create_volume</span></code>. The request
+is not rescheduled, since the volume already exists on the backend. The
+backend volume is removed when the user deletes the volume in <code class="docutils literal notranslate"><span class="pre">error</span></code>.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">생성: per_volume_qos_support가 있는 타입이면, 드라이버가 볼륨을 만든 뒤 볼륨 매니저가 update_volume_qos를 호출합니다. 따라서 드라이버는 create_volume과 그 변형 메서드를 고칠 필요가 없습니다. 이 호출이 실패하면 볼륨을 error로 두고 사용자 메시지를 생성합니다. create_volume 중 드라이버가 볼륨 타입 QoS spec 적용에 실패했을 때와 같습니다. 볼륨이 이미 백엔드에 있으므로 재스케줄하지 않습니다. 백엔드 볼륨은 사용자가 error 볼륨을 삭제할 때 정리됩니다.</span></p>
 </div>
 </li>
-<li><p>Volumes created from a snapshot, volume or backup do not inherit the limits.
-Migration keeps them. Retype keeps them, but is rejected with 400 when a
-value is outside the range of the new volume type, unless the caller is
-allowed by <code class="docutils literal notranslate"><span class="pre">volume:set_qos:any_value</span></code>.</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code>: the driver is called first and the database is updated only
+on success. On failure a user message is created and the stored values stay
+unchanged. <code class="docutils literal notranslate"><span class="pre">null</span></code> clears a per-volume value, so the type default applies
+again.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">스냅샷, 볼륨, 백업에서 생성한 볼륨은 상한을 물려받지 않습니다. 마이그레이션은 상한을 유지합니다. retype도 상한을 유지하지만, 값이 새 볼륨 타입의 범위를 벗어나면 400으로 거부됩니다. 단, 호출자가 volume:set_qos:any_value로 허용된 경우는 예외입니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">os-set_qos: 드라이버를 먼저 호출하고, 성공했을 때만 데이터베이스를 갱신합니다. 실패하면 사용자 메시지가 생성되고 저장된 값은 바뀌지 않습니다. null은 볼륨별 값을 지워 타입 기본값이 다시 적용되게 합니다.</span></p>
+</div>
+</li>
+<li><p>Retype: per-volume values are cleared, because they were checked against
+the old type. The values in <code class="docutils literal notranslate"><span class="pre">qos</span></code> of the retype request are used instead,
+checked against the range of the new type. Without them, the defaults of the
+new type apply. If the new type does not have <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code>, no
+per-volume limits are applied and the QoS spec of the new type applies as
+today.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">retype: 볼륨별 값은 이전 타입 기준으로 검사된 값이므로 지웁니다. 대신 retype 요청의 qos 값을 새 타입의 범위로 검사해 사용합니다. qos가 없으면 새 타입의 기본값이 적용됩니다. 새 타입에 per_volume_qos_support가 없으면 볼륨별 상한은 적용하지 않고, 새 타입의 QoS spec이 지금처럼 적용됩니다.</span></p>
+</div>
+</li>
+<li><p>Migration keeps the per-volume values, and the destination backend applies
+them.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">마이그레이션은 볼륨별 값을 유지하고, 대상 백엔드가 그 값을 적용합니다.</span></p>
+</div>
+</li>
+<li><p>Volumes created from a snapshot, volume or backup do not inherit the limits.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">스냅샷, 볼륨, 백업에서 생성한 볼륨은 상한을 물려받지 않습니다.</span></p>
+</div>
+</li>
+</ul>
+<p>Driver contract:</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">드라이버 계약:</span></p>
+</div>
+<ul class="simple">
+<li><p>New optional driver method <code class="docutils literal notranslate"><span class="pre">update_volume_qos(context,</span> <span class="pre">volume,</span> <span class="pre">qos)</span></code>,
+called with the computed values. The base driver raises
+<code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code>. A driver that implements it reports
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support=True</span></code>.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">선택 구현 드라이버 메서드 update_volume_qos(context, volume, qos)를 새로 추가하며, 계산된 값으로 호출됩니다. base 드라이버는 NotImplementedError를 발생시킵니다. 이를 구현한 드라이버는 per_volume_qos_support=True를 보고합니다.</span></p>
+</div>
+</li>
+<li><p>A driver must use the computed values wherever it applies QoS, for example
+on attach or retype, not only in <code class="docutils literal notranslate"><span class="pre">update_volume_qos</span></code>. Otherwise the volume
+type QoS spec would replace them. A common helper returns the computed values
+for a volume.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">드라이버는 update_volume_qos뿐 아니라 attach나 retype처럼 QoS를 적용하는 모든 곳에서 계산된 값을 써야 합니다. 그렇지 않으면 볼륨 타입 QoS spec이 그 값을 덮어씁니다. 볼륨의 계산된 값은 공통 헬퍼가 돌려줍니다.</span></p>
+</div>
+</li>
+<li><p>For a replicated volume, the driver also applies the limits to the
+secondary, so they stay after failover.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">복제(replication) 볼륨이면 드라이버는 secondary에도 상한을 적용해, failover 뒤에도 상한이 유지되게 합니다.</span></p>
 </div>
 </li>
 </ul>
@@ -391,6 +476,15 @@ the API and the drivers.</p>
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨 메타데이터에 QoS 값을 넣는 방식: 소유자가 범위 제한이나 검증 없이 아무 값이나 넣을 수 있고, 이 키들은 API와 드라이버 사이에 문서화되지 않은 약속이 됩니다.</span></p>
 </div>
 </li>
+<li><p>Range in the QoS spec instead of the volume type extra specs: project
+members cannot read QoS specs, and opening them would show every key of
+every QoS spec. Back-end QoS spec keys go to the drivers, and some drivers
+reject unknown keys (for example NetApp). A type without a QoS spec would
+need an empty one only to hold the range.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">범위를 볼륨 타입 extra spec 대신 QoS spec에 두는 방식: 프로젝트 멤버는 QoS spec을 읽을 수 없고, 열어 주면 모든 QoS spec의 모든 키가 보입니다. back-end QoS spec 키는 드라이버로 전달되는데, 모르는 키를 거부하는 드라이버가 있습니다(예: NetApp). QoS spec이 없는 타입은 범위만 담으려고 빈 QoS spec을 붙여야 합니다.</span></p>
+</div>
+</li>
 </ul>
 </section>
 <section id="data-model-impact">
@@ -398,12 +492,13 @@ the API and the drivers.</p>
 <div class="bilingual-entry docutils container">
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">데이터 모델 영향</span></p>
 </div>
-<p>Two nullable integer columns on <code class="docutils literal notranslate"><span class="pre">volumes</span></code>: <code class="docutils literal notranslate"><span class="pre">qos_max_iops</span></code> and
-<code class="docutils literal notranslate"><span class="pre">qos_max_bps</span></code>. <code class="docutils literal notranslate"><span class="pre">NULL</span></code> means use the volume type QoS spec, so existing rows
-need no data migration. The <code class="docutils literal notranslate"><span class="pre">Volume</span></code> object gets a new version, and
+<p>Two nullable columns on <code class="docutils literal notranslate"><span class="pre">volumes</span></code>: <code class="docutils literal notranslate"><span class="pre">qos_max_iops</span></code> (Integer) and
+<code class="docutils literal notranslate"><span class="pre">qos_max_bps</span></code> (BigInteger, since Integer stops at about 2.1 GB/s). <code class="docutils literal notranslate"><span class="pre">NULL</span></code>
+means no per-volume value, so the rules above apply and existing rows need no
+data migration. The <code class="docutils literal notranslate"><span class="pre">Volume</span></code> object gets a new version, and
 <code class="docutils literal notranslate"><span class="pre">obj_make_compatible</span></code> drops the fields for older targets.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">volumes 테이블에 nullable 정수 컬럼 두 개, qos_max_iops와 qos_max_bps를 추가합니다. NULL은 볼륨 타입 QoS spec을 따른다는 뜻이므로 기존 행에 데이터 마이그레이션이 필요 없습니다. Volume 객체는 새 버전이 되고, obj_make_compatible이 이전 버전 대상에 대해서는 이 필드들을 제거합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">volumes 테이블에 nullable 컬럼 두 개를 추가합니다: qos_max_iops(Integer)와 qos_max_bps(BigInteger, Integer는 약 2.1 GB/s가 한계이므로). NULL은 볼륨별 값이 없다는 뜻이므로 위 규칙이 적용되고, 기존 행에 데이터 마이그레이션이 필요 없습니다. Volume 객체는 새 버전이 되고, obj_make_compatible이 이전 버전 대상에 대해서는 이 필드들을 제거합니다.</span></p>
 </div>
 </section>
 <section id="rest-api-impact">
@@ -411,18 +506,20 @@ need no data migration. The <code class="docutils literal notranslate"><span cla
 <div class="bilingual-entry docutils container">
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">REST API 영향</span></p>
 </div>
-<p>Both changes are introduced in one new microversion.</p>
+<p>All changes are introduced in one new microversion.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">두 변경 모두 하나의 새 microversion으로 도입합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">모든 변경을 하나의 새 microversion으로 도입합니다.</span></p>
 </div>
 <p>Create a volume with limits:</p>
 <div class="bilingual-entry docutils container">
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">상한을 지정해 볼륨 생성:</span></p>
 </div>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/v3/{project_id}/volumes</span></code>, response 202, errors 400 and 403.</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/v3/{project_id}/volumes</span></code>, response 202, errors 400 (invalid
+values, values outside the range, or a type without
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code>) and 403.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">POST /v3/{project_id}/volumes, 응답 202, 오류 400과 403.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">POST /v3/{project_id}/volumes, 응답 202, 오류 400(잘못된 값, 범위를 벗어난 값, 또는 per_volume_qos_support가 없는 타입)과 403.</span></p>
 </div>
 </li>
 <li><p>New optional attribute (integers &gt;= 1, <code class="docutils literal notranslate"><span class="pre">qos</span></code> must not be empty):</p>
@@ -452,10 +549,10 @@ and <code class="docutils literal notranslate"><span class="pre">additionalPrope
 </div>
 </li>
 <li><p>Response 202. Errors: 400 (invalid values, values outside the range of the
-volume type, or volume not <code class="docutils literal notranslate"><span class="pre">available</span></code> or <code class="docutils literal notranslate"><span class="pre">in-use</span></code>), 403 (policy), 404
-(volume not found).</p>
+volume type, a type without <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code>, or volume not
+<code class="docutils literal notranslate"><span class="pre">available</span></code> or <code class="docutils literal notranslate"><span class="pre">in-use</span></code>), 403 (policy), 404 (volume not found).</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">응답 202. 오류: 400(잘못된 값, 볼륨 타입 범위를 벗어난 값, 또는 볼륨이 available이나 in-use 상태가 아님), 403(정책), 404(볼륨 없음).</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">응답 202. 오류: 400(잘못된 값, 볼륨 타입 범위를 벗어난 값, per_volume_qos_support가 없는 타입, 또는 볼륨이 available이나 in-use 상태가 아님), 403(정책), 404(볼륨 없음).</span></p>
 </div>
 </li>
 <li><p>Asynchronous (RPC cast). The new values show in the volume detail after the
@@ -465,19 +562,39 @@ backend accepted them. A backend failure is reported via user messages.</p>
 </div>
 </li>
 </ul>
+<p>Retype with limits:</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">상한을 지정해 retype:</span></p>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/v3/{project_id}/volumes/{volume_id}/action</span></code></p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">POST /v3/{project_id}/volumes/{volume_id}/action</span></p>
+</div>
+</li>
+<li><p>Body: <code class="docutils literal notranslate"><span class="pre">{&quot;os-retype&quot;:</span> <span class="pre">{&quot;new_type&quot;:</span> <span class="pre">&quot;gold&quot;,</span> <span class="pre">&quot;qos&quot;:</span> <span class="pre">{&quot;max_iops&quot;:</span> <span class="pre">8000}}}</span></code>.
+<code class="docutils literal notranslate"><span class="pre">qos</span></code> is optional and follows the same rules as on create, against the new
+type.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">본문: {"os-retype": {"new_type": "gold", "qos": {"max_iops": 8000}}}. qos는 선택 항목이며, 생성 때와 같은 규칙을 새 타입 기준으로 따릅니다.</span></p>
+</div>
+</li>
+</ul>
 <p>Volume detail returns <code class="docutils literal notranslate"><span class="pre">qos</span></code> with <code class="docutils literal notranslate"><span class="pre">max_iops</span></code> and <code class="docutils literal notranslate"><span class="pre">max_bps</span></code> (<code class="docutils literal notranslate"><span class="pre">null</span></code> when
 not set) from the new microversion.</p>
 <div class="bilingual-entry docutils container">
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 microversion부터 볼륨 상세 정보는 max_iops와 max_bps를 담은 qos를 반환합니다(설정되지 않았으면 null).</span></p>
 </div>
-<p>The four <code class="docutils literal notranslate"><span class="pre">per_volume_qos:*</span></code> range keys are added to the user visible extra
-specs, so project members can see the allowed range in the volume type.</p>
+<p><code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code> and the six <code class="docutils literal notranslate"><span class="pre">per_volume_qos:*</span></code> keys are added to
+the user visible extra specs, so project members can see which types allow
+per-volume limits and their ranges.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">per_volume_qos:* 범위 키 4개를 사용자에게 보이는 extra spec 목록에 추가해, 프로젝트 멤버가 볼륨 타입에서 허용 범위를 볼 수 있게 합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">per_volume_qos_support와 per_volume_qos:* 키 6개를 사용자에게 보이는 extra spec 목록에 추가해, 프로젝트 멤버가 볼륨별 상한을 허용하는 타입과 그 범위를 볼 수 있게 합니다.</span></p>
 </div>
-<p>Policy: two new rules, both also checked when <code class="docutils literal notranslate"><span class="pre">qos</span></code> is present on create.</p>
+<p>Policy: two new rules, also checked when <code class="docutils literal notranslate"><span class="pre">qos</span></code> is present on create or
+retype.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">정책: 새 규칙 두 개를 추가하며, 둘 다 생성 요청에 qos가 있을 때도 검사합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">정책: 새 규칙 두 개를 추가하며, 생성이나 retype 요청에 qos가 있을 때도 검사합니다.</span></p>
 </div>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">volume:set_qos</span></code>, default <code class="docutils literal notranslate"><span class="pre">rule:xena_system_admin_or_project_member</span></code>
@@ -544,9 +661,10 @@ need the new create argument and action.</p>
 <div class="bilingual-entry docutils container">
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">성능 영향</span></p>
 </div>
-<p>One extra backend call after creation, only when <code class="docutils literal notranslate"><span class="pre">qos</span></code> was given.</p>
+<p>One extra backend call after creation and retype, only for volume types with
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code>.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">생성 후 백엔드 호출이 한 번 늘어나며, qos가 지정된 경우에만 해당합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">per_volume_qos_support가 있는 볼륨 타입에 한해, 생성과 retype 뒤 백엔드 호출이 한 번 늘어납니다.</span></p>
 </div>
 </section>
 <section id="other-deployer-impact">
@@ -555,10 +673,11 @@ need the new create argument and action.</p>
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">기타 배포자 영향</span></p>
 </div>
 <p>New database migration. The API refuses to send the new RPC to an older volume
-service during a rolling upgrade. To let project members set limits, deployers
-add the <code class="docutils literal notranslate"><span class="pre">per_volume_qos:*</span></code> range extra specs to volume types.</p>
+service during a rolling upgrade. To allow per-volume limits, deployers add
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support='&lt;is&gt;</span> <span class="pre">True'</span></code> and the <code class="docutils literal notranslate"><span class="pre">per_volume_qos:*</span></code> range
+extra specs to volume types.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 데이터베이스 마이그레이션이 추가됩니다. 롤링 업그레이드 중에는 API가 이전 버전 볼륨 서비스로 새 RPC를 보내지 않습니다. 프로젝트 멤버가 상한을 설정하게 하려면 배포자가 볼륨 타입에 per_volume_qos:* 범위 extra spec을 추가합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">새 데이터베이스 마이그레이션이 추가됩니다. 롤링 업그레이드 중에는 API가 이전 버전 볼륨 서비스로 새 RPC를 보내지 않습니다. 볼륨별 상한을 허용하려면 배포자가 볼륨 타입에 per_volume_qos_support='&lt;is&gt; True'와 per_volume_qos:* 범위 extra spec을 추가합니다.</span></p>
 </div>
 </section>
 <section id="developer-impact">
@@ -567,10 +686,11 @@ add the <code class="docutils literal notranslate"><span class="pre">per_volume_
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">개발자 영향</span></p>
 </div>
 <p>Driver maintainers may implement <code class="docutils literal notranslate"><span class="pre">update_volume_qos</span></code> and then report
-<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support=True</span></code> in the volume stats. The support matrix
-gets a new row. Per-volume values must override the QoS spec.</p>
+<code class="docutils literal notranslate"><span class="pre">per_volume_qos_support=True</span></code> in the volume stats. They must use the
+computed values in every path that applies QoS, and on the replication
+secondary. The support matrix gets a new row.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">드라이버 메인테이너는 update_volume_qos를 구현할 수 있으며, 구현하면 볼륨 통계에 per_volume_qos_support=True를 보고합니다. support matrix에 새 행이 추가됩니다. 볼륨별 값은 QoS spec보다 우선해야 합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">드라이버 메인테이너는 update_volume_qos를 구현할 수 있으며, 구현하면 볼륨 통계에 per_volume_qos_support=True를 보고합니다. QoS를 적용하는 모든 경로와 복제 secondary에서 계산된 값을 써야 합니다. support matrix에 새 행이 추가됩니다.</span></p>
 </div>
 </section>
 </section>
@@ -602,14 +722,24 @@ gets a new row. Per-volume values must override the QoS spec.</p>
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">컬럼, 마이그레이션, Volume 객체 버전.</span></p>
 </div>
 </li>
-<li><p>Microversion: create schema, <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code>, view, policy.</p>
+<li><p>Microversion: create and retype schema, <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code>, view, policy.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Microversion: 생성 스키마, os-set_qos, view, 정책.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">Microversion: 생성과 retype 스키마, os-set_qos, view, 정책.</span></p>
 </div>
 </li>
-<li><p>Range check against the volume type on create, <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code> and retype.</p>
+<li><p>Extra spec checks for <code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code> and the range keys.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">생성, os-set_qos, retype 시 볼륨 타입 범위 검사.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">per_volume_qos_support와 범위 키에 대한 extra spec 검사.</span></p>
+</div>
+</li>
+<li><p>Range check on create, <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code> and retype.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">생성, os-set_qos, retype 시 범위 검사.</span></p>
+</div>
+</li>
+<li><p>Helper that computes the limits of a volume.</p>
+<div class="bilingual-entry docutils container">
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">볼륨의 상한을 계산하는 헬퍼.</span></p>
 </div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">volume.set_qos</span></code> notifications.</p>
@@ -617,14 +747,14 @@ gets a new row. Per-volume values must override the QoS spec.</p>
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">volume.set_qos 알림.</span></p>
 </div>
 </li>
-<li><p>RPC <code class="docutils literal notranslate"><span class="pre">set_volume_qos</span></code>, manager logic, create flow hook.</p>
+<li><p>RPC <code class="docutils literal notranslate"><span class="pre">set_volume_qos</span></code>, manager logic for create, retype and migration.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">RPC set_volume_qos, 매니저 로직, 생성 흐름 훅.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">RPC set_volume_qos, 생성·retype·마이그레이션용 매니저 로직.</span></p>
 </div>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code> capability and scheduler filtering on create.</p>
+<li><p><code class="docutils literal notranslate"><span class="pre">per_volume_qos_support</span></code> capability.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">per_volume_qos_support capability와 생성 시 스케줄러 필터링.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">per_volume_qos_support capability.</span></p>
 </div>
 </li>
 <li><p>Driver base method, support matrix, NetApp ONTAP and Dell PowerFlex.</p>
@@ -655,12 +785,12 @@ gets a new row. Per-volume values must override the QoS spec.</p>
 <div class="bilingual-entry docutils container">
 <p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">테스트</span></p>
 </div>
-<p>Tempest API tests for create with <code class="docutils literal notranslate"><span class="pre">qos</span></code> and <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code>, including
-values outside the range of the volume type, skipped when
+<p>Tempest API tests for create with <code class="docutils literal notranslate"><span class="pre">qos</span></code>, <code class="docutils literal notranslate"><span class="pre">os-set_qos</span></code> and retype,
+including values outside the range of the volume type, skipped when
 the backend does not support per-volume QoS. The LVM driver used in the gate
 does not implement it, so driver coverage comes from vendor third-party CI.</p>
 <div class="bilingual-entry docutils container">
-<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">qos를 포함한 생성과 os-set_qos에 대한 Tempest API 테스트를 추가하며(볼륨 타입 범위를 벗어난 값 포함), 백엔드가 볼륨별 QoS를 지원하지 않으면 건너뜁니다. 게이트에서 쓰는 LVM 드라이버는 이를 구현하지 않으므로, 드라이버 검증은 벤더 서드파티 CI가 담당합니다.</span></p>
+<p class="bilingual-translation"><strong>한국어</strong> <span class="bilingual-text">qos를 포함한 생성, os-set_qos, retype에 대한 Tempest API 테스트를 추가하며(볼륨 타입 범위를 벗어난 값 포함), 백엔드가 볼륨별 QoS를 지원하지 않으면 건너뜁니다. 게이트에서 쓰는 LVM 드라이버는 이를 구현하지 않으므로, 드라이버 검증은 벤더 서드파티 CI가 담당합니다.</span></p>
 </div>
 </section>
 <section id="documentation-impact">
@@ -874,7 +1004,7 @@ does not implement it, so driver coverage comes from vendor third-party CI.</p>
     gitURL = "Source: https://opendev.org/openstack/cinder-specs/src/doc/source" + "/" + sourceFile;
 
     /* gitsha, project and bug_tag rely on variables in conf.py */
-    var gitSha = "SHA: 2c54e609f6e216a2a4b237be62e9b88ba39d0543";
+    var gitSha = "SHA: 28e9fb87b0fb6b6ff730df3b02b0bf9c8073fe54";
     var repositoryName = "openstack/cinder-specs";
     var bugProject = "cinder-specs";
     var bugTitle = "Per-volume QoS at create time and online update in Cinder Specs";
