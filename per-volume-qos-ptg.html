@@ -101,8 +101,8 @@
       <div class="qa">
         <p class="q">Q. Can we extend this later, for example with read and write limits?</p>
         <p class="ko">나중에 read/write 분리 상한 같은 걸로 확장할 수 있나요?</p>
-        <p>A. Yes. The API uses a qos object, so we can add new fields and new columns in a later microversion.</p>
-        <p class="ko">네. API가 qos 객체를 쓰므로, 이후 microversion에서 새 필드와 컬럼을 추가하면 됩니다.</p>
+        <p>A. Yes. In the API, the limits are grouped in a &quot;qos&quot; field, so we can add keys like max_read_iops there. In the database, we add new columns to the volumes table. We can do this in a later microversion.</p>
+        <p class="ko">네. API에서는 상한 값들을 &quot;qos&quot; 필드로 묶어 두므로 거기에 max_read_iops 같은 키를 추가하면 됩니다. DB에는 volumes 테이블에 새 컬럼을 추가합니다. 이후 microversion에서 할 수 있습니다.</p>
       </div>
       <div class="qa">
         <p class="q">Q. Do we need a total IOPS quota per project?</p>
