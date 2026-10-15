@@ -87,6 +87,12 @@
         <p class="ko">front-end QoS는 바꾸지 않습니다. 하이퍼바이저가 계속 적용합니다. 그래서 실제 상한은 둘 중 낮은 값입니다.</p>
       </div>
       <div class="qa">
+        <p class="q">Q. What if the volume type has a maximum but no default?</p>
+        <p class="ko">볼륨 타입에 default 없이 max만 있으면 어떻게 되나요?</p>
+        <p>A. Then the maximum is used. So a volume without its own value gets the maximum of the range. The minimum is optional too. If it is not set, it is 1.</p>
+        <p class="ko">그러면 max가 적용됩니다. 그래서 자기 값이 없는 볼륨은 범위의 최대값을 받습니다. min도 선택 항목이며, 없으면 1입니다.</p>
+      </div>
+      <div class="qa">
         <p class="q">Q. What happens if applying QoS fails after the volume is created?</p>
         <p class="ko">볼륨을 만든 뒤 QoS 적용이 실패하면 어떻게 되나요?</p>
         <p>A. The same as today when a driver fails to apply the type's QoS. The volume goes to error and we create a user message. We don't reschedule, because the volume already exists.</p>
