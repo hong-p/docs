@@ -87,7 +87,7 @@
 
       <p>If you set a value on a volume, it takes priority over the volume type. If you don't set one, or you clear it, the volume uses the type's default.</p>
 
-      <p>When you retype a volume, it uses the QoS settings of the new type. The values set for the old type are not kept.</p>
+      <p>When you retype a volume, the old values are not kept. If the new volume type has QoS settings, the volume gets their default values.</p>
 
       <p>For now, this is only for QoS on the storage side. Each driver adds one method to update QoS. Cinder puts these volumes only on backends that support it.</p>
 
