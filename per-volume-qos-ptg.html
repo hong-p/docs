@@ -54,9 +54,9 @@
 
       <p>The admin enables it in the volume type. The admin also sets a min, a max, and a default value. Everyone, including admins, chooses a value between the minimum and the maximum. If a bigger value is needed, the admin changes the range.</p>
 
-      <p>If you set a value on a volume, it takes priority over the volume type. If you don't set one, or you clear it, the volume uses the type's default.</p>
+      <p>If you set a value on a volume, it takes priority over the volume type. If you don't set one, or you clear it, the volume uses the type's default. If there is no default, the type's QoS spec applies as before.</p>
 
-      <p>When you retype a volume, the old values are not kept. If the new volume type has QoS settings, the volume gets their default values.</p>
+      <p>When you retype a volume, values that fit the new type's range are kept. Other values are cleared, and the user gets a message.</p>
 
       <p>For now, this is only for QoS on the storage side. Each driver adds one method to update QoS. Cinder puts these volumes only on backends that support it.</p>
 
@@ -71,8 +71,8 @@
       <div class="qa">
         <p class="q">Q. Why not use volume metadata or admin metadata?</p>
         <p class="ko">왜 볼륨 메타데이터나 admin metadata를 쓰지 않나요?</p>
-        <p>A. Metadata is free-form text. There is no type check, no range check, and no API contract. With real columns, we get integers, validation, policy, and a microversioned API.</p>
-        <p class="ko">메타데이터는 자유 형식 텍스트라 타입 검사, 범위 검사, API 계약이 없습니다. 컬럼을 쓰면 정수 타입, 검증, 정책, microversion으로 관리되는 API를 얻습니다.</p>
+        <p>A. Metadata is free-form text. There is no type check, no range check, and no API contract. With a real column, we get validation, policy, and a microversioned API.</p>
+        <p class="ko">메타데이터는 자유 형식 텍스트라 타입 검사, 범위 검사, API 계약이 없습니다. 전용 컬럼을 쓰면 검증, 정책, microversion으로 관리되는 API를 얻습니다.</p>
       </div>
       <div class="qa">
         <p class="q">Q. Why put the range in volume type extra specs, not in the QoS spec?</p>
@@ -89,8 +89,8 @@
       <div class="qa">
         <p class="q">Q. What if the volume type has a maximum but no default?</p>
         <p class="ko">볼륨 타입에 default 없이 max만 있으면 어떻게 되나요?</p>
-        <p>A. Then the maximum is used. So a volume without its own value gets the maximum of the range. The minimum is optional too. If it is not set, it is 1.</p>
-        <p class="ko">그러면 max가 적용됩니다. 그래서 자기 값이 없는 볼륨은 범위의 최대값을 받습니다. min도 선택 항목이며, 없으면 1입니다.</p>
+        <p>A. Then no per-volume value is applied, and the type's QoS spec applies as before. The range only limits what users can set. The minimum is optional, and is 1 if not set.</p>
+        <p class="ko">그러면 볼륨별 값은 적용되지 않고, 타입의 QoS spec이 지금처럼 적용됩니다. 범위는 사용자가 설정할 수 있는 값을 제한할 뿐입니다. min은 선택 항목이며, 없으면 1입니다.</p>
       </div>
       <div class="qa">
         <p class="q">Q. What happens if applying QoS fails after the volume is created?</p>
@@ -107,8 +107,8 @@
       <div class="qa">
         <p class="q">Q. Can we extend this later, for example with read and write limits?</p>
         <p class="ko">나중에 read/write 분리 상한 같은 걸로 확장할 수 있나요?</p>
-        <p>A. Yes. In the API, the limits are grouped in a &quot;qos&quot; field, so we can add keys like max_read_iops there. In the database, we add new columns to the volumes table. We can do this in a later microversion.</p>
-        <p class="ko">네. API에서는 상한 값들을 &quot;qos&quot; 필드로 묶어 두므로 거기에 max_read_iops 같은 키를 추가하면 됩니다. DB에는 volumes 테이블에 새 컬럼을 추가합니다. 이후 microversion에서 할 수 있습니다.</p>
+        <p>A. Yes. In the API, the limits are grouped in a &quot;qos&quot; field, so we can add keys like max_read_iops there. In the database, it is one JSON column, so new keys need no migration. We can do this in a later microversion.</p>
+        <p class="ko">네. API에서는 상한 값들을 &quot;qos&quot; 필드로 묶어 두므로 거기에 max_read_iops 같은 키를 추가하면 됩니다. DB는 JSON 컬럼 하나라서 새 키에 마이그레이션이 필요 없습니다. 이후 microversion에서 할 수 있습니다.</p>
       </div>
       <div class="qa">
         <p class="q">Q. Do we need a total IOPS quota per project?</p>
@@ -125,8 +125,8 @@
       <div class="qa">
         <p class="q">Q. What about replication and failover?</p>
         <p class="ko">복제(replication)와 failover는요?</p>
-        <p>A. When the replica is created, it already gets QoS from the volume type. But per-volume values can change later. So when they are set or changed, the driver applies them to the replica too. That way, the limits stay the same after failover.</p>
-        <p class="ko">복제본은 만들어질 때 이미 볼륨 타입의 QoS가 적용됩니다. 하지만 볼륨별 값은 나중에 바뀔 수 있습니다. 그래서 값을 설정하거나 바꿀 때 드라이버가 복제본에도 적용합니다. 그러면 failover 뒤에도 상한이 똑같이 유지됩니다.</p>
+        <p>A. When the replica is created, it already gets QoS from the volume type. But per-volume values can change later. So when they are set or changed, the driver applies them to the replica too, where the backend supports it. Otherwise, it applies them when the replica becomes active.</p>
+        <p class="ko">복제본은 만들어질 때 이미 볼륨 타입의 QoS가 적용됩니다. 하지만 볼륨별 값은 나중에 바뀔 수 있습니다. 그래서 값을 설정하거나 바꿀 때 백엔드가 지원하면 드라이버가 복제본에도 적용합니다. 그렇지 않으면 복제본이 활성화될 때 적용합니다.</p>
       </div>
       <div class="qa">
         <p class="q">Q. How will you test this in the gate? LVM doesn't support it.</p>
@@ -136,7 +136,7 @@
       </div>
     </article>
     <footer>
-      Checked against the <a href="./specs/2027.1/per-volume-qos.html">2027.1 per-volume QoS spec</a> on October 15, 2026.
+      Checked against the <a href="./specs/2027.1/per-volume-qos.html">2027.1 per-volume QoS spec</a> on October 30, 2026.
       This is a proposal; upstream support is planned.
     </footer>
   </main>
